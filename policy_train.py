@@ -69,7 +69,7 @@ def main(config, gpu, docker, debug, eval, goal_idx=0, seed=0):
     print('cfg.agent', cfg.agent)
     print(list(range(variant['env_params']['n_tasks'])))
     # multi-processing
-    p = mp.Pool(mp.cpu_count())
+    p = mp.Pool(min(mp.cpu_count(), 5))
     if variant['env_params']['n_tasks'] > 1:
         p.starmap(experiment, product([variant], [cfg], list(range(variant['env_params']['n_tasks']))))
     else:
