@@ -37,6 +37,8 @@ def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
     env.reset_task(goal_idx)
     if "cuda" in cfg.device:
         os.environ["CUDA_VISIBLE_DEVICES"] = str(cfg.gpu_id)
+    os.environ["OMP_NUM_THREADS"] = str(16)
+    os.environ["KMP_AFFINITY"] = "compact,granularity\=fine"
     # NOTE: for new environment variable to be effective, torch should be imported after assignment
     from rlkit.torch.sac.pytorch_sac.train import Workspace
     workspace = Workspace(cfg=cfg, env=env, env_name=variant['env_name'], goal_idx=goal_idx)
