@@ -2,7 +2,7 @@
     "env_name": "sparse-point-robot",
     "n_train_tasks": 80,
     "n_eval_tasks": 20,
-    "seed_list": [21,22,23],
+    "seed_list": [],
     "randomize_tasks": 1,
     "env_params": {
         "n_tasks": 100,
