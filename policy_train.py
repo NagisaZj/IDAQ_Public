@@ -17,6 +17,8 @@ from rlkit.envs.wrappers import NormalizedBoxEnv
 from rlkit.envs import ENVS
 from configs.default import default_config
 
+import numpy as np
+
 
 def deep_update_dict(fr, to):
     ''' update dict of dicts with new values '''
@@ -65,13 +67,15 @@ def main(config, num_gpus, docker, debug, eval, goal_idx=0, seed=0):
         variant = deep_update_dict(exp_params, variant)
     variant['util_params']['num_gpus'] = num_gpus
 
+    random_task_id = np.ndarray.tolist(np.random.permutation(variant['env_params']['n_tasks']))
+
     #cfg.gpu_id = gpu
     #print('cfg.agent', cfg.agent)
     print(list(range(variant['env_params']['n_tasks'])))
     # multi-processing
     p = mp.Pool(min(mp.cpu_count(), num_gpus))
     if variant['env_params']['n_tasks'] > 1:
-        p.starmap(experiment, product([variant], [cfg], list(range(variant['env_params']['n_tasks']))))
+        p.starmap(experiment, product([variant], [cfg], random_task_id))
     else:
         experiment(variant=variant, cfg=cfg, goal_idx=goal_idx)
 
