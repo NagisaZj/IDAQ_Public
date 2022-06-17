@@ -36,7 +36,7 @@ def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
         env.seed(seed) 
     env.reset_task(goal_idx)
     if "cuda" in cfg.device:
-        os.environ["CUDA_VISIBLE_DEVICES"] = str(cfg.gpu_id)
+        os.environ["CUDA_VISIBLE_DEVICES"] = str(goal_idx % variant['util_params']['num_gpus'])
     os.environ["OMP_NUM_THREADS"] = str(16)
     os.environ["KMP_AFFINITY"] = "compact,granularity\=fine"
     # NOTE: for new environment variable to be effective, torch should be imported after assignment
@@ -51,11 +51,11 @@ def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
 
 @click.command()
 @click.argument("config", default="./configs/sparse-point-robot.json")
-@click.option("--gpu", default=0)
+@click.option("--num_gpus", default=8)
 @click.option("--docker", is_flag=True, default=False)
 @click.option("--debug", is_flag=True, default=False)
 @click.option("--eval", is_flag=True, default=False)
-def main(config, gpu, docker, debug, eval, goal_idx=0, seed=0):
+def main(config, num_gpus, docker, debug, eval, goal_idx=0, seed=0):
     variant = default_config
     cwd = os.getcwd()
     files = os.listdir(cwd)
@@ -63,10 +63,10 @@ def main(config, gpu, docker, debug, eval, goal_idx=0, seed=0):
         with open(os.path.join(config)) as f:
             exp_params = json.load(f)
         variant = deep_update_dict(exp_params, variant)
-    variant['util_params']['gpu_id'] = gpu
+    variant['util_params']['num_gpus'] = num_gpus
 
-    cfg.gpu_id = gpu
-    print('cfg.agent', cfg.agent)
+    #cfg.gpu_id = gpu
+    #print('cfg.agent', cfg.agent)
     print(list(range(variant['env_params']['n_tasks'])))
     # multi-processing
     p = mp.Pool(min(mp.cpu_count(), 5))
