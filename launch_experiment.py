@@ -183,8 +183,9 @@ def deep_update_dict(fr, to):
 
 @click.command()
 @click.argument('config', default=None)
+@click.argument('data_dir', default=None)
 @click.option('--gpu', default=0)
-def main(config, gpu):
+def main(config, data_dir, gpu):
 
     variant = default_config
     if config:
@@ -192,6 +193,7 @@ def main(config, gpu):
             exp_params = json.load(f)
         variant = deep_update_dict(exp_params, variant)
     variant['util_params']['gpu_id'] = gpu
+    variant['algo_params']['data_dir'] = data_dir
 
     # multi-processing
     p = mp.Pool(mp.cpu_count())
