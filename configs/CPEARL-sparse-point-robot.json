@@ -32,7 +32,6 @@
         "eval_epoch": 4800,
         "sample": 1,
         "n_trj": 50,
-        "agent_type": "Contrastive",
         "data_dir": "./data/sparse-point-robot",
         "divergence_name": "kl",
         "use_brac": 0,
