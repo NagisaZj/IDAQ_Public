@@ -937,7 +937,7 @@ class FOCALSoftActorCriticModel(OfflineMetaRLAlgorithm):
             return False
 
 
-class COMRL(OMRLOnlineAdaptAlgorithm):
+class CPEARL(OMRLOnlineAdaptAlgorithm):
     def __init__(
             self,
             env,
