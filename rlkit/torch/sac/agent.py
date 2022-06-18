@@ -325,14 +325,21 @@ class OldPEARLAgent(nn.Module):
         kl_div_sum = torch.sum(torch.stack(kl_divs))
         return kl_div_sum
 
-    def infer_posterior(self, context):
+    def infer_posterior(self, context, task_indices=None):
         ''' compute q(z|c) as a function of input context and sample new z from it'''
         params = self.context_encoder(context)
         params = params.view(context.size(0), -1, self.context_encoder.output_size)
+        if task_indices is None:
+            self.task_indices = np.zeros((context.size(0),))
+        elif not hasattr(task_indices, '__iter__'):
+            self.task_indices = np.array([task_indices])
+        else:
+            self.task_indices = np.array(task_indices)
         # with probabilistic z, predict mean and variance of q(z | c)
         if self.use_ib:
             mu = params[..., :self.latent_dim]
             sigma_squared = F.softplus(params[..., self.latent_dim:])
+            # permutation invariant encoding
             z_params = [_product_of_gaussians(m, s) for m, s in zip(torch.unbind(mu), torch.unbind(sigma_squared))]
             self.z_means = torch.stack([p[0] for p in z_params])
             self.z_vars = torch.stack([p[1] for p in z_params])
