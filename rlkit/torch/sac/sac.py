@@ -7,7 +7,7 @@ from torch import nn as nn
 from collections import OrderedDict
 from itertools import product
 from rlkit.core.eval_util import create_stats_ordered_dict
-from rlkit.core.rl_algorithm import OfflineMetaRLAlgorithm
+from rlkit.core.rl_algorithm import OfflineMetaRLAlgorithm, OMRLOnlineAdaptAlgorithm
 from rlkit.torch.brac import divergences
 from rlkit.torch.brac import utils
 
@@ -937,7 +937,7 @@ class FOCALSoftActorCriticModel(OfflineMetaRLAlgorithm):
             return False
 
 
-class COMRL(OfflineMetaRLAlgorithm):
+class COMRL(OMRLOnlineAdaptAlgorithm):
     def __init__(
             self,
             env,
