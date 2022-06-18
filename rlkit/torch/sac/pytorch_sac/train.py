@@ -99,7 +99,7 @@ class Workspace(object):
                 obs = new_obs
                 episode_reward += reward
                 self.video_recorder.record(self.env, self.mujoco)
-                print(done, action, obs, reward)
+                #print(done, action, obs, reward)
 
 
             self.video_recorder.save(f'{self.step}.mp4')
