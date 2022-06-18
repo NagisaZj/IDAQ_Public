@@ -287,7 +287,7 @@ class OldPEARLAgent(nn.Module):
         # reset the context collected so far
         self.context = None
         # reset any hidden state in the encoder network (relevant for RNN)
-        self.context_encoder.reset(num_tasks)
+        #self.context_encoder.reset(num_tasks)
 
     def detach_z(self):
         ''' disable backprop through z '''
@@ -302,7 +302,10 @@ class OldPEARLAgent(nn.Module):
             r = info['sparse_reward']
         o = ptu.from_numpy(o[None, None, ...])
         a = ptu.from_numpy(a[None, None, ...])
-        r = ptu.from_numpy(np.array([r])[None, None, ...])
+        if len(r.shape) == 0:
+            r = ptu.from_numpy(np.array([r])[None, None, ...])
+        else:
+            r = ptu.from_numpy(r[None, None, ...])
         no = ptu.from_numpy(no[None, None, ...])
 
         if self.use_next_obs_in_context:
