@@ -86,7 +86,7 @@ class PEARLAgent(nn.Module):
         # reset the context collected so far
         self.context = None
         # reset any hidden state in the encoder network (relevant for RNN)
-        self.context_encoder.reset(num_tasks)
+        #self.context_encoder.reset(num_tasks)
 
     def detach_z(self):
         ''' disable backprop through z '''
@@ -101,11 +101,35 @@ class PEARLAgent(nn.Module):
             r = info['sparse_reward']
         o = ptu.from_numpy(o[None, None, ...])
         a = ptu.from_numpy(a[None, None, ...])
-        r = ptu.from_numpy(np.array([r])[None, None, ...])
+        if len(r.shape) == 0:
+            r = ptu.from_numpy(np.array([r])[None, None, ...])
+        else:
+            r = ptu.from_numpy(r[None, None, ...])
         no = ptu.from_numpy(no[None, None, ...])
-
         if self.use_next_obs_in_context:
             data = torch.cat([o, a, r, no], dim=2)
+        else:
+            data = torch.cat([o, a, r], dim=2)
+        if self.context is None:
+            self.context = data
+        else:
+            self.context = torch.cat([self.context, data], dim=1)
+ 
+    def update_context_dict(self, batch_dict, env):
+        ''' append context dictionary containing single/multiple transitions to the current context '''
+        o = ptu.from_numpy(batch_dict['observations'][None, ...])
+        a = ptu.from_numpy(batch_dict['actions'][None, ...])
+        next_o = ptu.from_numpy(batch_dict['next_observations'][None, ...])
+        if callable(getattr(env, "sparsify_rewards", None)) and self.sparse_rewards:
+            r = batch_dict['rewards']
+            sr = []
+            for r_entry in r:
+                sr.append(env.sparsify_rewards(r_entry))
+            r = ptu.from_numpy(np.array(sr)[None, ...])
+        else:
+            r = ptu.from_numpy(batch_dict['rewards'][None, ...])
+        if self.use_next_obs_in_context:
+            data = torch.cat([o, a, r, next_o], dim=2)
         else:
             data = torch.cat([o, a, r], dim=2)
         if self.context is None:
@@ -115,26 +139,35 @@ class PEARLAgent(nn.Module):
 
     def compute_kl_div(self):
         ''' compute KL( q(z|c) || r(z) ) '''
-        prior = torch.distributions.Normal(ptu.zeros(self.latent_dim), ptu.ones(self.latent_dim))
+        prior = torch.distributions.Normal(ptu.zeros(self.latent_dim), 0.05*ptu.ones(self.latent_dim))
         posteriors = [torch.distributions.Normal(mu, torch.sqrt(var)) for mu, var in zip(torch.unbind(self.z_means), torch.unbind(self.z_vars))]
         kl_divs = [torch.distributions.kl.kl_divergence(post, prior) for post in posteriors]
         kl_div_sum = torch.sum(torch.stack(kl_divs))
         return kl_div_sum
 
-    def infer_posterior(self, context):
+    def infer_posterior(self, context, task_indices=None):
         ''' compute q(z|c) as a function of input context and sample new z from it'''
         params = self.context_encoder(context)
         params = params.view(context.size(0), -1, self.context_encoder.output_size)
+        if task_indices is None:
+            self.task_indices = np.zeros((context.size(0),))
+        elif not hasattr(task_indices, '__iter__'):
+            self.task_indices = np.array([task_indices])
+        else:
+            self.task_indices = np.array(task_indices)
         # with probabilistic z, predict mean and variance of q(z | c)
         if self.use_ib:
             mu = params[..., :self.latent_dim]
             sigma_squared = F.softplus(params[..., self.latent_dim:])
+            # permutation invariant encoding
             z_params = [_product_of_gaussians(m, s) for m, s in zip(torch.unbind(mu), torch.unbind(sigma_squared))]
             self.z_means = torch.stack([p[0] for p in z_params])
             self.z_vars = torch.stack([p[1] for p in z_params])
         # sum rather than product of gaussians structure
         else:
-            self.z_means = torch.mean(params, dim=1)
+
+            self.z_means = torch.mean(params, dim=1) # dim: task, batch, feature (latent dim)
+            self.z_vars = torch.std(params, dim=1)
         self.sample_z()
 
     def sample_z(self):
@@ -155,32 +188,54 @@ class PEARLAgent(nn.Module):
     def set_num_steps_total(self, n):
         self.policy.set_num_steps_total(n)
 
-    def forward(self, obs, context):
+    def forward(self, obs, context, task_indices=None):
         ''' given context, get statistics under the current policy of a set of observations '''
-        self.infer_posterior(context)
+        self.infer_posterior(context, task_indices=task_indices)
         self.sample_z()
 
         task_z = self.z
 
+        # self.meta_batch * self.batch_size * dim(obs)
         t, b, _ = obs.size()
         obs = obs.view(t * b, -1)
         task_z = [z.repeat(b, 1) for z in task_z]
         task_z = torch.cat(task_z, dim=0)
-
         # run policy, get log probs and new actions
-        in_ = torch.cat([obs, task_z.detach()], dim=1)
-        policy_outputs = self.policy(in_, reparameterize=True, return_log_prob=True)
+        in_ = torch.cat([obs, task_z], dim=1)
+        policy_outputs = self.policy(t, b, in_, reparameterize=True, return_log_prob=True)
 
+        if not self.use_ib:
+            task_z_vars = [z.repeat(b, 1) for z in self.z_vars]
+            task_z_vars = torch.cat(task_z_vars, dim=0)
+            return policy_outputs, task_z, task_z_vars
         return policy_outputs, task_z
 
     def log_diagnostics(self, eval_statistics):
-        '''
-        adds logging data about encodings to eval_statistics
-        '''
-        z_mean = np.mean(np.abs(ptu.get_numpy(self.z_means[0])))
+        # adds logging data about encodings to eval_statistics
+        # z_mean = np.mean(np.abs(ptu.get_numpy(self.z_means[0])))
+        
+
+        for i in range(len(self.z_means[0])):
+            z_mean = ptu.get_numpy(self.z_means[0][i])
+            name = 'Z mean eval' + str(i)
+            eval_statistics[name] = z_mean
+        #z_mean1 = ptu.get_numpy(self.z_means[0][0])
+        #z_mean2 = ptu.get_numpy(self.z_means[0][1])
+        #z_mean3 = ptu.get_numpy(self.z_means[0][2])
+        #z_mean4 = ptu.get_numpy(self.z_means[0][3])
+        #z_mean5 = ptu.get_numpy(self.z_means[0][4])
+
+        #eval_statistics['Z mean eval1'] = z_mean1
+        #eval_statistics['Z mean eval2'] = z_mean2
+        #eval_statistics['Z mean eval3'] = z_mean3
+        #eval_statistics['Z mean eval4'] = z_mean4
+        #eval_statistics['Z mean eval5'] = z_mean5
         z_sig = np.mean(ptu.get_numpy(self.z_vars[0]))
-        eval_statistics['Z mean eval'] = z_mean
         eval_statistics['Z variance eval'] = z_sig
+
+        # eval_statistics['Z mean eval'] = z_mean
+        # eval_statistics['Z variance eval'] = z_sig
+        eval_statistics['task_idx'] = self.task_indices[0]
 
     @property
     def networks(self):
