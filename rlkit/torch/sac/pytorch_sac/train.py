@@ -69,6 +69,9 @@ class Workspace(object):
         print('cfg.agent',cfg.agent)
         self.agent = hydra.utils.instantiate(cfg.agent)
 
+        if cfg.is_uniform:
+            self.agent.actor.is_uniform = True
+
         self.replay_buffer = ReplayBuffer(self.env.observation_space.shape,
                                           self.env.action_space.shape,
                                           int(cfg.replay_buffer_capacity),

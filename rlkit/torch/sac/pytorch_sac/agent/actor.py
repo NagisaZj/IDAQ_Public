@@ -67,6 +67,7 @@ class DiagGaussianActor(nn.Module):
 
         self.outputs = dict()
         self.apply(utils.weight_init)
+        self.is_uniform = False
 
     def forward(self, obs):
         mu, log_std = self.trunk(obs).chunk(2, dim=-1)
@@ -78,6 +79,9 @@ class DiagGaussianActor(nn.Module):
                                                                      1)
 
         std = log_std.exp()
+
+        if self.is_uniform:
+            std = std * 0. + 0.4
 
         self.outputs['mu'] = mu
         self.outputs['std'] = std
