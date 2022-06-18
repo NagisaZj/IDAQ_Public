@@ -73,6 +73,7 @@ class OfflineMetaRLAlgorithm(metaclass=abc.ABCMeta):
 		self.n_trj = kwargs['n_trj']
 		self.allow_eval = kwargs['allow_eval']
 		self.mb_replace = kwargs['mb_replace']
+		self.is_zloss = kwargs['is_zloss']
 
 		self.eval_deterministic = eval_deterministic
 		self.render = render
@@ -470,7 +471,7 @@ class OfflineMetaRLAlgorithm(metaclass=abc.ABCMeta):
 			# Sample train tasks and compute gradient updates on parameters.
 			for train_step in range(self.num_train_steps_per_itr):
 				indices = np.random.choice(self.train_tasks, self.meta_batch, replace=self.mb_replace)
-				z_means, z_vars = self._do_training(indices, zloss=True)
+				z_means, z_vars = self._do_training(indices, zloss=self.is_zloss)
 				indices_lst.append(indices)
 				z_means_lst.append(z_means)
 				z_vars_lst.append(z_vars)
@@ -878,75 +879,6 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
             goal_radius=goal_radius,
             **kwargs
         )
-
-	def train(self):
-		'''
-		meta-training loop
-		'''
-		params = self.get_epoch_snapshot(-1)
-		logger.save_itr_params(-1, params)
-		gt.reset()
-		gt.set_def_unique(False)
-		self._current_path_builder = PathBuilder()
-
-		# at each iteration, we first collect data from tasks, perform meta-updates, then try to evaluate
-		for it_ in gt.timed_for(range(self.num_iterations), save_itrs=True):
-			self._start_epoch(it_)
-			self.training_mode(True)
-			if it_ == 0:
-				print('collecting initial pool of data for train and eval')
-				# temp for evaluating
-				for idx in self.train_tasks:
-					self.task_idx = idx
-					self.env.reset_task(idx)
-					self.collect_data(self.num_initial_steps, 1, np.inf, buffer=self.train_buffer)
-			# Sample data from train tasks.
-			for i in range(self.num_tasks_sample):
-				idx = np.random.choice(self.train_tasks, 1)[0]
-				self.task_idx = idx
-				self.env.reset_task(idx)
-				self.enc_replay_buffer.task_buffers[idx].clear()
-
-				# collect some trajectories with z ~ prior
-				if self.num_steps_prior > 0:
-					self.collect_data(self.num_steps_prior, 1, np.inf, buffer=self.train_buffer)
-				# collect some trajectories with z ~ posterior
-				if self.num_steps_posterior > 0:
-					self.collect_data(self.num_steps_posterior, 1, self.update_post_train, buffer=self.train_buffer)
-				# even if encoder is trained only on samples from the prior, the policy needs to learn to handle z ~ posterior
-				if self.num_extra_rl_steps_posterior > 0:
-					self.collect_data(self.num_extra_rl_steps_posterior, 1, self.update_post_train,
-					                  buffer=self.train_buffer,
-					                  add_to_enc_buffer=False)
-
-			indices_lst = []
-			z_means_lst = []
-			z_vars_lst = []
-			# Sample train tasks and compute gradient updates on parameters.
-			for train_step in range(self.num_train_steps_per_itr):
-				indices = np.random.choice(self.train_tasks, self.meta_batch, replace=self.mb_replace)
-				z_means, z_vars = self._do_training(indices, zloss=False)
-				indices_lst.append(indices)
-				z_means_lst.append(z_means)
-				z_vars_lst.append(z_vars)
-				self._n_train_steps_total += 1
-
-			indices = np.concatenate(indices_lst)
-			z_means = np.concatenate(z_means_lst)
-			z_vars = np.concatenate(z_vars_lst)
-			data_dict = self.data_dict(indices, z_means, z_vars)
-			logger.save_itr_data(it_, **data_dict)
-			gt.stamp('train')
-			self.training_mode(False)
-			# eval
-			params = self.get_epoch_snapshot(it_)
-			logger.save_itr_params(it_, params)
-
-			if self.allow_eval:
-				logger.save_extra_data(self.get_extra_data_to_save(it_))
-				self._try_to_eval(it_)
-				gt.stamp('eval')
-			self._end_epoch()
 
 	def _do_eval(self, indices, epoch):
 		final_returns = []
