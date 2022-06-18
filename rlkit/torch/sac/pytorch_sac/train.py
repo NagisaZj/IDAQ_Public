@@ -153,7 +153,7 @@ class Workspace(object):
                 if self.step > self.cfg.num_seed_steps and self.step % self.cfg.eval_frequency == 0:
                     self.logger.log('eval/episode', episode, self.step)
                     self.evaluate()
-                    #self.evaluate_sample()
+                    self.evaluate_sample()
                     if self.step > self.cfg.num_seed_steps:
                         self.agent.save_model(output=self.work_dir, step=self.step)
                 self.logger.log('train/episode_reward', episode_reward,
