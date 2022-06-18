@@ -57,7 +57,8 @@ def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
 @click.option("--docker", is_flag=True, default=False)
 @click.option("--debug", is_flag=True, default=False)
 @click.option("--eval", is_flag=True, default=False)
-def main(config, num_gpus, docker, debug, eval, goal_idx=0, seed=0):
+@click.option("--is_uniform", is_flag=True, default=False)
+def main(config, num_gpus, docker, debug, eval, is_uniform, goal_idx=0, seed=0):
     variant = default_config
     cwd = os.getcwd()
     files = os.listdir(cwd)
@@ -68,6 +69,9 @@ def main(config, num_gpus, docker, debug, eval, goal_idx=0, seed=0):
     variant['util_params']['num_gpus'] = num_gpus
 
     random_task_id = np.ndarray.tolist(np.random.permutation(variant['env_params']['n_tasks']))
+
+    cfg.is_uniform = is_uniform
+    print('cfg.is_uniform', cfg.is_uniform)
 
     #cfg.gpu_id = gpu
     #print('cfg.agent', cfg.agent)
