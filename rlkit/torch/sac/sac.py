@@ -1111,7 +1111,7 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
         for i in range(num_updates):
             context = context_batch[:, i * mb_size: i * mb_size + mb_size, :]
             self.loss['step'] = self._num_steps
-            z_means, z_vars = self._take_step(indices, context, zloss=zloss)
+            z_means, z_vars = self._take_step(indices, context)
             self._num_steps += 1
             z_means_lst.append(z_means[None, ...])
             z_vars_lst.append(z_vars[None, ...])
@@ -1138,7 +1138,7 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
         if self.use_information_bottleneck:
             policy_outputs, task_z = self.agent(obs, context, task_indices=indices)
         else:
-            policy_outputs, task_z, task_z_vars = self.agent(obs, context, task_indices=indices)
+            raise NotImplementedError
         new_actions, policy_mean, policy_log_std, log_pi = policy_outputs[:4]
 
         # flattens out the task dimension
@@ -1153,24 +1153,7 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
         c_loss.backward(retain_graph=True)
         self.c_optimizer.step()
 
-    def z_loss(self, indices, task_z, task_z_vars, b, epsilon=1e-3, threshold=0.999):
-        pos_z_loss = 0.
-        neg_z_loss = 0.
-        pos_cnt = 0
-        neg_cnt = 0
-        for i in range(len(indices)):
-            idx_i = i * b  # index in task * batch dim
-            for j in range(i + 1, len(indices)):
-                idx_j = j * b  # index in task * batch dim
-                if indices[i] == indices[j]:
-                    pos_z_loss += torch.sqrt(torch.mean((task_z[idx_i] - task_z[idx_j]) ** 2) + epsilon)
-                    pos_cnt += 1
-                else:
-                    neg_z_loss += 1 / (torch.mean((task_z[idx_i] - task_z[idx_j]) ** 2) + epsilon * 100)
-                    neg_cnt += 1
-        return pos_z_loss / (pos_cnt + epsilon) + neg_z_loss / (neg_cnt + epsilon)
-
-    def _take_step(self, indices, context, zloss=False):
+    def _take_step(self, indices, context):
         obs_dim = int(np.prod(self.env.observation_space.shape))
         action_dim = int(np.prod(self.env.action_space.shape))
         reward_in_context = context[:, :, obs_dim + action_dim].cpu().numpy()
@@ -1183,8 +1166,7 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
         if self.use_information_bottleneck:
             policy_outputs, task_z = self.agent(obs, context, task_indices=indices)
         else:
-            policy_outputs, task_z, task_z_vars = self.agent(obs, context, task_indices=indices)
-            # policy_outputs, task_z, task_z_vars, task_zp, task_zp_vars = self.agent(obs, context, task_indices=indices)
+            raise NotImplementedError
 
         # flattens out the task dimension
         t, b, _ = obs.size()
@@ -1234,10 +1216,8 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
             kl_div = self.agent.compute_kl_div()
             kl_loss = self.kl_lambda * kl_div
             kl_loss.backward(retain_graph=True)
-        elif zloss:
-            z_loss = self.z_loss_weight * self.z_loss(indices=indices, task_z=task_z, task_z_vars=task_z_vars, b=b)
-            z_loss.backward(retain_graph=True)
-            self.loss["z_loss"] = z_loss.item()
+        else:
+            raise NotImplementedError
         self.context_optimizer.step()
 
         # qf and encoder update (note encoder does not get grads from policy or vf)
@@ -1366,8 +1346,8 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
             if self.use_information_bottleneck:
                 self.eval_statistics['KL Divergence'] = ptu.get_numpy(kl_div)
                 self.eval_statistics['KL Loss'] = ptu.get_numpy(kl_loss)
-            elif zloss:
-                self.eval_statistics['Z Loss'] = ptu.get_numpy(z_loss)
+            else:
+                raise NotImplementedError
 
             self.eval_statistics['QF Loss'] = np.mean(ptu.get_numpy(qf_loss))
             self.eval_statistics['VF Loss'] = np.mean(ptu.get_numpy(vf_loss))
