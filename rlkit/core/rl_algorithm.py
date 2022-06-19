@@ -924,7 +924,6 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 			self.task_idx = idx
 			self.env.reset_task(idx)
 			paths = []
-			all_rets = []
 			for _ in range(self.num_steps_per_eval // self.max_path_length):
 				context = self.sample_context(idx)
 				self.agent.infer_posterior(context)
@@ -933,15 +932,15 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 				                                   accum_context=False,
 				                                   max_trajs=1,
 				                                   resample=np.inf)
-				if self.sparse_rewards:
-					for px in p:
-						sparse_rewards = np.stack(e['sparse_reward'] for e in px['env_infos']).reshape(-1, 1)
-						px['rewards'] = sparse_rewards
 				paths += p
-				all_rets.append(eval_util.get_average_returns(p))
+
+			if self.sparse_rewards:
+				for p in paths:
+					sparse_rewards = np.stack(e['sparse_reward'] for e in p['env_infos']).reshape(-1, 1)
+					p['rewards'] = sparse_rewards
 
 			train_returns.append(eval_util.get_average_returns(paths))
-			buffercontext_returns.append(all_rets)
+			buffercontext_returns.append([eval_util.get_average_returns([p]) for p in paths])
 
 		train_returns = np.mean(train_returns)
 		n = min([len(t) for t in buffercontext_returns])
