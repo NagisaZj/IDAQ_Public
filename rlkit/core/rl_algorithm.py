@@ -919,10 +919,12 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 		eval_util.dprint('evaluating on {} train tasks'.format(len(indices)))
 		### eval train tasks with posterior sampled from the training replay buffer
 		train_returns = []
+		buffercontext_returns = []
 		for idx in indices:
 			self.task_idx = idx
 			self.env.reset_task(idx)
 			paths = []
+			all_rets = []
 			for _ in range(self.num_steps_per_eval // self.max_path_length):
 				context = self.sample_context(idx)
 				self.agent.infer_posterior(context)
@@ -931,15 +933,25 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 				                                   accum_context=False,
 				                                   max_trajs=1,
 				                                   resample=np.inf)
+				if self.sparse_rewards:
+					for px in p:
+						sparse_rewards = np.stack(e['sparse_reward'] for e in px['env_infos']).reshape(-1, 1)
+						px['rewards'] = sparse_rewards
 				paths += p
-
-			if self.sparse_rewards:
-				for p in paths:
-					sparse_rewards = np.stack(e['sparse_reward'] for e in p['env_infos']).reshape(-1, 1)
-					p['rewards'] = sparse_rewards
+				all_rets.append([eval_util.get_average_returns([px]) for px in p])
 
 			train_returns.append(eval_util.get_average_returns(paths))
+			# record online returns for the first n trajectories
+			n = min([len(a) for a in all_rets])
+			all_rets = [a[:n] for a in all_rets]
+			all_rets = np.mean(np.stack(all_rets), axis=0)  # avg return per nth rollout
+			buffercontext_returns.append(all_rets)
+
 		train_returns = np.mean(train_returns)
+		n = min([len(t) for t in buffercontext_returns])
+		buffercontext_returns = [t[:n] for t in buffercontext_returns]
+		eval_util.dprint('online returns with buffer context')
+		eval_util.dprint(buffercontext_returns)
 		### eval train tasks with on-policy data to match eval of test tasks
 		train_final_returns, train_online_returns = self._do_eval(indices, epoch)
 		eval_util.dprint('train online returns')
