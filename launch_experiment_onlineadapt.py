@@ -15,7 +15,7 @@ from rlkit.envs import ENVS
 from rlkit.envs.wrappers import NormalizedBoxEnv
 from rlkit.torch.sac.policies import TanhGaussianPolicy
 from rlkit.torch.networks import FlattenMlp, MlpEncoder, RecurrentEncoder
-from rlkit.torch.sac.sac import FOCALSoftActorCritic
+from rlkit.torch.sac.sac import FOCALSoftActorCriticOnlineAdapt
 from rlkit.torch.sac.agent import PEARLAgent
 from rlkit.launchers.launcher_util import setup_logger
 import rlkit.torch.pytorch_util as ptu
@@ -101,7 +101,7 @@ def experiment(variant, seed=None):
             train_tasks = rng.choice(len(tasks), size=variant['n_train_tasks'], replace=False)
             eval_tasks = set(range(len(tasks))).difference(train_tasks)
             if 'goal_radius' in variant['env_params']:
-                algorithm = FOCALSoftActorCritic(
+                algorithm = FOCALSoftActorCriticOnlineAdapt(
                     env=env,
                     train_tasks=train_tasks,
                     eval_tasks=eval_tasks,
@@ -111,7 +111,7 @@ def experiment(variant, seed=None):
                     **variant['algo_params']
                 )
             else:
-                algorithm = FOCALSoftActorCritic(
+                algorithm = FOCALSoftActorCriticOnlineAdapt(
                     env=env,
                     train_tasks=list(tasks[:variant['n_train_tasks']]),
                     eval_tasks=list(tasks[-variant['n_eval_tasks']:]),
@@ -121,7 +121,7 @@ def experiment(variant, seed=None):
                 )
         else:
             if 'goal_radius' in variant['env_params']:
-                algorithm = FOCALSoftActorCritic(
+                algorithm = FOCALSoftActorCriticOnlineAdapt(
                     env=env,
                     train_tasks=list(tasks[:variant['n_train_tasks']]),
                     eval_tasks=list(tasks[-variant['n_eval_tasks']:]),
@@ -131,7 +131,7 @@ def experiment(variant, seed=None):
                     **variant['algo_params']
                 )
             else:
-                algorithm = FOCALSoftActorCritic(
+                algorithm = FOCALSoftActorCriticOnlineAdapt(
                     env=env,
                     train_tasks=list(tasks[:variant['n_train_tasks']]),
                     eval_tasks=list(tasks[-variant['n_eval_tasks']:]),
@@ -185,7 +185,8 @@ def deep_update_dict(fr, to):
 @click.argument('config', default=None)
 @click.argument('data_dir', default=None)
 @click.option('--gpu', default=0)
-def main(config, data_dir, gpu):
+@click.option("--is_sparse_reward", default=0)
+def main(config, data_dir, gpu, is_sparse_reward):
 
     variant = default_config
     if config:
@@ -194,6 +195,7 @@ def main(config, data_dir, gpu):
         variant = deep_update_dict(exp_params, variant)
     variant['util_params']['gpu_id'] = gpu
     variant['algo_params']['data_dir'] = data_dir
+    variant['algo_params']['sparse_rewards'] = is_sparse_reward
 
     # multi-processing
     p = mp.Pool(mp.cpu_count())
