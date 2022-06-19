@@ -1191,9 +1191,9 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
         # div_estimate = self._divergence.dual_estimate(
         #     s2, a2_p, a2_b, self._c_fn)
         div_estimate = self._divergence.dual_estimate(
-            obs, new_actions, actions, task_z.detach())
+            obs, new_actions, actions, task_z)
         self.loss["div_estimate"] = torch.mean(div_estimate).item()
-        c_loss = self._divergence.dual_critic_loss(obs, new_actions, actions, task_z.detach())
+        c_loss = self._divergence.dual_critic_loss(obs, new_actions, actions, task_z)
         self.c_optimizer.zero_grad()
         c_loss.backward(retain_graph=True)
         self.c_optimizer.step()
