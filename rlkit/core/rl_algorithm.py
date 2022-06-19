@@ -940,11 +940,9 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 					p['rewards'] = sparse_rewards
 
 			train_returns.append(eval_util.get_average_returns(paths))
-			buffercontext_returns.append([eval_util.get_average_returns([p]) for p in paths])
+			buffercontext_returns.append(np.array([eval_util.get_average_returns([p]) for p in paths]))
 
 		train_returns = np.mean(train_returns)
-		n = min([len(t) for t in buffercontext_returns])
-		buffercontext_returns = [t[:n] for t in buffercontext_returns]
 		eval_util.dprint('online returns with buffer context')
 		eval_util.dprint(buffercontext_returns)
 		### eval train tasks with on-policy data to match eval of test tasks
