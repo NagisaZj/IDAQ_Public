@@ -1181,7 +1181,7 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
         if self.allow_backward_z:
             q1_pred = self.qf1(t, b, obs, actions, task_z)
             q2_pred = self.qf2(t, b, obs, actions, task_z)
-            v_pred = self.vf(t, b, obs, task_z)
+            v_pred = self.vf(t, b, obs, task_z.detach())
         else:
             q1_pred = self.qf1(t, b, obs, actions, task_z.detach())
             q2_pred = self.qf2(t, b, obs, actions, task_z.detach())
@@ -1191,9 +1191,9 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
         # div_estimate = self._divergence.dual_estimate(
         #     s2, a2_p, a2_b, self._c_fn)
         div_estimate = self._divergence.dual_estimate(
-            obs, new_actions, actions, task_z)
+            obs, new_actions, actions, task_z.detach())
         self.loss["div_estimate"] = torch.mean(div_estimate).item()
-        c_loss = self._divergence.dual_critic_loss(obs, new_actions, actions, task_z)
+        c_loss = self._divergence.dual_critic_loss(obs, new_actions, actions, task_z.detach())
         self.c_optimizer.zero_grad()
         c_loss.backward(retain_graph=True)
         self.c_optimizer.step()
