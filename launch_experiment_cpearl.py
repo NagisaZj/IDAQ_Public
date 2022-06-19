@@ -192,7 +192,8 @@ def deep_update_dict(fr, to):
 @click.argument('config', default=None)
 @click.argument('data_dir', default=None)
 @click.option('--gpu', default=0)
-def main(config, data_dir, gpu):
+@click.option("--is_sparse_reward", default=0)
+def main(config, data_dir, gpu, is_sparse_reward):
 
     variant = default_config
     if config:
@@ -201,6 +202,7 @@ def main(config, data_dir, gpu):
         variant = deep_update_dict(exp_params, variant)
     variant['util_params']['gpu_id'] = gpu
     variant['algo_params']['data_dir'] = data_dir
+    variant['algo_params']['sparse_rewards'] = is_sparse_reward
 
     # multi-processing
     p = mp.Pool(mp.cpu_count())
