@@ -938,13 +938,9 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 						sparse_rewards = np.stack(e['sparse_reward'] for e in px['env_infos']).reshape(-1, 1)
 						px['rewards'] = sparse_rewards
 				paths += p
-				all_rets.append([eval_util.get_average_returns([px]) for px in p])
+				all_rets.append(eval_util.get_average_returns(p))
 
 			train_returns.append(eval_util.get_average_returns(paths))
-			# record online returns for the first n trajectories
-			n = min([len(a) for a in all_rets])
-			all_rets = [a[:n] for a in all_rets]
-			all_rets = np.mean(np.stack(all_rets), axis=0)  # avg return per nth rollout
 			buffercontext_returns.append(all_rets)
 
 		train_returns = np.mean(train_returns)
