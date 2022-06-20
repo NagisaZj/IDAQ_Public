@@ -322,7 +322,8 @@ def offline_sample(env, agent, buffer, max_path_length=np.inf, accum_context=Tru
 
 
 
-def rollout(env, agent, max_path_length=np.inf, accum_context=True, animated=False, save_frames=False):
+def rollout(env, agent, max_path_length=np.inf, accum_context=True, is_onlineadapt_x=False, animated=False,
+            save_frames=False):
     """
     The following value for the following keys will be a 2D array, with the
     first dimension corresponding to the time dimension.
@@ -355,6 +356,8 @@ def rollout(env, agent, max_path_length=np.inf, accum_context=True, animated=Fal
     next_o = None
     path_length = 0
 
+    context = []
+
 
     if animated:
         env.render()
@@ -374,9 +377,8 @@ def rollout(env, agent, max_path_length=np.inf, accum_context=True, animated=Fal
         logging.info('r')
         logging.info(r)
 
-        # update the agent's current context
-        if accum_context:
-            agent.update_context([o, a, r, next_o, d, env_info])
+        context.append([o, a, r, next_o, d, env_info])
+
         observations.append(o)
         rewards.append(r)
         terminals.append(d)
@@ -393,6 +395,15 @@ def rollout(env, agent, max_path_length=np.inf, accum_context=True, animated=Fal
         env_infos.append(env_info)
         if d:
             break
+
+    # update the agent's current context
+    if accum_context:
+        if not is_onlineadapt_x:
+            for c in context:
+                agent.update_context(c)
+        elif np.mean(rewards) > 1.0:
+            for c in context:
+                agent.update_context(c)
 
     actions = np.array(actions)
     if len(actions.shape) == 1:

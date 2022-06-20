@@ -1000,7 +1000,8 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 
 			path, num = self.sampler.obtain_samples(deterministic=self.eval_deterministic,
 			                                        max_samples=self.num_steps_per_eval - num_transitions, max_trajs=1,
-			                                        accum_context=True)
+			                                        accum_context=True,
+			                                        is_onlineadapt_x=self.is_onlineadapt_x)
 			paths += path
 			num_transitions += num
 			num_trajs += 1
