@@ -993,7 +993,7 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 		num_transitions = 0
 		num_trajs = 0
 		while num_transitions < self.num_steps_per_eval:
-			if self.is_onlineadapt_x and num_trajs <= self.num_exp_traj_eval or not self.agent.context:
+			if self.is_onlineadapt_x and not self.agent.context:
 				idx = np.random.choice(self.train_tasks)
 				context = self.sample_context(idx)
 				self.agent.infer_posterior(context)
