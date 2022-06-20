@@ -400,7 +400,7 @@ def rollout(env, agent, max_path_length=np.inf, accum_context=True, is_select=Fa
 
     # update the agent's current context
     if accum_context:
-        if not is_select or np.mean(sparse_rewards) > 0.3:
+        if not is_select or np.sum(sparse_rewards) > 0.3:
             for c in context:
                 agent.update_context(c)
 
