@@ -356,6 +356,8 @@ def rollout(env, agent, max_path_length=np.inf, accum_context=True, is_select=Fa
     next_o = None
     path_length = 0
 
+    context = []
+
     if animated:
         env.render()
     while path_length < max_path_length:
@@ -374,12 +376,7 @@ def rollout(env, agent, max_path_length=np.inf, accum_context=True, is_select=Fa
         logging.info('r')
         logging.info(r)
 
-        # update the agent's current context
-        if accum_context:
-            if not is_select:
-                agent.update_context([o, a, r, next_o, d, env_info])
-            elif r > 0.:
-                agent.update_context([o, a, r, next_o, d, env_info])
+        context.append([o, a, r, next_o, d, env_info])
 
         observations.append(o)
         rewards.append(r)
@@ -397,6 +394,12 @@ def rollout(env, agent, max_path_length=np.inf, accum_context=True, is_select=Fa
         env_infos.append(env_info)
         if d:
             break
+
+    # update the agent's current context
+    if accum_context:
+        if not is_select or np.mean(rewards) > 0.3:
+            for c in context:
+                agent.update_context(c)
 
     actions = np.array(actions)
     if len(actions.shape) == 1:
