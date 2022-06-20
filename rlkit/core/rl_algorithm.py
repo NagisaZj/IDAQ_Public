@@ -992,21 +992,24 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 		paths = []
 		num_transitions = 0
 		num_trajs = 0
+		is_select = False
 		while num_transitions < self.num_steps_per_eval:
 			if self.is_onlineadapt_x and not self.agent.context:
 				idx = np.random.choice(self.train_tasks)
 				context = self.sample_context(idx)
 				self.agent.infer_posterior(context)
+				is_select = True
 
 			path, num = self.sampler.obtain_samples(deterministic=self.eval_deterministic,
 			                                        max_samples=self.num_steps_per_eval - num_transitions, max_trajs=1,
 			                                        accum_context=True,
-			                                        is_onlineadapt_x=self.is_onlineadapt_x)
+			                                        is_select=is_select)
 			paths += path
 			num_transitions += num
 			num_trajs += 1
 			if num_trajs >= self.num_exp_traj_eval and self.agent.context:
 				self.agent.infer_posterior(self.agent.context)
+				is_select = False
 
 		if self.sparse_rewards:
 			for p in paths:
