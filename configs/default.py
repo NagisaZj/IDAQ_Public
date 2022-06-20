@@ -71,7 +71,8 @@ default_config = dict(
         dropout=0.1, # dropout for context encoder
         # data_dir="./data/walker_randparam_new_norm", # default data directory
         data_dir="./data/walker_randparam_new_norm", # default data directory
-        is_zloss=True, # default using contrastive learning
+        is_zloss=True, # default using contrastive learning,
+        is_onlineadapt_x=False, # default not use prepared online adapt
     ),
     util_params=dict(
         base_log_dir='output',

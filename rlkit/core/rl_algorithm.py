@@ -880,6 +880,8 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
             **kwargs
         )
 
+		self.is_onlineadapt_x = kwargs['is_onlineadapt_x']
+
 	def _do_eval(self, indices, epoch):
 		final_returns = []
 		online_returns = []
@@ -991,6 +993,11 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 		num_transitions = 0
 		num_trajs = 0
 		while num_transitions < self.num_steps_per_eval:
+			if self.is_onlineadapt_x and num_trajs <= self.num_exp_traj_eval:
+				idx = np.random.choice(self.train_tasks)
+				context = self.sample_context(idx)
+				self.agent.infer_posterior(context)
+
 			path, num = self.sampler.obtain_samples(deterministic=self.eval_deterministic,
 			                                        max_samples=self.num_steps_per_eval - num_transitions, max_trajs=1,
 			                                        accum_context=True)

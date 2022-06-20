@@ -26,7 +26,7 @@
         "reward_scale": 100.0,
         "sparse_rewards": 1,
         "kl_lambda": 1.0,
-        "num_exp_traj_eval": 5,
+        "num_exp_traj_eval": 10,
         "dump_eval_paths": 0,
         "train_epoch": 4800,
         "eval_epoch": 4800,
@@ -34,7 +34,8 @@
         "n_trj": 50,
         "data_dir": "./data/sparse-point-robot",
         "divergence_name": "kl",
-        "use_brac": 0
+        "use_brac": 0,
+        "is_onlineadapt_x": 1
     },
     "util_params": {
         "use_gpu": 1
