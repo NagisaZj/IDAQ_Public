@@ -381,6 +381,15 @@ def rollout(env, agent, max_path_length=np.inf, accum_context=True, is_select=Fa
         if is_select:
             sparse_rewards.append(env_info['sparse_reward'])
 
+        '''
+        # update the agent's current context
+        if accum_context:
+            if not is_select:
+                agent.update_context([o, a, r, next_o, d, env_info])
+            elif env_info['sparse_reward'] > 0.:
+                agent.update_context([o, a, r, next_o, d, env_info])
+        '''
+
         observations.append(o)
         rewards.append(r)
         terminals.append(d)
