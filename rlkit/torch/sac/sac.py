@@ -1445,7 +1445,7 @@ class CPEARL(FOCALSoftActorCriticOnlineAdapt):
             **kwargs
         )
 
-    def _take_step(self, indices, context):
+    def _take_step(self, indices, context, zloss=False):
         obs_dim = int(np.prod(self.env.observation_space.shape))
         action_dim = int(np.prod(self.env.action_space.shape))
         reward_in_context = context[:, :, obs_dim + action_dim].cpu().numpy()
