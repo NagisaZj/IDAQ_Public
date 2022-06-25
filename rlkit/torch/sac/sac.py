@@ -938,6 +938,9 @@ class FOCALSoftActorCriticModel(OfflineMetaRLAlgorithm):
 
 
 class FOCALSoftActorCriticOnlineAdapt(OMRLOnlineAdaptAlgorithm):
+
+    # is the same as FOCALSoftActorCriticModel except of OMRLOnlineAdaptAlgorithm
+
     def __init__(
             self,
             env,
@@ -1415,7 +1418,7 @@ class FOCALSoftActorCriticOnlineAdapt(OMRLOnlineAdaptAlgorithm):
             return False
 
 
-class CPEARL(OMRLOnlineAdaptAlgorithm):
+class CPEARL(FOCALSoftActorCriticOnlineAdapt):
     def __init__(
             self,
             env,
@@ -1430,206 +1433,17 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
             **kwargs
     ):
         super().__init__(
-            env=env,
-            agent=nets[0],
-            train_tasks=train_tasks,
-            eval_tasks=eval_tasks,
+            env,
+            train_tasks,
+            eval_tasks,
+            latent_dim,
+            nets,
             goal_radius=goal_radius,
+            optimizer_class=optimizer_class,
+            plotter=plotter,
+            render_eval_paths=render_eval_paths,
             **kwargs
         )
-
-        self.latent_dim = latent_dim
-        self.soft_target_tau = kwargs['soft_target_tau']
-        self.policy_mean_reg_weight = kwargs['policy_mean_reg_weight']
-        self.policy_std_reg_weight = kwargs['policy_std_reg_weight']
-        self.policy_pre_activation_weight = kwargs['policy_pre_activation_weight']
-        self.recurrent = kwargs['recurrent']
-        self.kl_lambda = kwargs['kl_lambda']
-        self._divergence_name = kwargs['divergence_name']
-        self.use_information_bottleneck = kwargs['use_information_bottleneck']
-        self.sparse_rewards = kwargs['sparse_rewards']
-        self.use_next_obs_in_context = kwargs['use_next_obs_in_context']
-        self.use_brac = kwargs['use_brac']
-        self.use_value_penalty = kwargs['use_value_penalty']
-        self.alpha_max = kwargs['alpha_max']
-        self._c_iter = kwargs['c_iter']
-        self.train_alpha = kwargs['train_alpha']
-        self._target_divergence = kwargs['target_divergence']
-        self.alpha_init = kwargs['alpha_init']
-        self.alpha_lr = kwargs['alpha_lr']
-        self.policy_lr = kwargs['policy_lr']
-        self.qf_lr = kwargs['qf_lr']
-        self.vf_lr = kwargs['vf_lr']
-        self.c_lr = kwargs['c_lr']
-        self.context_lr = kwargs['context_lr']
-        self.z_loss_weight = kwargs['z_loss_weight']
-        self.max_entropy = kwargs['max_entropy']
-        self.allow_backward_z = kwargs['allow_backward_z']
-        self.loss = {}
-        self.plotter = plotter
-        self.render_eval_paths = render_eval_paths
-        self.qf_criterion = nn.MSELoss()
-        self.vf_criterion = nn.MSELoss()
-        self.vib_criterion = nn.MSELoss()
-        self.l2_reg_criterion = nn.MSELoss()
-
-        self.qf1, self.qf2, self.vf, self.c,self.reward_decoder,self.transition_decoder = nets[1:]
-        self.target_vf = self.vf.copy()
-
-        self.policy_optimizer = optimizer_class(self.agent.policy.parameters(), lr=self.policy_lr)
-        self.qf1_optimizer = optimizer_class(self.qf1.parameters(), lr=self.qf_lr)
-        self.qf2_optimizer = optimizer_class(self.qf2.parameters(), lr=self.qf_lr)
-        self.reward_decoder_optimizer = optimizer_class(self.reward_decoder.parameters(), lr=self.qf_lr)
-        self.transition_decoder_optimizer = optimizer_class(self.transition_decoder.parameters(), lr=self.qf_lr)
-        self.vf_optimizer = optimizer_class(self.vf.parameters(), lr=self.vf_lr)
-        self.c_optimizer = optimizer_class(self.c.parameters(), lr=self.c_lr)
-        self.context_optimizer = optimizer_class(self.agent.context_encoder.parameters(), lr=self.context_lr)
-        self.pred_loss = nn.MSELoss()
-        self._num_steps = 0
-        self._visit_num_steps_train = 10
-        self._alpha_var = torch.tensor(1.)
-
-        for net in nets:
-            self.print_networks(net)
-
-    ###### Torch stuff #####
-    @property
-    def networks(self):
-        return self.agent.networks + [self.agent] + [self.qf1, self.qf2, self.vf, self.target_vf, self.c,self.reward_decoder,self.transition_decoder]
-
-    @property
-    def get_alpha(self):
-        return utils.clip_v2(
-            self._alpha_var, 0.0, self.alpha_max)
-
-    def training_mode(self, mode):
-        for net in self.networks:
-            net.train(mode)
-
-    def to(self, device=None):
-        if device == None:
-            device = ptu.device
-        for net in self.networks:
-            net.to(device)
-        if self.train_alpha:
-            self._alpha_var = torch.tensor(self.alpha_init, device=ptu.device, requires_grad=True)
-        self._divergence = divergences.get_divergence(name=self._divergence_name, c=self.c, device=ptu.device)
-
-    def print_networks(self, net):
-        print('---------- Networks initialized -------------')
-        num_params = 0
-        for param in net.parameters():
-            num_params += param.numel()
-        # print(net)
-        print('[Network] Total number of parameters : %.3f M' % (num_params / 1e6))
-        print('-----------------------------------------------')
-
-    ##### Data handling #####
-    def unpack_batch(self, batch, sparse_reward=False):
-        ''' unpack a batch and return individual elements '''
-        o = batch['observations'][None, ...]
-        a = batch['actions'][None, ...]
-        if sparse_reward:
-            r = batch['sparse_rewards'][None, ...]
-        else:
-            r = batch['rewards'][None, ...]
-        no = batch['next_observations'][None, ...]
-        t = batch['terminals'][None, ...]
-        return [o, a, r, no, t]
-
-    def sample_sac(self, indices):
-        ''' sample batch of training data from a list of tasks for training the actor-critic '''
-        # this batch consists of transitions sampled randomly from replay buffer
-        # rewards are always dense
-        batches = [ptu.np_to_pytorch_batch(self.replay_buffer.random_batch(idx, batch_size=self.batch_size)) for idx in
-                   indices]
-        unpacked = [self.unpack_batch(batch) for batch in batches]
-        # group like elements together
-        unpacked = [[x[i] for x in unpacked] for i in range(len(unpacked[0]))]
-        unpacked = [torch.cat(x, dim=0) for x in unpacked]
-        return unpacked
-
-    def sample_context(self, indices):
-        ''' sample batch of context from a list of tasks from the replay buffer '''
-        # make method work given a single task index
-        if not hasattr(indices, '__iter__'):
-            indices = [indices]
-        batches = [ptu.np_to_pytorch_batch(
-            self.enc_replay_buffer.random_batch(idx, batch_size=self.embedding_batch_size, sequence=self.recurrent)) for
-                   idx in indices]
-        context = [self.unpack_batch(batch, sparse_reward=self.sparse_rewards) for batch in batches]
-        # group like elements together
-        context = [[x[i] for x in context] for i in range(len(context[0]))]
-        context = [torch.cat(x, dim=0) for x in
-                   context]  # 5 * self.meta_batch * self.embedding_batch_size * dim(o, a, r, no, t)
-        # full context consists of [obs, act, rewards, next_obs, terms]
-        # if dynamics don't change across tasks, don't include next_obs
-        # don't include terminals in context
-        if self.use_next_obs_in_context:
-            context = torch.cat(context[:-1], dim=2)
-        else:
-            context = torch.cat(context[:-2], dim=2)
-        # self.meta_batch * self.embedding_batch_size * sum_dim(o, a, r, no, t)
-        return context
-
-    ##### Training #####
-    def _do_training(self, indices, zloss=False):
-        mb_size = self.embedding_mini_batch_size  # NOTE: not meta batch!
-        num_updates = self.embedding_batch_size // mb_size
-
-        # sample context batch
-        context_batch = self.sample_context(indices)
-
-        # zero out context and hidden encoder state
-        self.agent.clear_z(num_tasks=len(indices))
-
-        z_means_lst = []
-        z_vars_lst = []
-        # do this in a loop so we can truncate backprop in the recurrent encoder
-        for i in range(num_updates):
-            context = context_batch[:, i * mb_size: i * mb_size + mb_size, :]
-            self.loss['step'] = self._num_steps
-            z_means, z_vars = self._take_step(indices, context)
-            self._num_steps += 1
-            z_means_lst.append(z_means[None, ...])
-            z_vars_lst.append(z_vars[None, ...])
-            # stop backprop
-            self.agent.detach_z()
-        z_means = np.mean(np.concatenate(z_means_lst), axis=0)
-        z_vars = np.mean(np.concatenate(z_vars_lst), axis=0)
-        return z_means, z_vars
-
-    def _min_q(self, obs, actions, task_z):
-        q1 = self.qf1(obs, actions, task_z.detach())
-        q2 = self.qf2(obs, actions, task_z.detach())
-        min_q = torch.min(q1, q2)
-        return min_q
-
-    def _update_target_network(self):
-        ptu.soft_update_from_to(self.vf, self.target_vf, self.soft_target_tau)
-
-    def _optimize_c(self, indices, context):
-        # data is (task, batch, feat)
-        obs, actions, rewards, next_obs, terms = self.sample_sac(indices)
-
-        # run inference in networks
-        if self.use_information_bottleneck:
-            policy_outputs, task_z = self.agent(obs, context, task_indices=indices)
-        else:
-            raise NotImplementedError
-        new_actions, policy_mean, policy_log_std, log_pi = policy_outputs[:4]
-
-        # flattens out the task dimension
-        t, b, _ = obs.size()
-        obs = obs.view(t * b, -1)
-        actions = actions.view(t * b, -1)
-        next_obs = next_obs.view(t * b, -1)
-
-        # optimize for c network (which computes dual-form divergences)
-        c_loss = self._divergence.dual_critic_loss(obs, new_actions, actions, task_z)
-        self.c_optimizer.zero_grad()
-        c_loss.backward(retain_graph=True)
-        self.c_optimizer.step()
 
     def _take_step(self, indices, context):
         obs_dim = int(np.prod(self.env.observation_space.shape))
@@ -1824,30 +1638,3 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
             self.eval_statistics.update(create_stats_ordered_dict('alpha', ptu.get_numpy(self._alpha_var).reshape(-1)))
             self.eval_statistics.update(create_stats_ordered_dict('div_estimate', ptu.get_numpy(div_estimate)))
         return ptu.get_numpy(self.agent.z_means), ptu.get_numpy(self.agent.z_vars)
-
-    def get_epoch_snapshot(self, epoch):
-        # NOTE: overriding parent method which also optionally saves the env
-        snapshot = OrderedDict(
-            qf1=self.qf1.state_dict(),
-            qf2=self.qf2.state_dict(),
-            policy=self.agent.policy.state_dict(),
-            vf=self.vf.state_dict(),
-            target_vf=self.target_vf.state_dict(),
-            context_encoder=self.agent.context_encoder.state_dict()
-        )
-        return snapshot
-
-    def load_epoch_model(self, epoch, log_dir):
-        path = log_dir
-        try:
-            self.agent.context_encoder.load_state_dict(
-                torch.load(os.path.join(path, 'context_encoder_itr_{}.pth'.format(epoch))))
-            self.agent.policy.load_state_dict(torch.load(os.path.join(path, 'policy_itr_{}.pth'.format(epoch))))
-            self.qf1.load_state_dict(torch.load(os.path.join(path, 'qf1_itr_{}.pth'.format(epoch))))
-            self.qf2.load_state_dict(torch.load(os.path.join(path, 'qf2_itr_{}.pth'.format(epoch))))
-            self.vf.load_state_dict(torch.load(os.path.join(path, 'vf_itr_{}.pth'.format(epoch))))
-            self.target_vf.load_state_dict(torch.load(os.path.join(path, 'target_vf_itr_{}.pth'.format(epoch))))
-            return True
-        except:
-            print("epoch: {} is not ready".format(epoch))
-            return False
