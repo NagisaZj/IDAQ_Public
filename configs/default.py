@@ -75,6 +75,7 @@ default_config = dict(
         is_onlineadapt_x=False, # default not use prepared online adapt
         is_predict_task_id=False, # whether to predict task id
         is_offline_pearl=False, # whether is offline pearl
+        is_onlineadapt_pearl=False, # default not use prepared online adapt using gaussian prior
     ),
     util_params=dict(
         base_log_dir='output',
