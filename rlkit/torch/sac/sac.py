@@ -1495,6 +1495,7 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
         self.c_optimizer = optimizer_class(self.c.parameters(), lr=self.c_lr)
         self.context_optimizer = optimizer_class(self.agent.context_encoder.parameters(), lr=self.context_lr)
         self.pred_loss = nn.MSELoss()
+        self.ce_loss = nn.CrossEntropyLoss()
         self._num_steps = 0
         self._visit_num_steps_train = 10
         self._alpha_var = torch.tensor(1.)
@@ -1707,6 +1708,14 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
             kl_loss.backward(retain_graph=True)
         else:
             raise NotImplementedError
+        if self.is_predict_task_id:
+            task_id = indices.view(-1, 1).repeat(self.batch_size, axis=1).view(-1,)
+            pred_task_id = self.task_id_decoder.forward(0, 0, task_z)
+            self.task_id_decoder_optimizer.zero_grad()
+            task_id_loss = self.ce_loss(pred_task_id, task_id)
+            task_id_loss.backward()
+            self.loss["task_id_prediction_loss"] = torch.mean(task_id_loss).item()
+            self.task_id_decoder_optimizer.step()
         if not self.is_offline_pearl:
             self.context_optimizer.step()
 
