@@ -38,8 +38,8 @@
         "use_information_bottleneck": 1,
         "is_zloss": 0,
         "is_onlineadapt_x": 1,
-        "is_predict_task_id": 1,
-        "is_offline_pearl": 0
+        "is_predict_task_id": 0,
+        "is_offline_pearl": 1
     },
     "util_params": {
         "use_gpu": 1
