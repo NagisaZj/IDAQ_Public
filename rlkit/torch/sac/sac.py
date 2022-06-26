@@ -1471,6 +1471,7 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
         self.z_loss_weight = kwargs['z_loss_weight']
         self.max_entropy = kwargs['max_entropy']
         self.allow_backward_z = kwargs['allow_backward_z']
+        self.is_predict_task_id = kwargs['is_predict_task_id']
         self.loss = {}
         self.plotter = plotter
         self.render_eval_paths = render_eval_paths
@@ -1705,6 +1706,7 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
             kl_loss.backward(retain_graph=True)
         else:
             raise NotImplementedError
+        self.context_optimizer.step()
 
         # qf and encoder update (note encoder does not get grads from policy or vf)
         self.qf1_optimizer.zero_grad()
@@ -1723,8 +1725,6 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
 
         self.qf1_optimizer.step()
         self.qf2_optimizer.step()
-
-        self.context_optimizer.step()
 
         pred_rewardss = rewards.view(self.batch_size * num_tasks, -1)
         # print(task_z.shape,obs.shape,actions.shape)

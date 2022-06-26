@@ -73,6 +73,7 @@ default_config = dict(
         data_dir="./data/walker_randparam_new_norm", # default data directory
         is_zloss=True, # default using contrastive learning,
         is_onlineadapt_x=False, # default not use prepared online adapt
+        is_predict_task_id=False, # whether to predict task id
     ),
     util_params=dict(
         base_log_dir='output',
