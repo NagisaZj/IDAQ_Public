@@ -429,7 +429,7 @@ class PEARLAgent_prob(OldPEARLAgent):
         task_z = [z.repeat(b, 1) for z in task_z]
         task_z = torch.cat(task_z, dim=0)
         # run policy, get log probs and new actions
-        in_ = torch.cat([obs, task_z], dim=1) # in focal these does not use detach()
+        in_ = torch.cat([obs, task_z.detach()], dim=1) # in focal these does not use detach()
         policy_outputs = self.policy(t, b, in_, reparameterize=True, return_log_prob=True)
 
         return policy_outputs, task_z
