@@ -1844,6 +1844,26 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
             # this way, these statistics are only computed for one batch.
             self.eval_statistics = OrderedDict()
 
+            # z_mean = np.mean(np.abs(ptu.get_numpy(self.agent.z_means[0])))
+            for i in range(len(self.agent.z_means[0])):
+                z_mean = ptu.get_numpy(self.agent.z_means[0][i])
+                name = 'Z mean train' + str(i)
+                self.eval_statistics[name] = z_mean
+
+            # z_mean1 = ptu.get_numpy(self.agent.z_means[0][0])
+            # z_mean2 = ptu.get_numpy(self.agent.z_means[0][1])
+            # z_mean3 = ptu.get_numpy(self.agent.z_means[0][2])
+            # z_mean4 = ptu.get_numpy(self.agent.z_means[0][3])
+            # z_mean5 = ptu.get_numpy(self.agent.z_means[0][4])
+
+            z_sig = np.mean(ptu.get_numpy(self.agent.z_vars[0]))
+            # self.eval_statistics['Z mean train1'] = z_mean1
+            # self.eval_statistics['Z mean train2'] = z_mean2
+            # self.eval_statistics['Z mean train3'] = z_mean3
+            # self.eval_statistics['Z mean train4'] = z_mean4
+            # self.eval_statistics['Z mean train5'] = z_mean5
+
+            self.eval_statistics['Z variance train'] = z_sig
             self.eval_statistics['task idx'] = indices[0]
             if self.use_information_bottleneck:
                 self.eval_statistics['KL Divergence'] = ptu.get_numpy(kl_div)
