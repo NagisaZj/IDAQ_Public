@@ -1705,7 +1705,6 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
             kl_loss.backward(retain_graph=True)
         else:
             raise NotImplementedError
-        self.context_optimizer.step()
 
         # qf and encoder update (note encoder does not get grads from policy or vf)
         self.qf1_optimizer.zero_grad()
@@ -1724,6 +1723,8 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
 
         self.qf1_optimizer.step()
         self.qf2_optimizer.step()
+
+        self.context_optimizer.step()
 
         pred_rewardss = rewards.view(self.batch_size * num_tasks, -1)
         # print(task_z.shape,obs.shape,actions.shape)
