@@ -971,6 +971,11 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 		self.eval_statistics['AverageTrainReturn_all_train_tasks'] = train_returns
 		self.eval_statistics['AverageReturn_all_train_tasks'] = avg_train_return
 		self.eval_statistics['AverageReturn_all_test_tasks'] = avg_test_return
+
+		last_train_return = np.mean(train_final_returns[-(len(train_final_returns) // 5 + 1):])
+		last_test_return = np.mean(test_final_returns[-(len(test_final_returns) // 5 + 1):])
+		self.eval_statistics['Last1/5Return_all_train_tasks'] = last_train_return
+		self.eval_statistics['Last1/5Return_all_test_tasks'] = last_test_return
 		logger.save_extra_data(avg_train_online_return, path='online-train-epoch{}'.format(epoch))
 		logger.save_extra_data(avg_test_online_return, path='online-test-epoch{}'.format(epoch))
 
