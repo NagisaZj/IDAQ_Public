@@ -46,6 +46,7 @@ def experiment(variant, seed=None):
     obs_dim = int(np.prod(env.observation_space.shape))
     action_dim = int(np.prod(env.action_space.shape))
     reward_dim = 1
+    task_dim = variant['n_train_tasks']
 
     # instantiate networks
     latent_dim = variant['latent_size']
@@ -93,9 +94,15 @@ def experiment(variant, seed=None):
     rew_decoder = FlattenMlp(hidden_sizes=[net_size, net_size, net_size],
                              input_size=latent_dim  + obs_dim + action_dim,
                              output_size=1, )
+
     transition_decoder = FlattenMlp(hidden_sizes=[net_size, net_size, net_size],
                                     input_size=latent_dim  + obs_dim + action_dim,
                                     output_size=obs_dim, )
+
+    task_id_decoder = FlattenMlp(hidden_sizes=[net_size],
+                                 input_size=latent_dim,
+                                 output_size=task_dim, )
+
     if variant['algo_type'] == 'CPEARL':
         # critic network for divergence in dual form (see BRAC paper https://arxiv.org/abs/1911.11361)
         c = FlattenMlp(
@@ -112,7 +119,7 @@ def experiment(variant, seed=None):
                     env=env,
                     train_tasks=train_tasks,
                     eval_tasks=eval_tasks,
-                    nets=[agent, qf1, qf2, vf, c,rew_decoder,transition_decoder],
+                    nets=[agent, qf1, qf2, vf, c, rew_decoder, transition_decoder, task_id_decoder],
                     latent_dim=latent_dim,
                     goal_radius=variant['env_params']['goal_radius'],
                     **variant['algo_params']
@@ -122,7 +129,7 @@ def experiment(variant, seed=None):
                     env=env,
                     train_tasks=list(tasks[:variant['n_train_tasks']]),
                     eval_tasks=list(tasks[-variant['n_eval_tasks']:]),
-                    nets=[agent, qf1, qf2, vf, c,rew_decoder,transition_decoder],
+                    nets=[agent, qf1, qf2, vf, c,rew_decoder,transition_decoder, task_id_decoder],
                     latent_dim=latent_dim,
                     **variant['algo_params']
                 )
@@ -132,7 +139,7 @@ def experiment(variant, seed=None):
                     env=env,
                     train_tasks=list(tasks[:variant['n_train_tasks']]),
                     eval_tasks=list(tasks[-variant['n_eval_tasks']:]),
-                    nets=[agent, qf1, qf2, vf, c,rew_decoder,transition_decoder],
+                    nets=[agent, qf1, qf2, vf, c, rew_decoder, transition_decoder, task_id_decoder],
                     latent_dim=latent_dim,
                     goal_radius=variant['env_params']['goal_radius'],
                     **variant['algo_params']
@@ -142,7 +149,7 @@ def experiment(variant, seed=None):
                     env=env,
                     train_tasks=list(tasks[:variant['n_train_tasks']]),
                     eval_tasks=list(tasks[-variant['n_eval_tasks']:]),
-                    nets=[agent, qf1, qf2, vf, c,rew_decoder,transition_decoder],
+                    nets=[agent, qf1, qf2, vf, c, rew_decoder, transition_decoder, task_id_decoder],
                     latent_dim=latent_dim,
                     **variant['algo_params']
                 )
