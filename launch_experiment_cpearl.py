@@ -46,7 +46,7 @@ def experiment(variant, seed=None):
     obs_dim = int(np.prod(env.observation_space.shape))
     action_dim = int(np.prod(env.action_space.shape))
     reward_dim = 1
-    task_dim = variant['n_train_tasks']
+    task_dim = variant['env_params']['n_tasks']
 
     # instantiate networks
     latent_dim = variant['latent_size']
