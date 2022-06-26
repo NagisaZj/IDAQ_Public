@@ -1643,6 +1643,23 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
         c_loss.backward(retain_graph=True)
         self.c_optimizer.step()
 
+    def z_loss(self, indices, task_z, task_z_vars, b, epsilon=1e-3, threshold=0.999):
+        pos_z_loss = 0.
+        neg_z_loss = 0.
+        pos_cnt = 0
+        neg_cnt = 0
+        for i in range(len(indices)):
+            idx_i = i * b  # index in task * batch dim
+            for j in range(i + 1, len(indices)):
+                idx_j = j * b  # index in task * batch dim
+                if indices[i] == indices[j]:
+                    pos_z_loss += torch.sqrt(torch.mean((task_z[idx_i] - task_z[idx_j]) ** 2) + epsilon)
+                    pos_cnt += 1
+                else:
+                    neg_z_loss += 1 / (torch.mean((task_z[idx_i] - task_z[idx_j]) ** 2) + epsilon * 100)
+                    neg_cnt += 1
+        return pos_z_loss / (pos_cnt + epsilon) + neg_z_loss / (neg_cnt + epsilon)
+
     def _take_step(self, indices, context, zloss=False):
         obs_dim = int(np.prod(self.env.observation_space.shape))
         action_dim = int(np.prod(self.env.action_space.shape))
@@ -1656,7 +1673,7 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
         if self.use_information_bottleneck:
             policy_outputs, task_z = self.agent(obs, context, task_indices=indices)
         else:
-            raise NotImplementedError
+            policy_outputs, task_z, task_z_vars = self.agent(obs, context, task_indices=indices)
 
         # flattens out the task dimension
         t, b, _ = obs.size()
@@ -1706,8 +1723,10 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
             kl_div = self.agent.compute_kl_div()
             kl_loss = self.kl_lambda * kl_div
             kl_loss.backward(retain_graph=True)
-        else:
-            raise NotImplementedError
+        elif zloss:
+            z_loss = self.z_loss_weight * self.z_loss(indices=indices, task_z=task_z, task_z_vars=task_z_vars, b=b)
+            z_loss.backward(retain_graph=True)
+            self.loss["z_loss"] = z_loss.item()
         if self.is_predict_task_id:
             task_id = indices.reshape(-1, 1).repeat(self.batch_size, axis=1).reshape(-1,)
             task_id = torch.tensor(task_id, device=ptu.device, dtype=torch.long)
@@ -1829,8 +1848,8 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
             if self.use_information_bottleneck:
                 self.eval_statistics['KL Divergence'] = ptu.get_numpy(kl_div)
                 self.eval_statistics['KL Loss'] = ptu.get_numpy(kl_loss)
-            else:
-                raise NotImplementedError
+            elif zloss:
+                self.eval_statistics['Z Loss'] = ptu.get_numpy(z_loss)
 
             self.eval_statistics['QF Loss'] = np.mean(ptu.get_numpy(qf_loss))
             self.eval_statistics['VF Loss'] = np.mean(ptu.get_numpy(vf_loss))
