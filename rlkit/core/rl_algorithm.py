@@ -880,7 +880,8 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
             **kwargs
         )
 
-		self.is_onlineadapt_x = kwargs['is_onlineadapt_x']
+		self.is_onlineadapt_uniform = kwargs['is_onlineadapt_uniform']
+		self.is_onlineadapt_pearl = kwargs['is_onlineadapt_pearl']
 
 	def _do_eval(self, indices, epoch):
 		final_returns = []
@@ -999,8 +1000,10 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 		num_trajs = 0
 		is_select = False
 		while num_transitions < self.num_steps_per_eval:
-			if self.is_offline_pearl:
-			if self.is_onlineadapt_x and type(self.agent.context) == type(None):
+			if self.is_onlineadapt_pearl:
+				if type(self.agent.context) == type(None):
+					is_select = True
+			elif self.is_onlineadapt_uniform and type(self.agent.context) == type(None):
 				idx = np.random.choice(self.train_tasks)
 				context = self.sample_context(idx)
 				self.agent.infer_posterior(context)
