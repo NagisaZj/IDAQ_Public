@@ -1432,6 +1432,9 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
             render_eval_paths=False,
             **kwargs
     ):
+
+        # add self.task_id_decoder and modify the _take_step
+
         super().__init__(
             env=env,
             agent=nets[0],
@@ -1476,7 +1479,8 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
         self.vib_criterion = nn.MSELoss()
         self.l2_reg_criterion = nn.MSELoss()
 
-        self.qf1, self.qf2, self.vf, self.c, self.reward_decoder, self.transition_decoder = nets[1:]
+        self.qf1, self.qf2, self.vf, self.c, self.reward_decoder, self.transition_decoder, self.task_id_decoder = \
+            nets[1:]
         self.target_vf = self.vf.copy()
 
         self.policy_optimizer = optimizer_class(self.agent.policy.parameters(), lr=self.policy_lr)
@@ -1484,6 +1488,7 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
         self.qf2_optimizer = optimizer_class(self.qf2.parameters(), lr=self.qf_lr)
         self.reward_decoder_optimizer = optimizer_class(self.reward_decoder.parameters(), lr=self.qf_lr)
         self.transition_decoder_optimizer = optimizer_class(self.transition_decoder.parameters(), lr=self.qf_lr)
+        self.task_id_decoder_optimizer = optimizer_class(self.task_id_decoder.parameters(), lr=self.qf_lr)
         self.vf_optimizer = optimizer_class(self.vf.parameters(), lr=self.vf_lr)
         self.c_optimizer = optimizer_class(self.c.parameters(), lr=self.c_lr)
         self.context_optimizer = optimizer_class(self.agent.context_encoder.parameters(), lr=self.context_lr)
@@ -1499,7 +1504,7 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
     @property
     def networks(self):
         return self.agent.networks + [self.agent] + [self.qf1, self.qf2, self.vf, self.target_vf, self.c,
-                                                     self.reward_decoder, self.transition_decoder]
+                                                     self.reward_decoder, self.transition_decoder, self.task_id_decoder]
 
     @property
     def get_alpha(self):
