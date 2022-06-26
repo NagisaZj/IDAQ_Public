@@ -1709,7 +1709,7 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
         else:
             raise NotImplementedError
         if self.is_predict_task_id:
-            task_id = indices.view(-1, 1).repeat(self.batch_size, axis=1).view(-1,)
+            task_id = indices.reshape(-1, 1).repeat(self.batch_size, axis=1).reshape(-1,)
             pred_task_id = self.task_id_decoder.forward(0, 0, task_z)
             self.task_id_decoder_optimizer.zero_grad()
             task_id_loss = self.ce_loss(pred_task_id, task_id)
