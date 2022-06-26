@@ -136,7 +136,7 @@ class FOCALSoftActorCritic(OfflineMetaRLAlgorithm):
         # this batch consists of transitions sampled randomly from replay buffer
         # rewards are always dense
         batches = [ptu.np_to_pytorch_batch(self.replay_buffer.random_batch(idx, batch_size=self.batch_size)) for idx in indices]
-        unpacked = [self.unpack_batch(batch) for batch in batches]
+        unpacked = [self.unpack_batch(batch, sparse_reward=self.sparse_rewards) for batch in batches]
         # group like elements together
         unpacked = [[x[i] for x in unpacked] for i in range(len(unpacked[0]))]
         unpacked = [torch.cat(x, dim=0) for x in unpacked]
@@ -587,7 +587,7 @@ class FOCALSoftActorCriticModel(OfflineMetaRLAlgorithm):
         # rewards are always dense
         batches = [ptu.np_to_pytorch_batch(self.replay_buffer.random_batch(idx, batch_size=self.batch_size)) for idx in
                    indices]
-        unpacked = [self.unpack_batch(batch) for batch in batches]
+        unpacked = [self.unpack_batch(batch, sparse_reward=self.sparse_rewards) for batch in batches]
         # group like elements together
         unpacked = [[x[i] for x in unpacked] for i in range(len(unpacked[0]))]
         unpacked = [torch.cat(x, dim=0) for x in unpacked]
@@ -1068,7 +1068,7 @@ class FOCALSoftActorCriticOnlineAdapt(OMRLOnlineAdaptAlgorithm):
         # rewards are always dense
         batches = [ptu.np_to_pytorch_batch(self.replay_buffer.random_batch(idx, batch_size=self.batch_size)) for idx in
                    indices]
-        unpacked = [self.unpack_batch(batch) for batch in batches]
+        unpacked = [self.unpack_batch(batch, sparse_reward=self.sparse_rewards) for batch in batches]
         # group like elements together
         unpacked = [[x[i] for x in unpacked] for i in range(len(unpacked[0]))]
         unpacked = [torch.cat(x, dim=0) for x in unpacked]
@@ -1555,7 +1555,7 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
         # rewards are always dense
         batches = [ptu.np_to_pytorch_batch(self.replay_buffer.random_batch(idx, batch_size=self.batch_size)) for idx in
                    indices]
-        unpacked = [self.unpack_batch(batch) for batch in batches]
+        unpacked = [self.unpack_batch(batch, sparse_reward=self.sparse_rewards) for batch in batches]
         # group like elements together
         unpacked = [[x[i] for x in unpacked] for i in range(len(unpacked[0]))]
         unpacked = [torch.cat(x, dim=0) for x in unpacked]
