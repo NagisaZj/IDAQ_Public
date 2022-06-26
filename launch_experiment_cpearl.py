@@ -16,7 +16,7 @@ from rlkit.envs.wrappers import NormalizedBoxEnv
 from rlkit.torch.sac.policies import TanhGaussianPolicy
 from rlkit.torch.networks import FlattenMlp, MlpEncoder, RecurrentEncoder
 from rlkit.torch.sac.sac import CPEARL
-from rlkit.torch.sac.agent import PEARLAgent_prob
+from rlkit.torch.sac.agent import PEARLAgent, OldPEARLAgent
 from rlkit.launchers.launcher_util import setup_logger
 import rlkit.torch.pytorch_util as ptu
 from configs.default import default_config
@@ -85,12 +85,21 @@ def experiment(variant, seed=None):
         action_dim=action_dim,
     )
 
-    agent = PEARLAgent_prob(
-        latent_dim,
-        context_encoder,
-        policy,
-        **variant['algo_params']
-    )
+    if variant['algo_params']["is_zloss"]:
+        agent = PEARLAgent(
+            latent_dim,
+            context_encoder,
+            policy,
+            **variant['algo_params']
+        )
+    else:
+        agent = OldPEARLAgent(
+            latent_dim,
+            context_encoder,
+            policy,
+            **variant['algo_params']
+        )
+
     rew_decoder = FlattenMlp(hidden_sizes=[net_size, net_size, net_size],
                              input_size=latent_dim  + obs_dim + action_dim,
                              output_size=1, )
