@@ -1723,6 +1723,7 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
             kl_div = self.agent.compute_kl_div()
             kl_loss = self.kl_lambda * kl_div
             kl_loss.backward(retain_graph=True)
+            self.loss["kl_loss"] = kl_loss.item()
         if zloss:
             z_loss = self.z_loss_weight * self.z_loss(indices=indices, task_z=task_z, b=b)
             z_loss.backward(retain_graph=True)
