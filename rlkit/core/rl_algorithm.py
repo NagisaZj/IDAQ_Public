@@ -999,8 +999,8 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 				if type(self.agent.context) == type(None):
 					is_select = True
 			elif self.is_onlineadapt_uniform and type(self.agent.context) == type(None):
-				idx = np.random.choice(self.train_tasks)
-				context = self.sample_context(idx)
+				sampled_idx = np.random.choice(self.train_tasks)
+				context = self.sample_context(sampled_idx)
 				self.agent.infer_posterior(context)
 				is_select = True
 
