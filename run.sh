@@ -55,7 +55,7 @@
  --is_offline_pearl=${is_offline_pearl} \
  --allow_backward_z=${allow_backward_z} \
  --is_true_sparse_rewards=${is_true_sparse} \
- >& out_logs/${Foldername}/${task}_${algo}_${datadir}_${is_sparse}_${use_brac}_${use_information_bottleneck}_${is_zloss}_${is_onlineadapt_uniform}_${is_offline_pearl}_${allow_backward_z}_${seed}.txt &
+ >& out_logs/${Foldername}/${task}_${algo}_${datadir}_${is_sparse}_${use_brac}_${use_information_bottleneck}_${is_zloss}_${is_onlineadapt_uniform}_${is_offline_pearl}_${allow_backward_z}_${is_true_sparse}_${seed}.txt &
  echo "task: ${task}, algo: ${algo}, datadir: ${datadir}, is_sparse: ${is_sparse}, use_brac: ${use_brac}"
  echo "     use_information_bottleneck: ${use_information_bottleneck}, is_zloss: ${is_zloss}"
  echo "     is_onlineadapt_uniform: ${is_onlineadapt_uniform}, is_offline_pearl: ${is_offline_pearl}"
