@@ -998,11 +998,14 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 			if self.is_onlineadapt_pearl:
 				if type(self.agent.context) == type(None):
 					is_select = True
-			elif self.is_onlineadapt_uniform and type(self.agent.context) == type(None):
-				sampled_idx = np.random.choice(self.train_tasks)
-				context = self.sample_context(sampled_idx)
-				self.agent.infer_posterior(context)
-				is_select = True
+			elif self.is_onlineadapt_uniform:
+				if type(self.agent.context) == type(None):
+					sampled_idx = np.random.choice(self.train_tasks)
+					context = self.sample_context(sampled_idx)
+					self.agent.infer_posterior(context)
+					is_select = True
+				else:
+					is_select = False
 
 			path, num = self.sampler.obtain_samples(deterministic=self.eval_deterministic,
 			                                        max_samples=self.num_steps_per_eval - num_transitions, max_trajs=1,
