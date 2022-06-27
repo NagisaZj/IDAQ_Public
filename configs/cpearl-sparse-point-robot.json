@@ -39,7 +39,7 @@
         "is_zloss": 1,
         "is_onlineadapt_uniform": 1,
         "is_predict_task_id": 0,
-        "is_offline_pearl": 0,
+        "is_onlineadapt_pearl": 0,
         "allow_backward_z": 0,
         "is_true_sparse_rewards": 0
     },

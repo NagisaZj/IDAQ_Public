@@ -1472,7 +1472,6 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
         self.max_entropy = kwargs['max_entropy']
         self.allow_backward_z = kwargs['allow_backward_z']
         self.is_predict_task_id = kwargs['is_predict_task_id']
-        self.is_offline_pearl = kwargs['is_offline_pearl']
         self.is_true_sparse_rewards = kwargs['is_true_sparse_rewards']
         self.loss = {}
         self.plotter = plotter
@@ -1737,7 +1736,7 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
             task_id_loss.backward()
             self.loss["task_id_prediction_loss"] = torch.mean(task_id_loss).item()
             self.task_id_decoder_optimizer.step()
-        if not self.is_offline_pearl:
+        if not self.allow_backward_z:
             self.context_optimizer.step()
 
         # qf and encoder update (note encoder does not get grads from policy or vf)
@@ -1758,7 +1757,7 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
         self.qf1_optimizer.step()
         self.qf2_optimizer.step()
 
-        if self.is_offline_pearl:
+        if self.allow_backward_z:
             self.context_optimizer.step()
 
         pred_rewardss = rewards.view(self.batch_size * num_tasks, -1)
