@@ -14,7 +14,7 @@
  declare -a use_information_bottlenecks=( "0" )
  declare -a is_zlosses=( "1" )
  declare -a is_onlineadapt_uniforms=( "1" )
- declare -a is_offline_pearls=( "0" )
+ declare -a is_onlineadapt_pearls=( "0" )
  declare -a allow_backward_zs=( "0" )
  declare -a is_true_sparses=( "0" "1" )
  n=0
@@ -37,7 +37,7 @@
  do
  for is_onlineadapt_uniform in "${is_onlineadapt_uniforms[@]}"
  do
- for is_offline_pearl in "${is_offline_pearls[@]}"
+ for is_onlineadapt_pearl in "${is_onlineadapt_pearls[@]}"
  do
  for allow_backward_z in "${allow_backward_zs[@]}"
  do
@@ -52,13 +52,13 @@
  --use_information_bottleneck=${use_information_bottleneck} \
  --is_zloss=${is_zloss} \
  --is_onlineadapt_uniform=${is_onlineadapt_uniform} \
- --is_offline_pearl=${is_offline_pearl} \
+ --is_onlineadapt_pearl=${is_onlineadapt_pearl} \
  --allow_backward_z=${allow_backward_z} \
  --is_true_sparse_rewards=${is_true_sparse} \
- >& out_logs/${Foldername}/${task}_${algo}_${datadir}_${is_sparse}_${use_brac}_${use_information_bottleneck}_${is_zloss}_${is_onlineadapt_uniform}_${is_offline_pearl}_${allow_backward_z}_${is_true_sparse}_${seed}.txt &
+ >& out_logs/${Foldername}/${task}_${algo}_${datadir}_${is_sparse}_${use_brac}_${use_information_bottleneck}_${is_zloss}_${is_onlineadapt_uniform}_${is_onlineadapt_pearl}_${allow_backward_z}_${is_true_sparse}_${seed}.txt &
  echo "task: ${task}, algo: ${algo}, datadir: ${datadir}, is_sparse: ${is_sparse}, use_brac: ${use_brac}"
  echo "     use_information_bottleneck: ${use_information_bottleneck}, is_zloss: ${is_zloss}"
- echo "     is_onlineadapt_uniform: ${is_onlineadapt_uniform}, is_offline_pearl: ${is_offline_pearl}"
+ echo "     is_onlineadapt_uniform: ${is_onlineadapt_uniform}, is_onlineadapt_pearl: ${is_onlineadapt_pearl}"
  echo "     allow_backward_z: ${allow_backward_z}, is_true_sparse: ${is_true_sparse}, seed: ${seed}, GPU: $n"
  n=$[($n+1) % ${gpunum}]
  sleep 10

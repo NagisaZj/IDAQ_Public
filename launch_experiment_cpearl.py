@@ -213,11 +213,11 @@ def deep_update_dict(fr, to):
 @click.option("--use_information_bottleneck", default=0)
 @click.option("--is_zloss", default=0)
 @click.option("--is_onlineadapt_uniform", default=0)
-@click.option("--is_offline_pearl", default=0)
+@click.option("--is_onlineadapt_pearl", default=0)
 @click.option("--allow_backward_z", default=0)
 @click.option("--is_true_sparse_rewards", default=0)
 def main(config, data_dir, gpu, is_sparse_reward, use_brac, use_information_bottleneck, is_zloss,
-         is_onlineadapt_uniform, is_offline_pearl, allow_backward_z, is_true_sparse_rewards):
+         is_onlineadapt_uniform, is_onlineadapt_pearl, allow_backward_z, is_true_sparse_rewards):
 
     variant = default_config
     if config:
@@ -231,7 +231,7 @@ def main(config, data_dir, gpu, is_sparse_reward, use_brac, use_information_bott
     variant['algo_params']['use_information_bottleneck'] = use_information_bottleneck
     variant['algo_params']['is_zloss'] = is_zloss
     variant['algo_params']['is_onlineadapt_uniform'] = is_onlineadapt_uniform
-    variant['algo_params']['is_offline_pearl'] = is_offline_pearl
+    variant['algo_params']['is_onlineadapt_pearl'] = is_onlineadapt_pearl
     variant['algo_params']['allow_backward_z'] = allow_backward_z
     variant['algo_params']['is_true_sparse_rewards'] = is_true_sparse_rewards
 
