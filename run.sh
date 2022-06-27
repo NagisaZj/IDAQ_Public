@@ -17,6 +17,7 @@
  declare -a is_onlineadapt_pearls=( "0" )
  declare -a allow_backward_zs=( "0" )
  declare -a is_true_sparses=( "0" "1" )
+ declare -a r_threses=( "0.3" )
  n=0
  gpunum=8
  for task in "${tasks[@]}"
@@ -43,6 +44,8 @@
  do
  for is_true_sparse in "${is_true_sparses[@]}"
  do
+ for r_thres in "${r_threses[@]}"
+ do
  OMP_NUM_THREADS=16 KMP_AFFINITY="compact,granularity\=fine" nohup python launch_experiment_${algo}.py \
  ./configs/${task}.json \
  ./data/${datadir} \
@@ -55,11 +58,12 @@
  --is_onlineadapt_pearl=${is_onlineadapt_pearl} \
  --allow_backward_z=${allow_backward_z} \
  --is_true_sparse_rewards=${is_true_sparse} \
- >& out_logs/${Foldername}/${task}_${algo}_${datadir}_${is_sparse}_${use_brac}_${use_information_bottleneck}_${is_zloss}_${is_onlineadapt_uniform}_${is_onlineadapt_pearl}_${allow_backward_z}_${is_true_sparse}_${seed}.txt &
+ --r_thres=${r_thres} \
+ >& out_logs/${Foldername}/${task}_${algo}_${datadir}_${is_sparse}_${use_brac}_${use_information_bottleneck}_${is_zloss}_${is_onlineadapt_uniform}_${is_onlineadapt_pearl}_${allow_backward_z}_${is_true_sparse}_${r_thres}_${seed}.txt &
  echo "task: ${task}, algo: ${algo}, datadir: ${datadir}, is_sparse: ${is_sparse}, use_brac: ${use_brac}"
  echo "     use_information_bottleneck: ${use_information_bottleneck}, is_zloss: ${is_zloss}"
  echo "     is_onlineadapt_uniform: ${is_onlineadapt_uniform}, is_onlineadapt_pearl: ${is_onlineadapt_pearl}"
- echo "     allow_backward_z: ${allow_backward_z}, is_true_sparse: ${is_true_sparse}, seed: ${seed}, GPU: $n"
+ echo "     allow_backward_z: ${allow_backward_z}, is_true_sparse: ${is_true_sparse}, r_thres: ${r_thres}, seed: ${seed}, GPU: $n"
  n=$[($n+1) % ${gpunum}]
  sleep 10
  done
