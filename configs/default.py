@@ -76,6 +76,7 @@ default_config = dict(
         is_predict_task_id=False, # whether to predict task id
         is_onlineadapt_pearl=False, # default not use prepared online adapt using gaussian prior
         is_true_sparse_rewards=False, # whether to sparsify true rewards in sac
+        r_thres=0., # threshold of reward to encode
     ),
     util_params=dict(
         base_log_dir='output',

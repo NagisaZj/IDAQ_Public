@@ -882,6 +882,7 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 
 		self.is_onlineadapt_uniform = kwargs['is_onlineadapt_uniform']
 		self.is_onlineadapt_pearl = kwargs['is_onlineadapt_pearl']
+		self.r_thres = kwargs['r_thres']
 
 	def _do_eval(self, indices, epoch):
 		final_returns = []
@@ -1007,7 +1008,8 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 			path, num = self.sampler.obtain_samples(deterministic=self.eval_deterministic,
 			                                        max_samples=self.num_steps_per_eval - num_transitions, max_trajs=1,
 			                                        accum_context=True,
-			                                        is_select=is_select)
+			                                        is_select=is_select,
+			                                        r_thres=self.r_thres)
 			paths += path
 			num_transitions += num
 			num_trajs += 1

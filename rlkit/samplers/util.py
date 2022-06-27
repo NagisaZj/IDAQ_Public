@@ -323,7 +323,7 @@ def offline_sample(env, agent, buffer, max_path_length=np.inf, accum_context=Tru
 
 
 def rollout(env, agent, max_path_length=np.inf, accum_context=True, is_select=False, animated=False,
-            save_frames=False):
+            save_frames=False, r_thres=0.):
     """
     The following value for the following keys will be a 2D array, with the
     first dimension corresponding to the time dimension.
@@ -409,7 +409,7 @@ def rollout(env, agent, max_path_length=np.inf, accum_context=True, is_select=Fa
 
     # update the agent's current context
     if accum_context:
-        if not is_select or np.sum(sparse_rewards) > 0.3:
+        if not is_select or np.sum(sparse_rewards) > r_thres:
             for c in context:
                 agent.update_context(c)
 

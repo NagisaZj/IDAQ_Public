@@ -226,8 +226,9 @@ def deep_update_dict(fr, to):
 @click.option("--is_onlineadapt_pearl", default=0)
 @click.option("--allow_backward_z", default=0)
 @click.option("--is_true_sparse_rewards", default=0)
+@click.option("--r_thres", default=0.)
 def main(config, data_dir, gpu, is_sparse_reward, use_brac, use_information_bottleneck, is_zloss,
-         is_onlineadapt_uniform, is_onlineadapt_pearl, allow_backward_z, is_true_sparse_rewards):
+         is_onlineadapt_uniform, is_onlineadapt_pearl, allow_backward_z, is_true_sparse_rewards, r_thres):
 
     variant = default_config
     if config:
@@ -244,6 +245,7 @@ def main(config, data_dir, gpu, is_sparse_reward, use_brac, use_information_bott
     variant['algo_params']['is_onlineadapt_pearl'] = is_onlineadapt_pearl
     variant['algo_params']['allow_backward_z'] = allow_backward_z
     variant['algo_params']['is_true_sparse_rewards'] = is_true_sparse_rewards
+    variant['algo_params']['r_thres'] = r_thres
 
     # multi-processing
     p = mp.Pool(mp.cpu_count())
