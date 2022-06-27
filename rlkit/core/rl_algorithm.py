@@ -995,17 +995,12 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 		num_trajs = 0
 		is_select = False
 		while num_transitions < self.num_steps_per_eval:
-			if self.is_onlineadapt_pearl:
-				if type(self.agent.context) == type(None):
-					is_select = True
-			elif self.is_onlineadapt_uniform:
+			if self.is_onlineadapt_uniform:
 				if type(self.agent.context) == type(None):
 					sampled_idx = np.random.choice(self.train_tasks)
 					context = self.sample_context(sampled_idx)
 					self.agent.infer_posterior(context)
 					is_select = True
-				else:
-					is_select = False
 
 			path, num = self.sampler.obtain_samples(deterministic=self.eval_deterministic,
 			                                        max_samples=self.num_steps_per_eval - num_transitions, max_trajs=1,
@@ -1014,7 +1009,11 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 			paths += path
 			num_transitions += num
 			num_trajs += 1
-			if num_trajs >= self.num_exp_traj_eval and type(self.agent.context) != type(None):
+			if self.is_onlineadapt_uniform:
+				if type(self.agent.context) != type(None):
+					self.agent.infer_posterior(self.agent.context)
+					is_select = False
+			elif num_trajs >= self.num_exp_traj_eval and type(self.agent.context) != type(None):
 				self.agent.infer_posterior(self.agent.context)
 				is_select = False
 
