@@ -8,6 +8,7 @@ import numpy as np
 import click
 import json
 import torch
+import datetime
 import multiprocessing as mp
 from itertools import product
 
@@ -173,6 +174,11 @@ def experiment(variant, seed=None):
     # debugging triggers a lot of printing and logs to a debug directory
     DEBUG = variant['util_params']['debug']
     os.environ['DEBUG'] = str(int(DEBUG))
+
+    # configure tensorboard logger
+    unique_token = "{}__{}".format(variant['env_name'], datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
+    variant['util_params']['unique_token'] = unique_token
+    variant['util_params']['base_log_dir'] = os.path.join(variant['util_params']['base_log_dir'], "{}").format(unique_token)
 
     # create logging directory
     # TODO support Docker
