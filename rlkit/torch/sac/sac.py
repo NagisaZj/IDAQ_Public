@@ -1473,6 +1473,7 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
         self.allow_backward_z = kwargs['allow_backward_z']
         self.is_predict_task_id = kwargs['is_predict_task_id']
         self.is_offline_pearl = kwargs['is_offline_pearl']
+        self.is_true_sparse_rewards = kwargs['is_true_sparse_rewards']
         self.loss = {}
         self.plotter = plotter
         self.render_eval_paths = render_eval_paths
@@ -1555,7 +1556,7 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
         # rewards are always dense
         batches = [ptu.np_to_pytorch_batch(self.replay_buffer.random_batch(idx, batch_size=self.batch_size)) for idx in
                    indices]
-        unpacked = [self.unpack_batch(batch, sparse_reward=self.sparse_rewards) for batch in batches]
+        unpacked = [self.unpack_batch(batch, sparse_reward=self.is_true_sparse_rewards) for batch in batches]
         # group like elements together
         unpacked = [[x[i] for x in unpacked] for i in range(len(unpacked[0]))]
         unpacked = [torch.cat(x, dim=0) for x in unpacked]
