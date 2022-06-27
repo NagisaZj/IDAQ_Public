@@ -11,6 +11,7 @@ import torch
 import datetime
 import multiprocessing as mp
 from itertools import product
+import sys
 
 from rlkit.envs import ENVS
 from rlkit.envs.wrappers import NormalizedBoxEnv
@@ -179,6 +180,9 @@ def experiment(variant, seed=None):
     unique_token = "{}__{}".format(variant['env_name'], datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S"))
     variant['util_params']['unique_token'] = unique_token
     variant['util_params']['base_log_dir'] = os.path.join(variant['util_params']['base_log_dir'], "{}").format(unique_token)
+
+    print("base_log_dir: ", variant['util_params']['base_log_dir'])
+    sys.stdout.flush()
 
     # create logging directory
     # TODO support Docker
