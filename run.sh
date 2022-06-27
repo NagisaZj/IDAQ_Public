@@ -53,8 +53,8 @@
  --allow_backward_z=${allow_backward_z} \
  >& out_logs/${Foldername}/${task}_${algo}_${datadir}_${is_sparse}_${use_brac}_${use_information_bottleneck}_${is_zloss}_${is_onlineadapt_uniform}_${is_offline_pearl}_${allow_backward_z}_${seed}.txt &
  echo "task: ${task}, algo: ${algo}, datadir: ${datadir}, is_spars: ${is_sparse}, use_information_bottleneck: ${use_information_bottleneck}"
- echo "\t is_zloss: ${is_zloss}, is_onlineadapt_uniform: ${is_onlineadapt_uniform}, is_offline_pearl: ${is_offline_pearl}"
- echo "\t allow_backward_z: ${allow_backward_z}, seed: ${seed}, GPU: $n"
+ echo "     is_zloss: ${is_zloss}, is_onlineadapt_uniform: ${is_onlineadapt_uniform}, is_offline_pearl: ${is_offline_pearl}"
+ echo "     allow_backward_z: ${allow_backward_z}, seed: ${seed}, GPU: $n"
  n=$[($n+1) % ${gpunum}]
  sleep 10
  done
