@@ -85,7 +85,7 @@ def experiment(variant, seed=None):
         action_dim=action_dim,
     )
 
-    if variant['algo_params']["is_zloss"]:
+    if variant['algo_params']["is_zloss"] and not variant['algo_params']["use_information_bottleneck"]:
         agent = PEARLAgent(
             latent_dim,
             context_encoder,
