@@ -1643,7 +1643,7 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
         c_loss.backward(retain_graph=True)
         self.c_optimizer.step()
 
-    def z_loss(self, indices, task_z, task_z_vars, b, epsilon=1e-3, threshold=0.999):
+    def z_loss(self, indices, task_z, b, epsilon=1e-3, threshold=0.999):
         pos_z_loss = 0.
         neg_z_loss = 0.
         pos_cnt = 0
@@ -1723,8 +1723,8 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
             kl_div = self.agent.compute_kl_div()
             kl_loss = self.kl_lambda * kl_div
             kl_loss.backward(retain_graph=True)
-        elif zloss:
-            z_loss = self.z_loss_weight * self.z_loss(indices=indices, task_z=task_z, task_z_vars=task_z_vars, b=b)
+        if zloss:
+            z_loss = self.z_loss_weight * self.z_loss(indices=indices, task_z=task_z, b=b)
             z_loss.backward(retain_graph=True)
             self.loss["z_loss"] = z_loss.item()
         if self.is_predict_task_id:
