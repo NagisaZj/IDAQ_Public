@@ -16,6 +16,7 @@
  declare -a is_onlineadapt_uniforms=( "1" )
  declare -a is_offline_pearls=( "0" )
  declare -a allow_backward_zs=( "0" )
+ declare -a is_true_sparses=( "0" "1" )
  n=0
  gpunum=8
  for task in "${tasks[@]}"
@@ -40,6 +41,8 @@
  do
  for allow_backward_z in "${allow_backward_zs[@]}"
  do
+ for is_true_sparse in "${is_true_sparses[@]}"
+ do
  OMP_NUM_THREADS=16 KMP_AFFINITY="compact,granularity\=fine" nohup python launch_experiment_${algo}.py \
  ./configs/${task}.json \
  ./data/${datadir} \
@@ -51,12 +54,14 @@
  --is_onlineadapt_uniform=${is_onlineadapt_uniform} \
  --is_offline_pearl=${is_offline_pearl} \
  --allow_backward_z=${allow_backward_z} \
+ --is_true_sparse_rewards=${is_true_sparse} \
  >& out_logs/${Foldername}/${task}_${algo}_${datadir}_${is_sparse}_${use_brac}_${use_information_bottleneck}_${is_zloss}_${is_onlineadapt_uniform}_${is_offline_pearl}_${allow_backward_z}_${seed}.txt &
  echo "task: ${task}, algo: ${algo}, datadir: ${datadir}, is_sparse: ${is_sparse}, use_information_bottleneck: ${use_information_bottleneck}"
  echo "     is_zloss: ${is_zloss}, is_onlineadapt_uniform: ${is_onlineadapt_uniform}, is_offline_pearl: ${is_offline_pearl}"
- echo "     allow_backward_z: ${allow_backward_z}, seed: ${seed}, GPU: $n"
+ echo "     allow_backward_z: ${allow_backward_z}, is_true_sparse: ${is_true_sparse}, seed: ${seed}, GPU: $n"
  n=$[($n+1) % ${gpunum}]
  sleep 10
+ done
  done
  done
  done
