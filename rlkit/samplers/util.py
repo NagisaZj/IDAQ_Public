@@ -378,7 +378,7 @@ def rollout(env, agent, max_path_length=np.inf, accum_context=True, is_select=Fa
         logging.info(r)
 
         context.append([o, a, r, next_o, d, env_info])
-        if is_select:
+        if is_select or is_onlineadapt_max:
             sparse_rewards.append(env_info['sparse_reward'])
 
         '''
