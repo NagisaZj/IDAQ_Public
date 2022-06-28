@@ -75,6 +75,7 @@ default_config = dict(
         is_onlineadapt_thres=False, # default not use prepared online adapt using uniform prior
         is_predict_task_id=False, # whether to predict task id
         is_onlineadapt_max=False, # default not use prepared online adapt using gaussian prior
+        is_onlineadapt_max_start=5, # how many exploration trajs to collect before the first encoder updating
         is_true_sparse_rewards=False, # whether to sparsify true rewards in sac
         r_thres=0., # threshold of reward to encode
     ),

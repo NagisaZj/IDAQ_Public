@@ -15,6 +15,7 @@
  declare -a is_zlosses=( "1" )
  declare -a is_onlineadapt_threses=( "1" )
  declare -a is_onlineadapt_maxes=( "0" )
+ declare -a is_onlineadapt_max_starts=( "10" )
  declare -a allow_backward_zs=( "0" )
  declare -a is_true_sparses=( "0" "1" )
  declare -a r_threses=( "0.3" )
@@ -40,6 +41,8 @@
  do
  for is_onlineadapt_max in "${is_onlineadapt_maxes[@]}"
  do
+ for is_onlineadapt_max_start in "${is_onlineadapt_max_starts[@]}"
+ do
  for allow_backward_z in "${allow_backward_zs[@]}"
  do
  for is_true_sparse in "${is_true_sparses[@]}"
@@ -56,14 +59,16 @@
  --is_zloss=${is_zloss} \
  --is_onlineadapt_thres=${is_onlineadapt_thres} \
  --is_onlineadapt_max=${is_onlineadapt_max} \
+ --is_onlineadapt_max_start=${is_onlineadapt_max_start} \
  --allow_backward_z=${allow_backward_z} \
  --is_true_sparse_rewards=${is_true_sparse} \
  --r_thres=${r_thres} \
- >& out_logs/${Foldername}/${task}_${algo}_${datadir}_${is_sparse}_${use_brac}_${use_information_bottleneck}_${is_zloss}_${is_onlineadapt_thres}_${is_onlineadapt_max}_${allow_backward_z}_${is_true_sparse}_${r_thres}_${seed}.txt &
+ >& out_logs/${Foldername}/${task}_${algo}_${datadir}_${is_sparse}_${use_brac}_${use_information_bottleneck}_${is_zloss}_${is_onlineadapt_thres}_${is_onlineadapt_max}_${is_onlineadapt_max_start}_${allow_backward_z}_${is_true_sparse}_${r_thres}_${seed}.txt &
  echo "task: ${task}, algo: ${algo}, datadir: ${datadir}, is_sparse: ${is_sparse}, use_brac: ${use_brac}"
  echo "     use_information_bottleneck: ${use_information_bottleneck}, is_zloss: ${is_zloss}"
  echo "     is_onlineadapt_thres: ${is_onlineadapt_thres}, is_onlineadapt_max: ${is_onlineadapt_max}"
- echo "     allow_backward_z: ${allow_backward_z}, is_true_sparse: ${is_true_sparse}, r_thres: ${r_thres}, seed: ${seed}, GPU: $n"
+ echo "     is_onlineadapt_max_start: ${is_onlineadapt_max_start}, allow_backward_z: ${allow_backward_z}"
+ echo "     is_true_sparse: ${is_true_sparse}, r_thres: ${r_thres}, seed: ${seed}, GPU: $n"
  n=$[($n+1) % ${gpunum}]
  sleep 10
  done
