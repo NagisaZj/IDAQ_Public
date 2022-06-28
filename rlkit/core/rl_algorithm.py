@@ -1028,7 +1028,8 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 					is_max_traj_num = 0
 					is_max_traj_cd = max(2, is_max_traj_cd - 1)
 					self.agent.update_onlineadapt_max_context()
-					self.agent.infer_posterior(self.agent.context)
+					if type(self.agent.context) != type(None):
+						self.agent.infer_posterior(self.agent.context)
 			elif self.is_onlineadapt_thres:
 				if num_trajs >= self.num_exp_traj_eval and type(self.agent.context) != type(None):
 					self.agent.infer_posterior(self.agent.context)
