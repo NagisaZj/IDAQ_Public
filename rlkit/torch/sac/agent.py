@@ -88,8 +88,6 @@ class PEARLAgent(nn.Module):
         # reset any hidden state in the encoder network (relevant for RNN)
         #self.context_encoder.reset(num_tasks)
 
-        self.clear_onlineadapt_max()
-
     def detach_z(self):
         ''' disable backprop through z '''
         self.z = self.z.detach()
@@ -102,12 +100,15 @@ class PEARLAgent(nn.Module):
             self.is_onlineadapt_max_context = context
 
     def update_onlineadapt_max_context(self):
-        for c in self.is_onlineadapt_max_context:
-            self.update_context(c)
+        if self.is_onlineadapt_max_score > self.old_onlineadapt_max_score:
+            self.old_onlineadapt_max_score = self.is_onlineadapt_max_score
+            for c in self.is_onlineadapt_max_context:
+                self.update_context(c)
 
     def clear_onlineadapt_max(self):
         self.is_onlineadapt_max_score = -1e8
         self.is_onlineadapt_max_context = []
+        self.old_onlineadapt_max_score = -1e8
 
     def update_context(self, inputs):
         ''' append single transition to the current context '''
