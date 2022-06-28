@@ -181,9 +181,6 @@ def experiment(variant, seed=None):
     variant['util_params']['unique_token'] = unique_token
     variant['util_params']['base_log_dir'] = os.path.join(variant['util_params']['base_log_dir'], "{}").format(unique_token)
 
-    print("base_log_dir: ", variant['util_params']['base_log_dir'])
-    sys.stdout.flush()
-
     # create logging directory
     # TODO support Docker
     exp_id = 'debug' if DEBUG else None
