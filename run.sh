@@ -84,4 +84,5 @@
  done
  done
  done
+ done
 # python policy_train.py ./configs/sparse-point-robot.json
