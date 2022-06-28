@@ -410,7 +410,7 @@ def rollout(env, agent, max_path_length=np.inf, accum_context=True, is_select=Fa
     # update the agent's current context
     if accum_context:
         if is_onlineadapt_max:
-            agent.update_onlineadapt_pearl(np.sum(sparse_rewards), context)
+            agent.update_onlineadapt_max(np.sum(sparse_rewards), context)
         elif not is_select or np.sum(sparse_rewards) > r_thres:
             for c in context:
                 agent.update_context(c)
