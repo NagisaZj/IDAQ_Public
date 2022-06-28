@@ -13,8 +13,8 @@
  declare -a use_bracs=( "0" )
  declare -a use_information_bottlenecks=( "0" )
  declare -a is_zlosses=( "1" )
- declare -a is_onlineadapt_uniforms=( "1" )
- declare -a is_onlineadapt_pearls=( "0" )
+ declare -a is_onlineadapt_threses=( "1" )
+ declare -a is_onlineadapt_maxes=( "0" )
  declare -a allow_backward_zs=( "0" )
  declare -a is_true_sparses=( "0" "1" )
  declare -a r_threses=( "0.3" )
@@ -36,9 +36,9 @@
  do
  for is_zloss in "${is_zlosses[@]}"
  do
- for is_onlineadapt_uniform in "${is_onlineadapt_uniforms[@]}"
+ for is_onlineadapt_thres in "${is_onlineadapt_threses[@]}"
  do
- for is_onlineadapt_pearl in "${is_onlineadapt_pearls[@]}"
+ for is_onlineadapt_max in "${is_onlineadapt_maxes[@]}"
  do
  for allow_backward_z in "${allow_backward_zs[@]}"
  do
@@ -54,15 +54,15 @@
  --use_brac=${use_brac} \
  --use_information_bottleneck=${use_information_bottleneck} \
  --is_zloss=${is_zloss} \
- --is_onlineadapt_uniform=${is_onlineadapt_uniform} \
- --is_onlineadapt_pearl=${is_onlineadapt_pearl} \
+ --is_onlineadapt_thres=${is_onlineadapt_thres} \
+ --is_onlineadapt_max=${is_onlineadapt_max} \
  --allow_backward_z=${allow_backward_z} \
  --is_true_sparse_rewards=${is_true_sparse} \
  --r_thres=${r_thres} \
- >& out_logs/${Foldername}/${task}_${algo}_${datadir}_${is_sparse}_${use_brac}_${use_information_bottleneck}_${is_zloss}_${is_onlineadapt_uniform}_${is_onlineadapt_pearl}_${allow_backward_z}_${is_true_sparse}_${r_thres}_${seed}.txt &
+ >& out_logs/${Foldername}/${task}_${algo}_${datadir}_${is_sparse}_${use_brac}_${use_information_bottleneck}_${is_zloss}_${is_onlineadapt_thres}_${is_onlineadapt_max}_${allow_backward_z}_${is_true_sparse}_${r_thres}_${seed}.txt &
  echo "task: ${task}, algo: ${algo}, datadir: ${datadir}, is_sparse: ${is_sparse}, use_brac: ${use_brac}"
  echo "     use_information_bottleneck: ${use_information_bottleneck}, is_zloss: ${is_zloss}"
- echo "     is_onlineadapt_uniform: ${is_onlineadapt_uniform}, is_onlineadapt_pearl: ${is_onlineadapt_pearl}"
+ echo "     is_onlineadapt_thres: ${is_onlineadapt_thres}, is_onlineadapt_max: ${is_onlineadapt_max}"
  echo "     allow_backward_z: ${allow_backward_z}, is_true_sparse: ${is_true_sparse}, r_thres: ${r_thres}, seed: ${seed}, GPU: $n"
  n=$[($n+1) % ${gpunum}]
  sleep 10

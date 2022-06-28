@@ -28,7 +28,7 @@ class InPlacePathSampler(object):
         pass
 
     def obtain_samples(self, deterministic=False, max_samples=np.inf, max_trajs=np.inf, accum_context=True,
-                       is_select=False, resample=1, r_thres=0., is_onlineadapt_pearl=False):
+                       is_select=False, resample=1, r_thres=0., is_onlineadapt_max=False):
         """
         Obtains samples in the environment until either we reach either max_samples transitions or
         num_traj trajectories.
@@ -42,7 +42,7 @@ class InPlacePathSampler(object):
         while n_steps_total < max_samples and n_trajs < max_trajs:
             path = rollout(
                 self.env, policy, max_path_length=self.max_path_length, accum_context=accum_context,
-                is_select=is_select, r_thres=r_thres, is_onlineadapt_pearl=is_onlineadapt_pearl)
+                is_select=is_select, r_thres=r_thres, is_onlineadapt_max=is_onlineadapt_max)
             # save the latent context that generated this trajectory
             path['context'] = policy.z.detach().cpu().numpy()
             paths.append(path)

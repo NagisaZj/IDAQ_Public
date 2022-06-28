@@ -88,7 +88,7 @@ class PEARLAgent(nn.Module):
         # reset any hidden state in the encoder network (relevant for RNN)
         #self.context_encoder.reset(num_tasks)
 
-        self.clear_onlineadapt_pearl()
+        self.clear_onlineadapt_max()
 
     def detach_z(self):
         ''' disable backprop through z '''
@@ -96,18 +96,18 @@ class PEARLAgent(nn.Module):
         if self.recurrent:
             self.context_encoder.hidden = self.context_encoder.hidden.detach()
 
-    def update_onlineadapt_pearl(self, score, context):
-        if score > self.is_onlineadapt_pearl_score:
-            self.is_onlineadapt_pearl_score = score
-            self.is_onlineadapt_pearl_context = context
+    def update_onlineadapt_max(self, score, context):
+        if score > self.is_onlineadapt_max_score:
+            self.is_onlineadapt_max_score = score
+            self.is_onlineadapt_max_context = context
 
-    def update_onlineadapt_pearl_context(self):
-        for c in self.is_onlineadapt_pearl_context:
+    def update_onlineadapt_max_context(self):
+        for c in self.is_onlineadapt_max_context:
             self.update_context(c)
 
-    def clear_onlineadapt_pearl(self):
-        self.is_onlineadapt_pearl_score = -1e8
-        self.is_onlineadapt_pearl_context = []
+    def clear_onlineadapt_max(self):
+        self.is_onlineadapt_max_score = -1e8
+        self.is_onlineadapt_max_context = []
 
     def update_context(self, inputs):
         ''' append single transition to the current context '''
@@ -304,7 +304,7 @@ class OldPEARLAgent(nn.Module):
         # reset any hidden state in the encoder network (relevant for RNN)
         #self.context_encoder.reset(num_tasks)
 
-        self.clear_onlineadapt_pearl()
+        self.clear_onlineadapt_max()
 
     def detach_z(self):
         ''' disable backprop through z '''
@@ -312,18 +312,18 @@ class OldPEARLAgent(nn.Module):
         if self.recurrent:
             self.context_encoder.hidden = self.context_encoder.hidden.detach()
 
-    def update_onlineadapt_pearl(self, score, context):
-        if score > self.is_onlineadapt_pearl_score:
-            self.is_onlineadapt_pearl_score = score
-            self.is_onlineadapt_pearl_context = context
+    def update_onlineadapt_max(self, score, context):
+        if score > self.is_onlineadapt_max_score:
+            self.is_onlineadapt_max_score = score
+            self.is_onlineadapt_max_context = context
 
-    def update_onlineadapt_pearl_context(self):
-        for c in self.is_onlineadapt_pearl_context:
+    def update_onlineadapt_max_context(self):
+        for c in self.is_onlineadapt_max_context:
             self.update_context(c)
 
-    def clear_onlineadapt_pearl(self):
-        self.is_onlineadapt_pearl_score = -1e8
-        self.is_onlineadapt_pearl_context = []
+    def clear_onlineadapt_max(self):
+        self.is_onlineadapt_max_score = -1e8
+        self.is_onlineadapt_max_context = []
 
     def update_context(self, inputs):
         ''' append single transition to the current context '''

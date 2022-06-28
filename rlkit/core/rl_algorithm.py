@@ -880,9 +880,9 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
             **kwargs
         )
 
-		self.is_onlineadapt_uniform = kwargs['is_onlineadapt_uniform']
-		self.is_onlineadapt_pearl = kwargs['is_onlineadapt_pearl']
-		self.is_onlineadapt_pearl_start = kwargs['is_onlineadapt_pearl_start']
+		self.is_onlineadapt_thres = kwargs['is_onlineadapt_thres']
+		self.is_onlineadapt_max = kwargs['is_onlineadapt_max']
+		self.is_onlineadapt_max_start = kwargs['is_onlineadapt_max_start']
 		self.r_thres = kwargs['r_thres']
 
 	def _do_eval(self, indices, epoch):
@@ -996,16 +996,16 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 		num_transitions = 0
 		num_trajs = 0
 		is_select = False
-		if self.is_onlineadapt_pearl:
-			is_pearl_traj_num = 0
-			is_pearl_traj_cd = self.is_onlineadapt_pearl_start
+		if self.is_onlineadapt_max:
+			is_max_traj_num = 0
+			is_max_traj_cd = self.is_onlineadapt_max_start
 		while num_transitions < self.num_steps_per_eval:
-			if self.is_onlineadapt_pearl:
+			if self.is_onlineadapt_max:
 				if type(self.agent.context) == type(None):
 					sampled_idx = np.random.choice(self.train_tasks)
 					context = self.sample_context(sampled_idx)
 					self.agent.infer_posterior(context)
-			elif self.is_onlineadapt_uniform:
+			elif self.is_onlineadapt_thres:
 				is_select = True
 				if num_trajs <= self.num_exp_traj_eval or type(self.agent.context) == type(None):
 					sampled_idx = np.random.choice(self.train_tasks)
@@ -1017,19 +1017,19 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 			                                        accum_context=True,
 			                                        is_select=is_select,
 			                                        r_thres=self.r_thres,
-			                                        is_onlineadapt_pearl=self.is_onlineadapt_pearl)
+			                                        is_onlineadapt_max=self.is_onlineadapt_max)
 			paths += path
 			num_transitions += num
 			num_trajs += 1
-			if self.is_onlineadapt_pearl:
-				is_pearl_traj_num += 1
-				if is_pearl_traj_num == is_pearl_traj_cd:
-					is_pearl_traj_num = 0
-					is_pearl_traj_cd = max(1, is_pearl_traj_cd - 1)
+			if self.is_onlineadapt_max:
+				is_max_traj_num += 1
+				if is_max_traj_num == is_max_traj_cd:
+					is_max_traj_num = 0
+					is_max_traj_cd = max(1, is_max_traj_cd - 1)
 					self.agent.update_onlineadapt_pearl_context()
 					self.agent.clear_onlineadapt_pearl()
 					self.agent.infer_posterior(self.agent.context)
-			elif self.is_onlineadapt_uniform:
+			elif self.is_onlineadapt_thres:
 				if num_trajs >= self.num_exp_traj_eval and type(self.agent.context) != type(None):
 					self.agent.infer_posterior(self.agent.context)
 			elif num_trajs >= self.num_exp_traj_eval and type(self.agent.context) != type(None):

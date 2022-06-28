@@ -72,9 +72,9 @@ default_config = dict(
         # data_dir="./data/walker_randparam_new_norm", # default data directory
         data_dir="./data/walker_randparam_new_norm", # default data directory
         is_zloss=True, # default using contrastive learning,
-        is_onlineadapt_uniform=False, # default not use prepared online adapt using uniform prior
+        is_onlineadapt_thres=False, # default not use prepared online adapt using uniform prior
         is_predict_task_id=False, # whether to predict task id
-        is_onlineadapt_pearl=False, # default not use prepared online adapt using gaussian prior
+        is_onlineadapt_max=False, # default not use prepared online adapt using gaussian prior
         is_true_sparse_rewards=False, # whether to sparsify true rewards in sac
         r_thres=0., # threshold of reward to encode
     ),
