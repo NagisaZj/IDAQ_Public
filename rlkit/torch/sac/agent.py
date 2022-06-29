@@ -95,8 +95,7 @@ class PEARLAgent(nn.Module):
             self.context_encoder.hidden = self.context_encoder.hidden.detach()
 
     def update_onlineadapt_max(self, score, context):
-        if score > self.is_onlineadapt_max_score or self.is_onlineadapt_update_context:
-            self.is_onlineadapt_update_context = False
+        if score > self.is_onlineadapt_max_score:
             self.is_onlineadapt_max_score = score
             self.is_onlineadapt_max_context = self.context
             self.is_onlineadapt_max_z = (self.z_means, self.z_vars)
@@ -104,17 +103,10 @@ class PEARLAgent(nn.Module):
             for c in context:
                 self.update_context(c)
             self.infer_posterior(self.context)
+            self.is_onlineadapt_max_upd_context = self.context
         else:
             self.context = self.is_onlineadapt_max_context
             self.set_z(self.is_onlineadapt_max_z[0], self.is_onlineadapt_max_z[1])
-
-    def clear_onlineadapt_max(self):
-        self.is_onlineadapt_max_score = -1e8
-        self.is_onlineadapt_max_context = None
-        self.is_onlineadapt_max_z = None
-        self.is_onlineadapt_max_z_sample = None
-        self.is_onlineadapt_update_context = False
-        self.old_onlineadapt_max_score =  -1e8
 
     def set_z(self, means, vars):
         self.z_means = means
@@ -125,7 +117,16 @@ class PEARLAgent(nn.Module):
         self.z = self.is_onlineadapt_max_z_sample
 
     def set_onlineadapt_update_context(self):
-        self.is_onlineadapt_update_context = True
+        self.context = self.is_onlineadapt_max_upd_context
+        self.infer_posterior(self.context)
+
+    def clear_onlineadapt_max(self):
+        self.is_onlineadapt_max_score = -1e8
+        self.is_onlineadapt_max_context = None
+        self.is_onlineadapt_max_upd_context = None
+        self.is_onlineadapt_max_z = None
+        self.is_onlineadapt_max_z_sample = None
+        self.old_onlineadapt_max_score = -1e8
 
     def update_context(self, inputs):
         ''' append single transition to the current context '''
@@ -329,8 +330,7 @@ class OldPEARLAgent(nn.Module):
             self.context_encoder.hidden = self.context_encoder.hidden.detach()
 
     def update_onlineadapt_max(self, score, context):
-        if score > self.is_onlineadapt_max_score or self.is_onlineadapt_update_context:
-            self.is_onlineadapt_update_context = False
+        if score > self.is_onlineadapt_max_score:
             self.is_onlineadapt_max_score = score
             self.is_onlineadapt_max_context = self.context
             self.is_onlineadapt_max_z = (self.z_means, self.z_vars)
@@ -338,17 +338,10 @@ class OldPEARLAgent(nn.Module):
             for c in context:
                 self.update_context(c)
             self.infer_posterior(self.context)
+            self.is_onlineadapt_max_upd_context = self.context
         else:
             self.context = self.is_onlineadapt_max_context
             self.set_z(self.is_onlineadapt_max_z[0], self.is_onlineadapt_max_z[1])
-
-    def clear_onlineadapt_max(self):
-        self.is_onlineadapt_max_score = -1e8
-        self.is_onlineadapt_max_context = None
-        self.is_onlineadapt_max_z = None
-        self.is_onlineadapt_max_z_sample = None
-        self.is_onlineadapt_update_context = False
-        self.old_onlineadapt_max_score =  -1e8
 
     def set_z(self, means, vars):
         self.z_means = means
@@ -359,7 +352,16 @@ class OldPEARLAgent(nn.Module):
         self.z = self.is_onlineadapt_max_z_sample
 
     def set_onlineadapt_update_context(self):
-        self.is_onlineadapt_update_context = True
+        self.context = self.is_onlineadapt_max_upd_context
+        self.infer_posterior(self.context)
+
+    def clear_onlineadapt_max(self):
+        self.is_onlineadapt_max_score = -1e8
+        self.is_onlineadapt_max_context = None
+        self.is_onlineadapt_max_upd_context = None
+        self.is_onlineadapt_max_z = None
+        self.is_onlineadapt_max_z_sample = None
+        self.old_onlineadapt_max_score =  -1e8
 
     def update_context(self, inputs):
         ''' append single transition to the current context '''
