@@ -7,7 +7,7 @@ import click
 from plot_utils import *
 
 @click.command()
-@click.argument('--name', default='sparse-point-robot__2022-06-28_23-15-44')
+@click.option('--name', default='sparse-point-robot__2022-06-28_23-15-44')
 
 def main(name):
 	path = 'output/' + name + '/sparse-point-robot/debug/'
