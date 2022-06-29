@@ -1638,7 +1638,7 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
 
     def _optimize_c(self, indices, context):
         # data is (task, batch, feat)
-        obs, actions, rewards, next_obs, terms = self.sample_sac(indices)
+        obs, actions, rewards, next_obs, terms, _ = self.sample_sac(indices)
 
         # run inference in networks
         if self.use_information_bottleneck:
