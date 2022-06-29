@@ -56,7 +56,7 @@ def data_read(paths=['./outputfin2/cheetah-vel-sparse/2019_11_20_08_52_39/progre
     shortest = 10000000000
     for p in mine_paths:
         csv_data = pd.read_csv(p)
-        values_steps = csv_data['Number of env steps total'].values
+        values_steps = csv_data['Epoch'].values
         values_returns = csv_data[load_name].values
         #values_returns = smoothingaverage(values_returns)
         #print(values_steps.shape)
