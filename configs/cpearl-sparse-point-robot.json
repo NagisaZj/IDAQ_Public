@@ -12,7 +12,7 @@
     },
     "algo_params": {
         "meta_batch":16,
-        "num_iterations": 100,
+        "num_iterations": 50,
         "num_initial_steps": 200,
         "num_tasks_sample": 10,
         "num_steps_prior": 100,
