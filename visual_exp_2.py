@@ -131,7 +131,7 @@ def main(name):
 
             count += 1
 
-    fig.suptitle("iteration:%d, average reward of all tasks:%f" % (epoch, np.mean(reward)))
+    fig.suptitle("iteration: %d, task %d, run: %d, average reward of all tasks:%f" % (epoch, test_task_list[0], run_num, np.mean(reward)))
 
     #task = 1
     #fig, axes = plt.subplots(2, 4)
