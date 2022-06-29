@@ -75,7 +75,7 @@ def data_read(paths=['./outputfin2/cheetah-vel-sparse/2019_11_20_08_52_39/progre
     '''if 'rl2' in paths[0]:
         shortest = 700'''
 
-    xs = mine_values[0][0][:shortest]/1e6
+    xs = mine_values[0][0][:shortest]
     ys = np.zeros([shortest,num_trajs])
     for i  in range(num_trajs):
         ys[:,i] = mine_values[i][1][:shortest]
