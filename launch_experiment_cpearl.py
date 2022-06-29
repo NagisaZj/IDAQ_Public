@@ -123,7 +123,7 @@ def experiment(variant, seed=None):
         )
         if 'randomize_tasks' in variant.keys() and variant['randomize_tasks']:
             rng = default_rng()
-            train_tasks = rng.choice(len(tasks), size=variant['n_train_tasks'], replace=False)
+            train_tasks = rng.choice(len(tasks), size=variant['n_train_tasks'], replace=False).sort()
             eval_tasks = set(range(len(tasks))).difference(train_tasks)
             if 'goal_radius' in variant['env_params']:
                 algorithm = CPEARL(
