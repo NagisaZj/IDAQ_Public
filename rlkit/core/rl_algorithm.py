@@ -1000,6 +1000,7 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 			self.plotter.draw()
 
 	def test_model(self, path, true_idx):
+		pass
 		for idx in self.train_tasks:
 			self.agent.set_z(self.trained_z[idx][0], self.trained_z[idx][1])
 			self.agent.sample_z()
@@ -1016,19 +1017,19 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 		num_trajs = 0
 		is_select = False
 		if self.is_onlineadapt_max:
-			is_max_traj_num = 0
-			is_max_traj_cd = self.is_onlineadapt_max_start
 			self.agent.clear_onlineadapt_max()
 		while num_transitions < self.num_steps_per_eval:
 			if self.is_onlineadapt_max:
 				if num_trajs < self.num_exp_traj_eval or type(self.agent.context) == type(None):
 					sampled_idx = np.random.choice(self.train_tasks)
+					self.agent.clear_z()
 					self.agent.set_z(self.trained_z[sampled_idx][0], self.trained_z[sampled_idx][1])
 					self.agent.sample_z()
 			elif self.is_onlineadapt_thres:
 				is_select = True
 				if num_trajs < self.num_exp_traj_eval or type(self.agent.context) == type(None):
 					sampled_idx = np.random.choice(self.train_tasks)
+					self.agent.clear_z()
 					self.agent.set_z(self.trained_z[sampled_idx][0], self.trained_z[sampled_idx][1])
 					self.agent.sample_z()
 
@@ -1046,13 +1047,8 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 			num_transitions += num
 			num_trajs += 1
 			if self.is_onlineadapt_max:
-				is_max_traj_num += 1
-				if is_max_traj_num == is_max_traj_cd:
-					is_max_traj_num = 0
-					is_max_traj_cd = 1
-					self.agent.update_onlineadapt_max_context()
-					if type(self.agent.context) != type(None):
-						self.agent.infer_posterior(self.agent.context)
+				if num_trajs >= self.num_exp_traj_eval and type(self.agent.context) != type(None):
+					self.agent.infer_posterior(self.agent.context)
 			elif self.is_onlineadapt_thres:
 				if num_trajs >= self.num_exp_traj_eval and type(self.agent.context) != type(None):
 					self.agent.infer_posterior(self.agent.context)
