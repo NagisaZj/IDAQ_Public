@@ -5,10 +5,8 @@ import matplotlib.pyplot as plt
 import csv
 import pickle
 import os
-import colour
 import torch
 import click
-from rlkit.torch.networks import SnailEncoder,MlpEncoder
 # config
 def cal_rew(encoder,path):
     s,a,r = path['observations'],path['actions'],path['rewards']
@@ -30,20 +28,25 @@ def cal_rew(encoder,path):
 
 def main(name):
 
-    tlow, thigh = 80, 100  # task ID range
+    #tlow, thigh = 80, 100  # task ID range
+
+    test_task_list = [1]
+    run_num = 0
+    task_num = len(test_task_list)
+
     # see `n_tasks` and `n_eval_tasks` args in the training config json
     # by convention, the test tasks are always the last `n_eval_tasks` IDs
     # so if there are 100 tasks total, and 20 test tasks, the test tasks will be IDs 81-100
-    epoch = 90
-    gr = 0.3  # goal radius, for visualization purposes
+    epoch = 13
+    gr = 0.2  # goal radius, for visualization purposes
 
-    expdir = 'output/' + name + '/sparse-point-robot/debug/'
+    expdir = 'output/' + name + '/sparse-point-robot/debug/eval_trajectories/'
 
     # expdir = './outputfin2/sparse-point-robot-noise/{}/eval_trajectories/'.format(exp_id)
     # dir = './outputfin2/sparse-point-robot-noise/{}/'.format(exp_id)
     # helpers
     def load_pkl(task):
-        with open(os.path.join(expdir, 'task{}-epoch{}-run0.pkl'.format(task, epoch)), 'rb') as f:
+        with open(os.path.join(expdir, 'task{}-epoch{}-run{}.pkl'.format(task, epoch, run_num)), 'rb') as f:
             data = pickle.load(f)
         return data
 
@@ -52,9 +55,9 @@ def main(name):
             data = pickle.load(f)
         return data
 
-    goals = [load_pkl(task)[0]['goal'] for task in range(tlow, thigh)]
+    goals = [load_pkl(task)[0]['goal'] for task in test_task_list]
 
-    plt.figure(figsize=(8, 8))
+    plt.figure(figsize=(60, 160))
     axes = plt.axes()
     axes.set(aspect='equal')
     plt.axis([-1.55, 1.55, -0.55, 1.55])
@@ -70,11 +73,10 @@ def main(name):
         plt.plot(states[:-1, 0], states[:-1, 1], '-o')
         plt.plot(states[-1, 0], states[-1, 1], '-x', markersize=20)'''
 
-    mpl = 20
-    num_trajs = 60
+    num_trajs = 20
 
     all_paths = []
-    for task in range(tlow, thigh):
+    for task in test_task_list:
         paths = [t['observations'] for t in load_pkl(task)]
         all_paths.append(paths)
 
@@ -83,11 +85,11 @@ def main(name):
     sample_locs = np.linspace(0, 0.9, num_trajs)
     colors = [cmap(s) for s in sample_locs]
 
-    fig, axes = plt.subplots(3, 3, figsize=(12, 20))
-    t = 10
+    fig, axes = plt.subplots(4, num_trajs // 4, figsize=(12, 20))
+    t = 0
 
     all_paths_rew = []
-    for task in range(tlow, thigh):
+    for task in test_task_list:
         paths = [t['rewards'] for t in load_pkl(task)]
         all_paths_rew.append(paths)
 
@@ -99,9 +101,9 @@ def main(name):
         all_paths_z_means.append(means)
         all_paths_z_vars.append(means)'''
 
-    reward = np.zeros((20, 1))
-    final_rew = np.zeros((20, 1))
-    for m in range(20):
+    reward = np.zeros((task_num, 1))
+    final_rew = np.zeros((task_num, 1))
+    for m in range(task_num):
         for n in range(len(all_paths_rew[m])):
             reward[m] = reward[m] + np.sum(all_paths_rew[m][n])
             # reward[m] = reward[m] + all_paths_rew[m][n][-1]
@@ -110,34 +112,32 @@ def main(name):
     # print(reward)
     # print(np.mean(reward))
 
-    for j in range(3):
-        for i in range(3):
+    count = 0
+    for i in range(4):
+        for j in range(num_trajs // 4):
             axes[i, j].set_xlim([-2.05, 2.05])
             axes[i, j].set_ylim([-1.05, 2.05])
             for k, g in enumerate(goals):
-                alpha = 1 if k == t else 0.2
+                alpha = 0.2
                 circle = plt.Circle((g[0], g[1]), radius=gr, alpha=alpha)
                 axes[i, j].add_artist(circle)
-            indices = list(np.linspace(0, 4, num_trajs, endpoint=False).astype(np.int))
-            counter = 0
-            for idx in indices:
-                states = all_paths[t][idx]
-                axes[i, j].plot(states[:-1, 0], states[:-1, 1], '-', color=colors[counter])
-                axes[i, j].plot(states[-1, 0], states[-1, 1], '-x', markersize=10, color=colors[counter])
-                axes[i, j].set(aspect='equal')
-                counter += 1
-            axes[i, j].set_title("average reward:%f" % reward[t])
-            t += 1
+
+            states = all_paths[t][count]
+            axes[i, j].plot(states[:-1, 0], states[:-1, 1], '-', color=colors[count])
+            axes[i, j].plot(states[-1, 0], states[-1, 1], '-x', markersize=10, color=colors[count])
+            axes[i, j].set(aspect='equal')
+
+            axes[i, j].set_title("average reward:%.3f" % np.sum(all_paths_rew[t][count]))
+
+            count += 1
 
     fig.suptitle("iteration:%d, average reward of all tasks:%f" % (epoch, np.mean(reward)))
 
-    task = 1
-    fig, axes = plt.subplots(2, 4)
-
-    # encoder.load_state_dict(torch.load(os.path.join(dir, 'context_encoder.pth')))
-    ap = [t for t in load_pkl(task + 80)]
+    #task = 1
+    #fig, axes = plt.subplots(2, 4)
 
     # print(ap[0]['z_vars'])
+    '''
     for m in range(1):
         for n in range(4):
             id = m * 4 + n
@@ -156,9 +156,10 @@ def main(name):
             # axes[m, n].text(states[3, 0], states[3, 1],
             #                '%.3f\n%.3f' % (np.mean(ap[id]['z_means'][3]), np.min(ap[id]['z_vars'][3] ** 0.5)))
             # axes[m, n].text(states[-1, 0], states[-1, 1], '%.3f\n%.3f' % (np.mean(ap[id]['z_means'][-1]),np.min(ap[id]['z_vars'][-1]**0.5)),fontsize=12)
+    '''
     # for i in range(10):
     #    print(ap[i]['z_means'])
-    plt.savefig("figures/heatmaps/" + name + "_" + str(epoch) + ".png")
+    plt.savefig("figures/heatmaps/" + name + "_task" + str(test_task_list[0]) + "_epoch" + str(epoch) + "_run" + str(run_num) + ".pdf")
 
 if __name__ =="__main__":
     main()
