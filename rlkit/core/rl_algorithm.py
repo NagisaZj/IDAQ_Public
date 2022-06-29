@@ -1004,7 +1004,7 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 			self.agent.set_z(self.trained_z[idx][0], self.trained_z[idx][1])
 			self.agent.sample_z()
 			loss = self.get_prediction_error(path, self.agent.z)
-			print('ture_idx: {}, sampled_idx: {}, prediction_loss: {}', true_idx, idx, loss)
+			print('ture_idx: {}, sampled_idx: {}, prediction_loss: {}'.format(true_idx, idx, loss))
 
 	def collect_paths(self, idx, epoch, run):
 		self.task_idx = idx
@@ -1039,7 +1039,7 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 			                                        r_thres=self.r_thres,
 			                                        is_onlineadapt_max=self.is_onlineadapt_max)
 
-			if num_trajs < self.num_exp_traj_eval and self.is_onlineadapt_model:
+			if epoch >= 3 and num_trajs < self.num_exp_traj_eval and self.is_onlineadapt_model:
 				self.test_model(path, idx)
 
 			paths += path
