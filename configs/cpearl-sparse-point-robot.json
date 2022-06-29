@@ -28,7 +28,7 @@
         "sparse_rewards": 1,
         "kl_lambda": 1.0,
         "num_exp_traj_eval": 10,
-        "dump_eval_paths": 0,
+        "dump_eval_paths": 1,
         "train_epoch": 4800,
         "eval_epoch": 4800,
         "sample": 1,
