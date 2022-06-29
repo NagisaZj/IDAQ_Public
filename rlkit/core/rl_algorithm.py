@@ -43,6 +43,10 @@ class OfflineMetaRLAlgorithm(metaclass=abc.ABCMeta):
 		self.eval_tasks = eval_tasks
 		self.goal_radius = goal_radius
 
+		print('train_tasks:', train_tasks)
+		print('eval_tasks:', eval_tasks)
+		print('goal_radius:', goal_radius)
+
 		self.meta_batch = kwargs['meta_batch']
 		self.batch_size = kwargs['batch_size']
 		self.num_iterations = kwargs['num_iterations']
