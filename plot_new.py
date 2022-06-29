@@ -33,7 +33,7 @@ def main(name):
 	# plt.plot(mine_data_new_intr[0], np.ones(mine_data_new_intr[0].shape) * 9.98, color='olive', linestyle='--',
 	#         linewidth=2, label='EPI')
 	# legend()
-	plt.savefig("figures/" + name + ".png")
+	plt.savefig("figures/curves/" + name + ".png")
 
 if __name__ =="__main__":
 	main()
