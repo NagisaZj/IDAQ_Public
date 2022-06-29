@@ -886,7 +886,6 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 
 		self.is_onlineadapt_thres = kwargs['is_onlineadapt_thres']
 		self.is_onlineadapt_max = kwargs['is_onlineadapt_max']
-		self.is_onlineadapt_max_start = kwargs['is_onlineadapt_max_start']
 		self.r_thres = kwargs['r_thres']
 		self.is_onlineadapt_model = kwargs['is_onlineadapt_model']
 
