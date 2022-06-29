@@ -48,7 +48,8 @@ def data_read_varibad2(paths=[]):
 
 def data_read(paths=['./outputfin2/cheetah-vel-sparse/2019_11_20_08_52_39/progress.csv',
                   '/home/zj/Desktop/new-pearl/outputfin2/cheetah-vel-sparse/2019_11_20_16_01_14/progress.csv',
-                  '/home/zj/Desktop/new-pearl/outputfin2/cheetah-vel-sparse/2019_11_19_19_57_40/progress.csv']):
+                  '/home/zj/Desktop/new-pearl/outputfin2/cheetah-vel-sparse/2019_11_19_19_57_40/progress.csv'],
+              load_name='AverageReturn_all_test_tasks'):
     mine_values = []
     num_trajs = len(paths)
     mine_paths = paths
@@ -56,7 +57,7 @@ def data_read(paths=['./outputfin2/cheetah-vel-sparse/2019_11_20_08_52_39/progre
     for p in mine_paths:
         csv_data = pd.read_csv(p)
         values_steps = csv_data['Number of env steps total'].values
-        values_returns = csv_data['AverageReturn_all_test_tasks_last'].values
+        values_returns = csv_data[load_name].values
         #values_returns = smoothingaverage(values_returns)
         #print(values_steps.shape)
         length = values_returns.shape[0]
@@ -506,7 +507,7 @@ def config_set_default(config_primal):
 
 
 config = plt_config_point
-config = plt_config_cheetah
+#config = plt_config_cheetah
 #config = plt_config_walker
 #config = plt_config_reacher
 #config = plt_config_params
