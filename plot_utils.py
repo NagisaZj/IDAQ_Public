@@ -572,6 +572,9 @@ def plot_all(datas,legends,start=0):
     #new_plot_full_xuxian(datas[0], color_list[0], legends[0])
     #new_plot_full(datas[0], color_list[0], legends[0])
 
+    plt.legend(loc=config['legend_loc'], prop={'size': config['legend_prop_size']}, frameon=True,
+               framealpha=config['framealpha'], facecolor='white', ncol=config['legend_ncol'])
+
 
 def legend():
 
