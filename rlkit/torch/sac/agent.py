@@ -98,14 +98,18 @@ class PEARLAgent(nn.Module):
         if score > self.is_onlineadapt_max_score:
             self.is_onlineadapt_max_score = score
             self.is_onlineadapt_max_context = self.context
+            self.is_onlineadapt_max_z = (self.z_means, self.z_vars)
             for c in context:
                 self.update_context(c)
+            self.infer_posterior(self.context)
         else:
             self.context = self.is_onlineadapt_max_context
+            self.set_z(self.is_onlineadapt_max_z[0], self.is_onlineadapt_max_z[1])
 
     def clear_onlineadapt_max(self):
         self.is_onlineadapt_max_score = -1e8
         self.is_onlineadapt_max_context = None
+        self.is_onlineadapt_max_z = None
         self.old_onlineadapt_max_score =  -1e8
 
     def set_z(self, means, vars):
@@ -317,14 +321,18 @@ class OldPEARLAgent(nn.Module):
         if score > self.is_onlineadapt_max_score:
             self.is_onlineadapt_max_score = score
             self.is_onlineadapt_max_context = self.context
+            self.is_onlineadapt_max_z = (self.z_means, self.z_vars)
             for c in context:
                 self.update_context(c)
+            self.infer_posterior(self.context)
         else:
             self.context = self.is_onlineadapt_max_context
+            self.set_z(self.is_onlineadapt_max_z[0], self.is_onlineadapt_max_z[1])
 
     def clear_onlineadapt_max(self):
         self.is_onlineadapt_max_score = -1e8
         self.is_onlineadapt_max_context = None
+        self.is_onlineadapt_max_z = None
         self.old_onlineadapt_max_score =  -1e8
 
     def set_z(self, means, vars):

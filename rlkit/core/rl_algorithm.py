@@ -999,7 +999,7 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 			self.plotter.draw()
 
 	def test_model(self, path, true_idx):
-		pass
+		return
 		for idx in self.train_tasks:
 			self.agent.set_z(self.trained_z[idx][0], self.trained_z[idx][1])
 			self.agent.sample_z()
@@ -1046,8 +1046,7 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 			num_transitions += num
 			num_trajs += 1
 			if self.is_onlineadapt_max:
-				if num_trajs >= self.num_exp_traj_eval and type(self.agent.context) != type(None):
-					self.agent.infer_posterior(self.agent.context)
+				pass
 			elif self.is_onlineadapt_thres:
 				if num_trajs >= self.num_exp_traj_eval and type(self.agent.context) != type(None):
 					self.agent.infer_posterior(self.agent.context)
