@@ -127,7 +127,7 @@ def main(name):
             axes[i, j].plot(states[-1, 0], states[-1, 1], '-x', markersize=10, color=colors[count])
             axes[i, j].set(aspect='equal')
 
-            axes[i, j].set_title("average reward:%.3f" % np.sum(all_paths_rew[t][count]))
+            axes[i, j].set_title("sum reward:%.3f" % np.sum(all_paths_rew[t][count]))
 
             count += 1
 
