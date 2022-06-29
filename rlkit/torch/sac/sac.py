@@ -1497,7 +1497,7 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
         self.pred_loss = nn.MSELoss()
         self.ce_loss = nn.CrossEntropyLoss()
         self._num_steps = 0
-        self._visit_num_steps_train = 10
+        self._visit_num_steps_train = 100
         self._alpha_var = torch.tensor(1.)
 
         for net in nets:
