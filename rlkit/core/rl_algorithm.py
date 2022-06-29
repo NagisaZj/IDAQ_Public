@@ -1023,14 +1023,12 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 					sampled_idx = np.random.choice(self.train_tasks)
 					self.agent.clear_z()
 					self.agent.set_z(self.trained_z[sampled_idx][0], self.trained_z[sampled_idx][1])
-					self.agent.sample_z()
 			elif self.is_onlineadapt_thres:
 				is_select = True
 				if num_trajs < self.num_exp_traj_eval or type(self.agent.context) == type(None):
 					sampled_idx = np.random.choice(self.train_tasks)
 					self.agent.clear_z()
 					self.agent.set_z(self.trained_z[sampled_idx][0], self.trained_z[sampled_idx][1])
-					self.agent.sample_z()
 
 			path, num = self.sampler.obtain_samples(deterministic=self.eval_deterministic,
 			                                        max_samples=self.num_steps_per_eval - num_transitions, max_trajs=1,

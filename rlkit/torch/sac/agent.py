@@ -115,6 +115,7 @@ class PEARLAgent(nn.Module):
     def set_z(self, means, vars):
         self.z_means = means
         self.z_vars = vars
+        self.sample_z()
 
     def update_context(self, inputs):
         ''' append single transition to the current context '''
@@ -338,6 +339,7 @@ class OldPEARLAgent(nn.Module):
     def set_z(self, means, vars):
         self.z_means = means
         self.z_vars = vars
+        self.sample_z()
 
     def update_context(self, inputs):
         ''' append single transition to the current context '''
