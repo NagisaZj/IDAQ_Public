@@ -153,6 +153,10 @@ class PEARLAgent(nn.Module):
         else:
             self.context = torch.cat([self.context, data], dim=1)
 
+    def set_z(self, means, vars):
+        self.z_means = means
+        self.z_vars = vars
+
     def compute_kl_div(self):
         ''' compute KL( q(z|c) || r(z) ) '''
         prior = torch.distributions.Normal(ptu.zeros(self.latent_dim), 0.05*ptu.ones(self.latent_dim))
@@ -326,6 +330,10 @@ class OldPEARLAgent(nn.Module):
         self.is_onlineadapt_max_score = -1e8
         self.is_onlineadapt_max_context = []
         self.old_onlineadapt_max_score =  -1e8
+
+    def set_z(self, means, vars):
+        self.z_means = means
+        self.z_vars = vars
 
     def update_context(self, inputs):
         ''' append single transition to the current context '''

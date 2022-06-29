@@ -521,7 +521,7 @@ class OfflineMetaRLAlgorithm(metaclass=abc.ABCMeta):
 		reward_prediction = self.reward_decoder.forward(0, 0, input_z.detach(), o, a)
 		no_prediction = self.transition_decoder.forward(0, 0, input_z.detach(), o, a)
 		# print(reward_prediction.shape, no_prediction.shape)
-		loss = ((r - reward_prediction) ** 2).mean() + ((no - no_prediction) ** 2).mean()
+		loss = ((r - reward_prediction) ** 2).mean() #+ ((no - no_prediction) ** 2).mean()
 		return loss.detach().cpu().numpy()
 
 	def evaluate(self, epoch):
@@ -888,6 +888,7 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 		self.is_onlineadapt_max = kwargs['is_onlineadapt_max']
 		self.is_onlineadapt_max_start = kwargs['is_onlineadapt_max_start']
 		self.r_thres = kwargs['r_thres']
+		self.is_onlineadapt_model = kwargs['is_onlineadapt_model']
 
 	def _do_eval(self, indices, epoch):
 		final_returns = []
@@ -921,6 +922,13 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 			                                             accum_context=False,
 			                                             resample=1)
 			logger.save_extra_data(prior_paths, path='eval_trajectories/prior-epoch{}'.format(epoch))
+
+		### prepare z of training tasks
+		self.trained_z = {}
+		for idx in self.train_tasks:
+			context = self.sample_context(idx)
+			self.agent.infer_posterior(context)
+			self.trained_z[idx] = (self.agent.z_means, self.agent.z_vars)
 
 		### train tasks
 		# eval on a subset of train tasks for speed
@@ -991,6 +999,13 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 		if self.plotter:
 			self.plotter.draw()
 
+	def test_model(self, path, true_idx):
+		for idx in self.train_tasks:
+			self.agent.set_z(self.trained_z[idx][0], self.trained_z[idx][1])
+			self.agent.sample_z()
+			loss = self.get_prediction_error(path, self.agent.z)
+			print('ture_idx: {}, sampled_idx: {}, prediction_loss: {}', true_idx, idx, loss)
+
 	def collect_paths(self, idx, epoch, run):
 		self.task_idx = idx
 		self.env.reset_task(idx)
@@ -1008,14 +1023,14 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 			if self.is_onlineadapt_max:
 				if num_trajs < self.num_exp_traj_eval or type(self.agent.context) == type(None):
 					sampled_idx = np.random.choice(self.train_tasks)
-					context = self.sample_context(sampled_idx)
-					self.agent.infer_posterior(context)
+					self.agent.set_z(self.trained_z[sampled_idx][0], self.trained_z[sampled_idx][1])
+					self.agent.sample_z()
 			elif self.is_onlineadapt_thres:
 				is_select = True
 				if num_trajs < self.num_exp_traj_eval or type(self.agent.context) == type(None):
 					sampled_idx = np.random.choice(self.train_tasks)
-					context = self.sample_context(sampled_idx)
-					self.agent.infer_posterior(context)
+					self.agent.set_z(self.trained_z[sampled_idx][0], self.trained_z[sampled_idx][1])
+					self.agent.sample_z()
 
 			path, num = self.sampler.obtain_samples(deterministic=self.eval_deterministic,
 			                                        max_samples=self.num_steps_per_eval - num_transitions, max_trajs=1,
@@ -1023,6 +1038,10 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 			                                        is_select=is_select,
 			                                        r_thres=self.r_thres,
 			                                        is_onlineadapt_max=self.is_onlineadapt_max)
+
+			if num_trajs < self.num_exp_traj_eval and self.is_onlineadapt_model:
+				self.test_model(path, idx)
+
 			paths += path
 			num_transitions += num
 			num_trajs += 1

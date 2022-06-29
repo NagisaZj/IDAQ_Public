@@ -45,7 +45,8 @@
         "allow_backward_z": 0,
         "is_true_sparse_rewards": 0,
         "r_thres": 0.3,
-        "num_evals": 1
+        "num_evals": 1,
+        "is_onlineadapt_model": 1
     },
     "util_params": {
         "use_gpu": 1

@@ -78,6 +78,7 @@ default_config = dict(
         is_onlineadapt_max_start=5, # how many exploration trajs to collect before the first encoder updating
         is_true_sparse_rewards=False, # whether to sparsify true rewards in sac
         r_thres=0., # threshold of reward to encode
+        is_onlineadapt_model=False, # default not use prepared online adapt using model boosting
     ),
     util_params=dict(
         base_log_dir='output',
