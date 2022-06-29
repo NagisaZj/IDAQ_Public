@@ -97,9 +97,9 @@ class PEARLAgent(nn.Module):
     def update_onlineadapt_max(self, score, context):
         if score > self.is_onlineadapt_max_score:
             self.is_onlineadapt_max_score = score
+            self.is_onlineadapt_max_context = self.context
             for c in context:
                 self.update_context(c)
-            self.is_onlineadapt_max_context = self.context
         else:
             self.context = self.is_onlineadapt_max_context
 
@@ -107,6 +107,10 @@ class PEARLAgent(nn.Module):
         self.is_onlineadapt_max_score = -1e8
         self.is_onlineadapt_max_context = None
         self.old_onlineadapt_max_score =  -1e8
+
+    def set_z(self, means, vars):
+        self.z_means = means
+        self.z_vars = vars
 
     def update_context(self, inputs):
         ''' append single transition to the current context '''
@@ -150,10 +154,6 @@ class PEARLAgent(nn.Module):
             self.context = data
         else:
             self.context = torch.cat([self.context, data], dim=1)
-
-    def set_z(self, means, vars):
-        self.z_means = means
-        self.z_vars = vars
 
     def compute_kl_div(self):
         ''' compute KL( q(z|c) || r(z) ) '''
@@ -316,9 +316,9 @@ class OldPEARLAgent(nn.Module):
     def update_onlineadapt_max(self, score, context):
         if score > self.is_onlineadapt_max_score:
             self.is_onlineadapt_max_score = score
+            self.is_onlineadapt_max_context = self.context
             for c in context:
                 self.update_context(c)
-            self.is_onlineadapt_max_context = self.context
         else:
             self.context = self.is_onlineadapt_max_context
 
