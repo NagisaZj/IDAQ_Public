@@ -321,10 +321,10 @@ plt_config_point =  {
 		'legend_loc': 'best',
 		'legend_ncol':1,
 		'legend_prop_size': 18.0,
-		'xlabel': 'Million Environment Samples',
+		'xlabel': 'Iterations',
 		'ylabel': 'Average Return',
-		'xlim': (-0.2,4.51),
-		'ylim': (-0.2, 25),
+		'xlim': (-5,110),
+		'ylim': (-3, 15),
 		'color': {
 			'QPLEX': color_set['Amaranth'],
 			'QTRAN': color_set['Amber'],
