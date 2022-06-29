@@ -101,7 +101,8 @@ class PEARLAgent(nn.Module):
             self.is_onlineadapt_max_z = (self.z_means, self.z_vars)
             for c in context:
                 self.update_context(c)
-            self.infer_posterior(self.context)
+            if type(self.context) != type(None):
+                self.infer_posterior(self.context)
         else:
             self.context = self.is_onlineadapt_max_context
             self.set_z(self.is_onlineadapt_max_z[0], self.is_onlineadapt_max_z[1])
@@ -324,7 +325,8 @@ class OldPEARLAgent(nn.Module):
             self.is_onlineadapt_max_z = (self.z_means, self.z_vars)
             for c in context:
                 self.update_context(c)
-            self.infer_posterior(self.context)
+            if type(self.context) != type(None):
+                self.infer_posterior(self.context)
         else:
             self.context = self.is_onlineadapt_max_context
             self.set_z(self.is_onlineadapt_max_z[0], self.is_onlineadapt_max_z[1])
