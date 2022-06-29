@@ -34,14 +34,7 @@ def main(name):
     # see `n_tasks` and `n_eval_tasks` args in the training config json
     # by convention, the test tasks are always the last `n_eval_tasks` IDs
     # so if there are 100 tasks total, and 20 test tasks, the test tasks will be IDs 81-100
-    epoch = 775  # good
-    epoch = 107  # good, sparse reward, large radius, delicious
-    epoch = 226  # can be used
-    epoch = 414  # dont move
-    epoch = 152
-    epoch = 1000
-    epoch = 385
-    epoch = 222
+    epoch = 90
     gr = 0.3  # goal radius, for visualization purposes
 
     expdir = 'output/' + name + '/sparse-point-robot/debug/'
@@ -165,7 +158,7 @@ def main(name):
             # axes[m, n].text(states[-1, 0], states[-1, 1], '%.3f\n%.3f' % (np.mean(ap[id]['z_means'][-1]),np.min(ap[id]['z_vars'][-1]**0.5)),fontsize=12)
     # for i in range(10):
     #    print(ap[i]['z_means'])
-    plt.savefig("figures/heatmaps/" + name + ".png")
+    plt.savefig("figures/heatmaps/" + name + "_" + str(epoch) + ".png")
 
 if __name__ =="__main__":
     main()
