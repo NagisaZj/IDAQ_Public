@@ -99,6 +99,7 @@ class PEARLAgent(nn.Module):
             self.is_onlineadapt_max_score = score
             self.is_onlineadapt_max_context = self.context
             self.is_onlineadapt_max_z = (self.z_means, self.z_vars)
+            self.is_onlineadapt_max_z_sample = self.z
             for c in context:
                 self.update_context(c)
             self.infer_posterior(self.context)
@@ -110,12 +111,16 @@ class PEARLAgent(nn.Module):
         self.is_onlineadapt_max_score = -1e8
         self.is_onlineadapt_max_context = None
         self.is_onlineadapt_max_z = None
+        self.is_onlineadapt_max_z_sample = None
         self.old_onlineadapt_max_score =  -1e8
 
     def set_z(self, means, vars):
         self.z_means = means
         self.z_vars = vars
         self.sample_z()
+
+    def set_onlineadapt_z_sample(self):
+        self.z = self.is_onlineadapt_max_z_sample
 
     def update_context(self, inputs):
         ''' append single transition to the current context '''
@@ -344,7 +349,6 @@ class OldPEARLAgent(nn.Module):
         self.sample_z()
 
     def set_onlineadapt_z_sample(self):
-        assert self.is_onlineadapt_max_z_sample
         self.z = self.is_onlineadapt_max_z_sample
 
     def update_context(self, inputs):
