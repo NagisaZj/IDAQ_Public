@@ -3,7 +3,7 @@
     "n_train_tasks": 80,
     "n_eval_tasks": 20,
     "seed_list": [],
-    "randomize_tasks": 1,
+    "randomize_tasks": 0,
     "env_params": {
         "n_tasks": 100,
         "goal_radius": -0.2,
