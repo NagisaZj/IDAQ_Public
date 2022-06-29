@@ -1549,13 +1549,29 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
         t = batch['terminals'][None, ...]
         return [o, a, r, no, t]
 
+    def unpack_batch_sac(self, batch, sparse_reward=False, true_sparse_reward=False):
+        ''' unpack a batch and return individual elements for sac '''
+        o = batch['observations'][None, ...]
+        a = batch['actions'][None, ...]
+        if sparse_reward:
+            r = batch['sparse_rewards'][None, ...]
+        else:
+            r = batch['rewards'][None, ...]
+        if true_sparse_reward:
+            r_label = batch['sparse_rewards'][None, ...]
+        else:
+            r_label = batch['rewards'][None, ...]
+        no = batch['next_observations'][None, ...]
+        t = batch['terminals'][None, ...]
+        return [o, a, r, no, t, r_label]
+
     def sample_sac(self, indices):
         ''' sample batch of training data from a list of tasks for training the actor-critic '''
         # this batch consists of transitions sampled randomly from replay buffer
         # rewards are always dense
         batches = [ptu.np_to_pytorch_batch(self.replay_buffer.random_batch(idx, batch_size=self.batch_size)) for idx in
                    indices]
-        unpacked = [self.unpack_batch(batch, sparse_reward=self.is_true_sparse_rewards) for batch in batches]
+        unpacked = [self.unpack_batch_sac(batch, true_sparse_reward=self.is_true_sparse_rewards) for batch in batches]
         # group like elements together
         unpacked = [[x[i] for x in unpacked] for i in range(len(unpacked[0]))]
         unpacked = [torch.cat(x, dim=0) for x in unpacked]
@@ -1669,7 +1685,7 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
 
         num_tasks = len(indices)
         # data is (task, batch, feat)
-        obs, actions, rewards, next_obs, terms = self.sample_sac(indices)
+        obs, actions, rewards, next_obs, terms, r_label = self.sample_sac(indices)
         if self.use_information_bottleneck:
             policy_outputs, task_z = self.agent(obs, context, task_indices=indices)
         else:
@@ -1761,7 +1777,7 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
         if self.allow_backward_z:
             self.context_optimizer.step()
 
-        pred_rewardss = rewards.view(self.batch_size * num_tasks, -1)
+        pred_rewardss = r_label.view(self.batch_size * num_tasks, -1)
         # print(task_z.shape,obs.shape,actions.shape)
         rew_pred = self.reward_decoder.forward(0,0,task_z.detach(), obs, actions)
         self.reward_decoder_optimizer.zero_grad()
