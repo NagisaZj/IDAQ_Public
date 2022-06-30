@@ -323,7 +323,7 @@ def offline_sample(env, agent, buffer, max_path_length=np.inf, accum_context=Tru
 
 
 def rollout(env, agent, max_path_length=np.inf, accum_context=True, is_select=False, animated=False,
-            save_frames=False, r_thres=0., is_onlineadapt_max=False):
+            save_frames=False, r_thres=0., is_onlineadapt_max=False, is_sparse_reward=False):
     """
     The following value for the following keys will be a 2D array, with the
     first dimension corresponding to the time dimension.
@@ -357,7 +357,7 @@ def rollout(env, agent, max_path_length=np.inf, accum_context=True, is_select=Fa
     path_length = 0
 
     context = []
-    sparse_rewards = []
+    scores = []
 
     if animated:
         env.render()
@@ -379,7 +379,10 @@ def rollout(env, agent, max_path_length=np.inf, accum_context=True, is_select=Fa
 
         context.append([o, a, r, next_o, d, env_info])
         if is_select or is_onlineadapt_max:
-            sparse_rewards.append(env_info['sparse_reward'])
+            if is_sparse_reward:
+                scores.append(env_info['sparse_reward'])
+            else:
+                scores.append(r)
 
         '''
         # update the agent's current context
@@ -410,8 +413,8 @@ def rollout(env, agent, max_path_length=np.inf, accum_context=True, is_select=Fa
     # update the agent's current context
     if accum_context:
         if is_onlineadapt_max:
-            agent.update_onlineadapt_max(np.sum(sparse_rewards), context)
-        elif not is_select or np.sum(sparse_rewards) > r_thres:
+            agent.update_onlineadapt_max(np.sum(scores), context)
+        elif not is_select or np.sum(scores) > r_thres:
             for c in context:
                 agent.update_context(c)
 

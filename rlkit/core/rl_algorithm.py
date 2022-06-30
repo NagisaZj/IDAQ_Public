@@ -1039,7 +1039,8 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 			                                        accum_context=True,
 			                                        is_select=is_select,
 			                                        r_thres=self.r_thres,
-			                                        is_onlineadapt_max=self.is_onlineadapt_max)
+			                                        is_onlineadapt_max=self.is_onlineadapt_max,
+			                                        is_sparse_reward=self.sparse_rewards)
 
 			if self.sparse_rewards:
 				for p in path:
