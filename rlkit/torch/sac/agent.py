@@ -113,6 +113,9 @@ class PEARLAgent(nn.Module):
         self.z_vars = vars
         self.sample_z()
 
+    def set_z_sample(self, z):
+        self.z = z
+
     def set_onlineadapt_z_sample(self):
         self.z = self.is_onlineadapt_max_z_sample
 
@@ -347,6 +350,9 @@ class OldPEARLAgent(nn.Module):
         self.z_means = means
         self.z_vars = vars
         self.sample_z()
+
+    def set_z_sample(self, z):
+        self.z = z
 
     def set_onlineadapt_z_sample(self):
         self.z = self.is_onlineadapt_max_z_sample
