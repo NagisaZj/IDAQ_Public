@@ -79,6 +79,7 @@ default_config = dict(
         is_true_sparse_rewards=False, # whether to sparsify true rewards in sac
         r_thres=0., # threshold of reward to encode
         is_onlineadapt_model=False, # default not use prepared online adapt using model boosting
+        onlineadapt_max_num_candidates=5, # default the number of candidates during adaptation
     ),
     util_params=dict(
         base_log_dir='output',

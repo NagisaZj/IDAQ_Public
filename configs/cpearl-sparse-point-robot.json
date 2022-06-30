@@ -45,7 +45,8 @@
         "is_true_sparse_rewards": 0,
         "r_thres": 0.3,
         "num_evals": 1,
-        "is_onlineadapt_model": 1
+        "is_onlineadapt_model": 1,
+        "onlineadapt_max_num_candidates": 5
     },
     "util_params": {
         "use_gpu": 1
