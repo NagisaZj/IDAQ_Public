@@ -329,7 +329,7 @@ plt_config_point = {
 	'legend_prop_size': 18.0,
 	'xlabel': 'Iterations',
 	'ylabel': 'Average Return',
-	'xlim': (-5, 110),
+	'xlim': (-5, 55),
 	'ylim': (-1, 13),
 	'color': {
 		'QPLEX': color_set['Amaranth'],
