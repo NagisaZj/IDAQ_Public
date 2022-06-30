@@ -1076,12 +1076,14 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 					sparse_rewards = np.stack(e['sparse_reward'] for e in p['env_infos']).reshape(-1, 1)
 					p['rewards'] = sparse_rewards
 
+			'''
 			if self.is_onlineadapt_max:
 				if num_trajs < self.num_exp_traj_eval:
 					for idx in self.train_tasks:
 						if abs(idx - sampled_idx) < 5:
 							pred_loss = self.test_one_model(idx, path)
 							self.train_task_weight[idx] = max(self.train_task_weight[idx], pred_loss)
+			'''
 
 			#if epoch >= 3 and num_trajs < self.num_exp_traj_eval and self.is_onlineadapt_model:
 			#	self.test_model(path, idx)
