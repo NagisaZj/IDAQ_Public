@@ -159,7 +159,7 @@ def main(name):
     '''
     # for i in range(10):
     #    print(ap[i]['z_means'])
-    plt.savefig("figures/heatmaps/" + name + "_task" + str(test_task_list[0]) + "_epoch" + str(epoch) + "_run" + str(run_num) + ".pdf")
+    plt.savefig("figures/heatmaps/" + name + "_task" + str(test_task_list[0]) + "_epoch" + str(epoch) + "_run" + str(run_num) + ".png")
 
 if __name__ =="__main__":
     main()
