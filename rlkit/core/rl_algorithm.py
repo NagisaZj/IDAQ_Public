@@ -1041,6 +1041,11 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 			                                        r_thres=self.r_thres,
 			                                        is_onlineadapt_max=self.is_onlineadapt_max)
 
+			if self.sparse_rewards:
+				for p in path:
+					sparse_rewards = np.stack(e['sparse_reward'] for e in p['env_infos']).reshape(-1, 1)
+					p['rewards'] = sparse_rewards
+
 			if epoch >= 3 and num_trajs < self.num_exp_traj_eval and self.is_onlineadapt_model:
 				self.test_model(path, idx)
 
@@ -1055,11 +1060,6 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 			elif num_trajs >= self.num_exp_traj_eval and type(self.agent.context) != type(None):
 				self.agent.infer_posterior(self.agent.context)
 				is_select = False
-
-		if self.sparse_rewards:
-			for p in paths:
-				sparse_rewards = np.stack(e['sparse_reward'] for e in p['env_infos']).reshape(-1, 1)
-				p['rewards'] = sparse_rewards
 
 		goal = self.env._goal
 		for path in paths:
