@@ -8,7 +8,7 @@
         "n_tasks": 50,
         "goal_radius": 0.2,
         "randomize_tasks": 0,
-        "max_path_length": 25
+        "max_episode_steps": 25
     },
     "algo_params": {
         "meta_batch":16,
