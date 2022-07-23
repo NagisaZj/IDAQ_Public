@@ -2,12 +2,13 @@
     "env_name": "point-robot-wind",
     "n_train_tasks": 40,
     "n_eval_tasks": 10,
-    "seed_list": [0, 1, 2],
+    "seed_list": [],
     "randomize_tasks": 1,
     "env_params": {
         "n_tasks": 50,
         "goal_radius": 0.2,
-        "randomize_tasks": 0
+        "randomize_tasks": 0,
+        "max_path_length": 25
     },
     "algo_params": {
         "meta_batch":16,
@@ -34,7 +35,6 @@
         "sample": true,
         "data_dir": "",
         "divergence_name": "kl",
-        "mp_count": 10,
         "use_brac": 0
     },
     "util_params": {
