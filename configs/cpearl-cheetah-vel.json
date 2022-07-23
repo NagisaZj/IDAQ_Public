@@ -30,5 +30,6 @@
     },
     "util_params": {
         "use_gpu": 1
-    }
+    },
+    "algo_type": "CPEARL"
 }
