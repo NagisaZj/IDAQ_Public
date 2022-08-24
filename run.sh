@@ -1,25 +1,26 @@
 #!/bin/bash
    # Script to reproduce results
 
- Foldername="0629_offline_meta_rl"
+ Foldername="0723_offline_meta_rl_aa"
  mkdir out_logs/${Foldername} &> /dev/null
- declare -a tasks=( "cpearl-sparse-point-robot" )
+ declare -a tasks=( "cpearl-point-robot-wind" )
+ #  "cpearl-sparse-point-robot"
  declare -a algos=( "cpearl" )
  ##
  declare -a seeds=( "1" )
- declare -a datadirs=( "sparse-point-robot-20" )
- # "sparse-point-robot-0.0" "sparse-point-robot-0.4" "sparse-point-robot-0.7"
- declare -a is_sparses=( "1" )
+ declare -a datadirs=( "point-robot-wind" )
+ # "sparse-point-robot-20"
+ declare -a is_sparses=( "0" )
  declare -a use_bracs=( "0" )
  declare -a use_information_bottlenecks=( "0" )
  declare -a is_zlosses=( "1" )
  declare -a is_onlineadapt_threses=( "0" )
  declare -a is_onlineadapt_maxes=( "1" )
- declare -a num_exp_traj_evals=( "10" )
+ declare -a num_exp_traj_evals=( "5" "10" )
  declare -a allow_backward_zs=( "0" )
  declare -a is_true_sparses=( "0" )
  declare -a r_threses=( "0.0" )
- n=0
+ n=2
  gpunum=8
  for task in "${tasks[@]}"
  do

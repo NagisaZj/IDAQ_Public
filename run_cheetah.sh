@@ -1,24 +1,24 @@
 #!/bin/bash
    # Script to reproduce results
 
- Foldername="0723_offline_meta_rl_aa"
+ Foldername="0723_offline_meta_rl_bb"
  mkdir out_logs/${Foldername} &> /dev/null
- declare -a tasks=( "cpearl-cheetah_vel" )
+ declare -a tasks=( "cpearl-cheetah-vel" )
  declare -a algos=( "cpearl" )
  ##
  declare -a seeds=( "1" )
- declare -a datadirs=( "cheetah_vel" )
+ declare -a datadirs=( "cheetah-vel" )
  declare -a is_sparses=( "0" )
- declare -a use_bracs=( "1" )
- declare -a use_information_bottlenecks=( "0" )
+ declare -a use_bracs=( "0" "1" )
+ declare -a use_information_bottlenecks=( "1" )
  declare -a is_zlosses=( "1" )
  declare -a is_onlineadapt_threses=( "0" )
  declare -a is_onlineadapt_maxes=( "1" )
  declare -a num_exp_traj_evals=( "2" )
- declare -a allow_backward_zs=( "0" )
+ declare -a allow_backward_zs=( "1" )
  declare -a is_true_sparses=( "0" )
  declare -a r_threses=( "0.0" )
- n=3
+ n=4
  gpunum=8
  for task in "${tasks[@]}"
  do
