@@ -25,8 +25,8 @@
         "sparse_rewards": 0,
         "alpha_init": 5e1, 
         "alpha_max": 2e3,
-        "train_epoch": 6e5,
-        "eval_epoch": 6e5
+        "train_epoch": 49800,
+        "eval_epoch": 49800
     },
     "util_params": {
         "use_gpu": 1

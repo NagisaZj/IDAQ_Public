@@ -3,12 +3,12 @@
 
  Foldername="0723_offline_meta_rl_aa"
  mkdir out_logs/${Foldername} &> /dev/null
- declare -a tasks=( "cpearl-point-robot-wind" )
+ declare -a tasks=( "cpearl-sparse-point-robot" )
  #  "cpearl-sparse-point-robot"
  declare -a algos=( "cpearl" )
  ##
  declare -a seeds=( "1" )
- declare -a datadirs=( "point-robot-wind" )
+ declare -a datadirs=( "sparse-point-robot" )
  # "sparse-point-robot-20"
  declare -a is_sparses=( "0" )
  declare -a use_bracs=( "0" )
@@ -21,7 +21,7 @@
  declare -a is_true_sparses=( "0" )
  declare -a r_threses=( "0.0" )
  n=2
- gpunum=8
+ gpunum=3
  for task in "${tasks[@]}"
  do
  for algo in "${algos[@]}"
@@ -86,5 +86,5 @@
  done
  done
  done
-# python policy_train.py ./configs/sparse-point-robot.json
+# CUDA_VISIBLE_DEVICES=3 python policy_train.py ./configs/sparse-point-robot.json
 # python policy_train.py ./configs/sparse-point-robot.json --is_uniform

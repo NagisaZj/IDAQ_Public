@@ -112,6 +112,7 @@ class OfflineMetaRLAlgorithm(metaclass=abc.ABCMeta):
 		train_trj_paths = []
 		eval_trj_paths = []
 		# trj entry format: [obs, action, reward, new_obs]
+		print(self.train_epoch,self.n_trj,self.eval_epoch)
 		if self.sample:
 			for n in range(self.n_trj):
 				if self.train_epoch is None:
@@ -120,6 +121,7 @@ class OfflineMetaRLAlgorithm(metaclass=abc.ABCMeta):
 				else:
 					train_trj_paths += glob.glob(
 						os.path.join(self.data_dir, "goal_idx*", "trj_evalsample%d_step%d.npy" % (n, self.train_epoch)))
+					# print("trj_evalsample%d_step%d.npy" % (n, self.train_epoch))
 				if self.eval_epoch is None:
 					eval_trj_paths += glob.glob(
 						os.path.join(self.data_dir, "goal_idx*", "trj_evalsample%d_step*.npy" % (n)))
@@ -174,6 +176,7 @@ class OfflineMetaRLAlgorithm(metaclass=abc.ABCMeta):
 			terminal_train_lst += terminal
 			task_train = [train_task_idx for _ in range(trj_npy.shape[0])]
 			task_train_lst += task_train
+			print(train_path,train_task_idx,len(obs_train_lst))
 		for eval_path, eval_task_idx in zip(eval_paths, eval_task_idxs):
 			trj_npy = np.load(eval_path, allow_pickle=True)
 			obs_eval_lst += list(trj_npy[:, 0])
@@ -185,6 +188,7 @@ class OfflineMetaRLAlgorithm(metaclass=abc.ABCMeta):
 			terminal_eval_lst += terminal
 			task_eval = [eval_task_idx for _ in range(trj_npy.shape[0])]
 			task_eval_lst += task_eval
+			print(eval_path, eval_task_idx, len(obs_eval_lst))
 
 		# load training buffer
 		for i, (

@@ -2,8 +2,10 @@
     "env_name": "cheetah-vel",
     "n_train_tasks": 80,
     "n_eval_tasks": 20,
+    "randomize_tasks": 1,
     "env_params": {
-        "n_tasks": 100
+        "n_tasks": 100,
+        "randomize_tasks": 0
     }
     ,
     "algo_params": {
@@ -21,13 +23,13 @@
         "embedding_mini_batch_size": 100,
         "sample": 1,
         "epoch": null,
-        "n_trj": 50,
+        "n_trj": 45,
         "sparse_rewards": 0,
         "alpha_init": 5e1, 
         "alpha_max": 2e3,
-        "train_epoch": 4800,
-        "eval_epoch": 4800,
-        "data_dir": "",
+        "train_epoch": 49800,
+        "eval_epoch": 49800,
+        "data_dir": "./data/cheetah-vel",
         "divergence_name": "kl",
         "use_brac": 1,
         "use_information_bottleneck": 0,

@@ -18,7 +18,7 @@
  declare -a allow_backward_zs=( "1" )
  declare -a is_true_sparses=( "0" )
  declare -a r_threses=( "0.0" )
- n=4
+ n=2
  gpunum=8
  for task in "${tasks[@]}"
  do
@@ -62,7 +62,7 @@
  --allow_backward_z=${allow_backward_z} \
  --is_true_sparse_rewards=${is_true_sparse} \
  --r_thres=${r_thres} \
- >& out_logs/${Foldername}/${task}_${algo}_${datadir}_${is_sparse}_${use_brac}_${use_information_bottleneck}_${is_zloss}_${is_onlineadapt_thres}_${is_onlineadapt_max}_${num_exp_traj_eval}_${allow_backward_z}_${is_true_sparse}_${r_thres}_${seed}.txt &
+ >& out_logs/${Foldername}/${task}_${algo}_${datadir}_${is_sparse}_${use_brac}_${use_information_bottleneck}_${is_zloss}_${is_onlineadapt_thres}_${is_onlineadapt_max}_${num_exp_traj_eval}_${allow_backward_z}_${is_true_sparse}_${r_thres}_${seed}_${n}.txt &
  echo "task: ${task}, algo: ${algo}, datadir: ${datadir}, is_sparse: ${is_sparse}, use_brac: ${use_brac}"
  echo "     use_information_bottleneck: ${use_information_bottleneck}, is_zloss: ${is_zloss}"
  echo "     is_onlineadapt_thres: ${is_onlineadapt_thres}, is_onlineadapt_max: ${is_onlineadapt_max}"
@@ -84,5 +84,9 @@
  done
  done
  done
-# python policy_train.py ./configs/sparse-point-robot.json
+# CUDA_VISIBLE_DEVICES=3  python policy_train.py ./configs/cheetah-vel.json
 # python policy_train.py ./configs/sparse-point-robot.json --is_uniform
+# determinsitic first
+
+
+# 27 probablistic first randomize

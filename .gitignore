@@ -10,6 +10,7 @@
 **/*ft_local
 data/
 output/
+out_logs/
 .vscode
 .temp
 .ipynb_checkpoints

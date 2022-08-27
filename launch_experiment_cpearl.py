@@ -121,7 +121,7 @@ def experiment(variant, seed=None):
             input_size=obs_dim + action_dim + latent_dim,
             output_size=1
         )
-        if 'randomize_tasks' in variant.keys() and variant['randomize_tasks']:
+        if 1:  # foce random
             rng = default_rng()
             train_tasks = np.sort(rng.choice(len(tasks), size=variant['n_train_tasks'], replace=False))
             eval_tasks = set(range(len(tasks))).difference(train_tasks)
@@ -138,8 +138,8 @@ def experiment(variant, seed=None):
             else:
                 algorithm = CPEARL(
                     env=env,
-                    train_tasks=list(tasks[:variant['n_train_tasks']]),
-                    eval_tasks=list(tasks[-variant['n_eval_tasks']:]),
+                    train_tasks=train_tasks,
+                    eval_tasks=eval_tasks,
                     nets=[agent, qf1, qf2, vf, c,rew_decoder,transition_decoder, task_id_decoder],
                     latent_dim=latent_dim,
                     **variant['algo_params']
