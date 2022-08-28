@@ -1,0 +1,50 @@
+{
+    "env_name": "ant-goal",
+    "n_train_tasks": 60,
+    "n_eval_tasks": 20,
+    "randomize_tasks": 1,
+    "env_params": {
+        "n_tasks": 80,
+        "randomize_tasks": 0
+    }
+    ,
+    "algo_params": {
+        "meta_batch": 16,
+        "num_iterations": 100,
+        "num_initial_steps": 2000,
+        "num_steps_prior": 400,
+        "num_steps_posterior": 0,
+        "num_extra_rl_steps_posterior": 600,
+        "num_evals": 1,
+        "num_steps_per_eval": 1000,
+        "num_exp_traj_eval": 2,
+        "num_train_steps_per_itr": 1000,
+        "embedding_batch_size": 100,
+        "embedding_mini_batch_size": 100,
+        "sample": 1,
+        "epoch": null,
+        "n_trj": 45,
+        "sparse_rewards": 0,
+        "alpha_init": 5e1, 
+        "alpha_max": 2e3,
+        "train_epoch": 49800,
+        "eval_epoch": 49800,
+        "data_dir": "./data/ant-goal-backup",
+        "divergence_name": "kl",
+        "use_brac": 1,
+        "use_information_bottleneck": 0,
+        "is_zloss": 1,
+        "is_onlineadapt_thres": 1,
+        "is_predict_task_id": 0,
+        "is_onlineadapt_max": 0,
+        "allow_backward_z": 0,
+        "is_true_sparse_rewards": 0,
+        "r_thres": 0.3,
+        "is_onlineadapt_model": 1,
+        "onlineadapt_max_num_candidates": 5
+    },
+    "util_params": {
+        "use_gpu": 1
+    },
+    "algo_type": "CPEARL"
+}

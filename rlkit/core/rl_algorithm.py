@@ -598,8 +598,8 @@ class OfflineMetaRLAlgorithm(metaclass=abc.ABCMeta):
 			# save the final posterior
 			self.agent.log_diagnostics(self.eval_statistics)
 
-			if hasattr(self.env, "log_diagnostics"):
-				self.env.log_diagnostics(paths, prefix=None)
+			# if hasattr(self.env, "log_diagnostics"):
+			# 	self.env.log_diagnostics(paths, prefix=None)
 
 			avg_train_online_return = np.mean(np.stack(train_online_returns), axis=0)
 			avg_test_online_return = np.mean(np.stack(test_online_returns), axis=0)
@@ -720,8 +720,8 @@ class OfflineMetaRLAlgorithm(metaclass=abc.ABCMeta):
 			# save the final posterior
 			self.agent.log_diagnostics(self.eval_statistics)
 
-			if hasattr(self.env, "log_diagnostics"):
-				self.env.log_diagnostics(paths, prefix=None)
+			# if hasattr(self.env, "log_diagnostics"):
+			# 	self.env.log_diagnostics(paths, prefix=None)
 
 			avg_train_return = np.mean(train_final_returns)
 			avg_test_return = np.mean(test_final_returns)
@@ -983,8 +983,8 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 		# save the final posterior
 		self.agent.log_diagnostics(self.eval_statistics)
 
-		if hasattr(self.env, "log_diagnostics"):
-			self.env.log_diagnostics(paths, prefix=None)
+		# if hasattr(self.env, "log_diagnostics"):
+		# 	self.env.log_diagnostics(paths, prefix=None)
 
 		avg_train_return = np.mean(train_final_returns)
 		avg_test_return = np.mean(test_final_returns)
