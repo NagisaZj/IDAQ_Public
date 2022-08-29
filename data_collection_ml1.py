@@ -60,6 +60,8 @@ def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
         policy = p.SawyerPickPlaceV2Policy
     elif variant['env_name']=='push-wall-v2':
         policy = p.SawyerPushWallV2Policy
+    elif variant['env_name']=='pick-place-wall-v2':
+        policy = p.SawyerPickPlaceV2Policy
     else:
         NotImplementedError
 

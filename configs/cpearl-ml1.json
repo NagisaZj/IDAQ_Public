@@ -1,5 +1,5 @@
 {
-    "env_name": "pick-place-v2",
+    "env_name": "push-v2",
     "n_train_tasks": 40,
     "n_eval_tasks": 10,
     "randomize_tasks": 1,
@@ -30,7 +30,7 @@
         "alpha_max": 2e3,
         "train_epoch": 49500,
         "eval_epoch": 49500,
-        "data_dir": "./data/pick-place-v2",
+        "data_dir": "./data/push-v2",
         "divergence_name": "kl",
         "z_loss_weight": 1000,
         "max_path_length": 500,

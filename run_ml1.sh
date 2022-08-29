@@ -7,7 +7,7 @@
  declare -a algos=( "cpearl" )
  ##
  declare -a seeds=( "1" )
- declare -a datadirs=( "pick-place-v2" )
+ declare -a datadirs=( "push-v2" )
  declare -a is_sparses=( "0" )
  declare -a use_bracs=( "1" "1" )
  declare -a use_information_bottlenecks=( "0" )
