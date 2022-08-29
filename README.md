@@ -35,6 +35,7 @@ Example of training policies and generating trajectories on multiple tasks:
 
 ```
 python policy_train.py ./configs/ant-goal-3.json 
+python policy_train_ml1.py  /data2/zj/Offline-MetaRL/configs/ml1-reach.json
 ```
 
 Generate trajectories from pretrained models

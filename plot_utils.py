@@ -539,8 +539,8 @@ def plot_all(datas, legends, start=0):
 	ax.spines['left'].set_color('black')
 	ax.spines['bottom'].set_color('black')
 
-	plt.xlim(config['xlim'])
-	plt.ylim(config['ylim'])
+	# plt.xlim(config['xlim'])
+	# plt.ylim(config['ylim'])
 	plt.tick_params('x', labelsize=20.0)
 	plt.tick_params('y', labelsize=20.0)
 	plt.xlabel(config['xlabel'], {'size': 26.0})

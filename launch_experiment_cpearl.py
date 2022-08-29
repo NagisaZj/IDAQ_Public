@@ -24,6 +24,8 @@ import rlkit.torch.pytorch_util as ptu
 from configs.default import default_config
 from numpy.random import default_rng
 
+import  metaworld,random,gym,gym.wrappers
+from rlkit.envs.metaworld_wrapper import MetaWorldWrapper
 rng = default_rng()
 
 def global_seed(seed=0):
@@ -33,12 +35,41 @@ def global_seed(seed=0):
 def experiment(variant, seed=None):
 
     # create multi-task environment and sample tasks, normalize obs if provided with 'normalizer.npz'
-    if 'normalizer.npz' in os.listdir(variant['algo_params']['data_dir']):
-        obs_absmax = np.load(os.path.join(variant['algo_params']['data_dir'], 'normalizer.npz'))['abs_max']
-        env = NormalizedBoxEnv(ENVS[variant['env_name']](**variant['env_params']), obs_absmax=obs_absmax)
+    if 'v2' not in variant['env_name']:
+        if 'normalizer.npz' in os.listdir(variant['algo_params']['data_dir']):
+            obs_absmax = np.load(os.path.join(variant['algo_params']['data_dir'], 'normalizer.npz'))['abs_max']
+            env = NormalizedBoxEnv(ENVS[variant['env_name']](**variant['env_params']), obs_absmax=obs_absmax)
+        else:
+            env = NormalizedBoxEnv(ENVS[variant['env_name']](**variant['env_params']))
     else:
-        env = NormalizedBoxEnv(ENVS[variant['env_name']](**variant['env_params']))
-    
+        if 'normalizer.npz' in os.listdir(variant['algo_params']['data_dir']):
+            obs_absmax = np.load(os.path.join(variant['algo_params']['data_dir'], 'normalizer.npz'))['abs_max']
+            ml1 = metaworld.ML1(variant['env_name'], seed=1337)  # Construct the benchmark, sampling tasks
+
+            env = ml1.train_classes[variant['env_name']]()  # Create an environment with task
+            # print(ml1.train_tasks)
+            env.train_tasks = ml1.train_tasks
+            task = random.choice(ml1.train_tasks)
+            env.set_task(task)
+
+            tasks = list(range(len(env.train_tasks)))
+            # env = gym.wrappers.TimeLimit(gym.wrappers.ClipAction(MetaWorldWrapper(env)), 500)
+            env = gym.wrappers.TimeLimit(gym.wrappers.ClipAction(env), 500)
+            env=MetaWorldWrapper(env)
+        else:
+            ml1 = metaworld.ML1(variant['env_name'], seed=1337)  # Construct the benchmark, sampling tasks
+
+            env = ml1.train_classes[variant['env_name']]()  # Create an environment with task
+            # print(ml1.train_tasks)
+            env.train_tasks = ml1.train_tasks
+            task = random.choice(ml1.train_tasks)
+            env.set_task(task)
+
+            tasks = list(range(len(env.train_tasks)))
+            # env = gym.wrappers.TimeLimit(gym.wrappers.ClipAction(MetaWorldWrapper(env)), 500)
+            env = gym.wrappers.TimeLimit(gym.wrappers.ClipAction(env), 500)
+            env = MetaWorldWrapper(env)
+
     if seed is not None:
         global_seed(seed)
         env.seed(seed)
