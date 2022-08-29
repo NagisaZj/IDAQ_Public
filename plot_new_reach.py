@@ -14,7 +14,7 @@ def main(name):
 	name='reach-v2__2022-08-29_10-02-30'
 	# name = 'reach-v2__2022-08-29_10-02-55'
 	# name = 'reach-v2__2022-08-29_10-03-57'
-	# name = 'reach-v2__2022-08-29_10-04-35'
+	name = 'reach-v2__2022-08-29_10-04-35'
 	names = []
 	path = 'output/' + name + '/reach-v2/debug/'
 	mine_testing_data = \

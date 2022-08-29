@@ -4,7 +4,7 @@ defaults:
 # this needs to be specified manually
 experiment: test_exp
 
-num_train_steps: 50000
+num_train_steps: 500000
 
 replay_buffer_capacity: 100000
 

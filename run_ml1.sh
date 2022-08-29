@@ -3,13 +3,13 @@
 
  Foldername="0723_offline_meta_rl_dd"
  mkdir out_logs/${Foldername} &> /dev/null
- declare -a tasks=( "cpearl-reach" )
+ declare -a tasks=( "cpearl-ml1" )
  declare -a algos=( "cpearl" )
  ##
  declare -a seeds=( "1" )
- declare -a datadirs=( "reach-v2" )
+ declare -a datadirs=( "pick-place-v2" )
  declare -a is_sparses=( "0" )
- declare -a use_bracs=( "0" "1" )
+ declare -a use_bracs=( "1" "1" )
  declare -a use_information_bottlenecks=( "0" )
  declare -a is_zlosses=( "1" )
  declare -a is_onlineadapt_threses=( "0" )
@@ -18,7 +18,7 @@
  declare -a allow_backward_zs=( "0" )
  declare -a is_true_sparses=( "0" )
  declare -a r_threses=( "0.0" )
- n=6
+ n=2
  gpunum=8
  for task in "${tasks[@]}"
  do
@@ -84,7 +84,8 @@
  done
  done
  done
-# CUDA_VISIBLE_DEVICES=3  python policy_train.py ./configs/cheetah-vel.json
+#  python policy_train_ml1.py ./configs/ml1.json
+#  python data_collection_ml1.py ./configs/ml1.json
 # python policy_train.py ./configs/sparse-point-robot.json --is_uniform
 # determinsitic first
 
