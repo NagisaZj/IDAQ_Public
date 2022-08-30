@@ -10,15 +10,15 @@
  declare -a datadirs=( "push-v2" )
  declare -a is_sparses=( "0" )
  declare -a use_bracs=( "1" "1" )
- declare -a use_information_bottlenecks=( "0" )
+ declare -a use_information_bottlenecks=( "1" )
  declare -a is_zlosses=( "1" )
  declare -a is_onlineadapt_threses=( "0" )
  declare -a is_onlineadapt_maxes=( "1" )
  declare -a num_exp_traj_evals=( "5" )
- declare -a allow_backward_zs=( "0" )
+ declare -a allow_backward_zs=( "1" )
  declare -a is_true_sparses=( "0" )
  declare -a r_threses=( "0.0" )
- n=6
+ n=0
  gpunum=8
  for task in "${tasks[@]}"
  do
@@ -84,13 +84,11 @@
  done
  done
  done
-#  python policy_train_ml1.py ./configs/ml1.json
-#  python data_collection_ml1.py ./configs/ml1.json
-# python policy_train.py ./configs/sparse-point-robot.json --is_uniform
-# determinsitic first
+#
+# data collection: python data_collection_ml1.py ./configs/ml1.json
+# To change to other environments, modify "env_name" in ./configs/ml1.json.
 
+# Training: bash run_ml1.sh.
+# To change to other environments, modify "datadirs" in line 10, as well as "env_name" in ./configs/cpeal-ml1.json.
 
-# 27 probablistic first randomize
-
-
-# 29 1000  10000
+# Plot training curves: See plot_new_ml1.py.

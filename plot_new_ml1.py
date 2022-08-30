@@ -12,9 +12,9 @@ from plot_utils import *
 def main(name):
 
 
-	names = ['push-v2__2022-08-29_22-40-22','push-v2__2022-08-29_22-40-31','push-v2__2022-08-29_22-40-44','push-v2__2022-08-29_22-40-53']
-	names = ['pick-place-v2__2022-08-29_22-33-00', 'pick-place-v2__2022-08-29_22-33-08', 'pick-place-v2__2022-08-29_22-33-11',
-			 'pick-place-v2__2022-08-29_22-33-20']
+	names = ['push-v2__2022-08-30_13-05-21','push-v2__2022-08-30_13-05-31','push-v2__2022-08-30_13-05-41','push-v2__2022-08-30_13-05-52']
+	names = ['pick-place-v2__2022-08-30_10-07-37', 'pick-place-v2__2022-08-30_10-07-44', 'pick-place-v2__2022-08-30_10-07-45',
+			 'pick-place-v2__2022-08-30_10-07-52']
 	paths = ['output/' + name + '/pick-place-v2/debug/progress.csv' for name in names]
 	# path = 'output/' + name + '/reach-v2/debug/'
 	mine_testing_data = \
