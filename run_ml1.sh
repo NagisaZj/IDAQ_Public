@@ -18,7 +18,7 @@
  declare -a allow_backward_zs=( "0" )
  declare -a is_true_sparses=( "0" )
  declare -a r_threses=( "0.0" )
- n=2
+ n=6
  gpunum=8
  for task in "${tasks[@]}"
  do

@@ -22,6 +22,7 @@ from configs.default import default_config
 import metaworld,random
 import numpy as np
 import metaworld.policies as p
+import copy
 
 
 def deep_update_dict(fr, to):
@@ -44,12 +45,13 @@ def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
     # print(ml1.train_tasks)
     env.train_tasks = ml1.train_tasks
     task = random.choice(ml1.train_tasks)
+    task = ml1.train_tasks[goal_idx]
     env.set_task(task)
 
-    tasks = list(range(len(env.train_tasks)))
-    env=gym.wrappers.TimeLimit(gym.wrappers.ClipAction(MetaWorldWrapper(env)),500)
-
-    env.reset_task(goal_idx)
+    # tasks = list(range(len(env.train_tasks)))
+    # env=gym.wrappers.TimeLimit(gym.wrappers.ClipAction(MetaWorldWrapper(env)),500)
+    #
+    # env.reset_task(goal_idx)
 
 
     if variant['env_name']=='push-v2':
@@ -65,22 +67,31 @@ def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
     else:
         NotImplementedError
 
-    for i in range(45):
+
+    success_cnt = 0
+    while success_cnt <45:
         obs = env.reset()
         done = False
         episode_reward = 0
         trj = []
         step = 0
+        success = 0
         while not done:
-            action = policy.get_action(policy,obs)
-            new_obs, reward, done, _ = env.step(action)
-            done = float(1) if step+1==env._max_episode_steps else done
+            newobs =copy.deepcopy(obs)
+            newobs[-3:] = copy.deepcopy(env.goal)
+            action = policy.get_action(policy,newobs)
+            new_obs, reward, done, info = env.step(action)
+            # env.render()
+            done = float(1) if step+1==500 else done
             step +=1
             trj.append([obs, action, reward, new_obs])
             obs = new_obs
             episode_reward += reward
-
-        np.save(os.path.join('./data/'+variant['env_name']+'/goal_idx%d'%goal_idx, f'trj_evalsample{i}_step{49500}.npy'), np.array(trj))
+            success +=info['success']
+        if success>0:
+            print(episode_reward,success,success_cnt)
+            np.save(os.path.join('./data/'+variant['env_name']+'/goal_idx%d'%goal_idx, f'trj_evalsample{success_cnt}_step{49500}.npy'), np.array(trj))
+            success_cnt+=1
 
 
 
@@ -111,7 +122,7 @@ def main(config, num_gpus, docker, debug, eval, is_uniform, goal_idx=0, seed=0):
     #print('cfg.agent', cfg.agent)
     print(list(range(variant['env_params']['n_tasks'])))
     # multi-processing
-    p = mp.Pool(min(mp.cpu_count(), num_gpus))
+    p = mp.Pool(min(mp.cpu_count(), 50))
 
     os.makedirs('./data/'+variant['env_name'],exist_ok=True)
     if variant['env_params']['n_tasks'] > 1:
