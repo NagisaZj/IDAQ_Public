@@ -94,6 +94,7 @@ def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
             success_cnt+=1
         else:
             if np.random.rand()>0.9:
+                print(episode_reward, success, success_cnt)
                 np.save(os.path.join('./data/' + variant['env_name'] + '/goal_idx%d' % goal_idx,
                                      f'trj_evalsample{success_cnt}_step{49500}.npy'), np.array(trj))
                 success_cnt += 1
