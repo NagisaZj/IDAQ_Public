@@ -90,7 +90,7 @@ def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
             store_new_obs = copy.deepcopy(new_obs)
             store_obs[-3:] = 0
             store_new_obs[-3:] = 0
-            trj.append([obs, action, reward, new_obs])
+            trj.append([store_obs, action, reward, store_new_obs])
             obs = new_obs
             episode_reward += reward
             success +=info['success']
