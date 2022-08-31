@@ -39,7 +39,7 @@ initialize(config_dir="rlkit/torch/sac/pytorch_sac/config/")
 cfg = compose("train.yaml")
 def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
     os.makedirs('./data/'+variant['env_name']+'/goal_idx%d'%goal_idx,exist_ok=True)
-    ml1 = metaworld.ML1(variant['env_name'],seed=1337)  # Construct the benchmark, sampling tasks
+    ml1 = metaworld.MT1(variant['env_name'],seed=1337)  # Construct the benchmark, sampling tasks
 
     env = ml1.train_classes[variant['env_name']]()  # Create an environment with task
     # print(ml1.train_tasks)
@@ -64,6 +64,10 @@ def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
         policy = p.SawyerPushWallV2Policy
     elif variant['env_name']=='pick-place-wall-v2':
         policy = p.SawyerPickPlaceV2Policy
+    elif variant['env_name']=='window-open-v2':
+        policy = p.SawyerWindowOpenV2Policy
+    elif variant['env_name']=='drawer-close-v2':
+        policy = p.SawyerDrawerCloseV2Policy
     else:
         NotImplementedError
 
@@ -77,13 +81,15 @@ def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
         step = 0
         success = 0
         while not done:
-            newobs =copy.deepcopy(obs)
-            newobs[-3:] = copy.deepcopy(env.goal)
-            action = policy.get_action(policy,newobs)
+            action = policy.get_action(policy,obs)
             new_obs, reward, done, info = env.step(action)
             # env.render()
             done = float(1) if step+1==500 else done
             step +=1
+            store_obs = copy.deepcopy(obs)
+            store_new_obs = copy.deepcopy(new_obs)
+            store_obs[-3:] = 0
+            store_new_obs[-3:] = 0
             trj.append([obs, action, reward, new_obs])
             obs = new_obs
             episode_reward += reward
@@ -93,7 +99,7 @@ def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
             np.save(os.path.join('./data/'+variant['env_name']+'/goal_idx%d'%goal_idx, f'trj_evalsample{success_cnt}_step{49500}.npy'), np.array(trj))
             success_cnt+=1
         else:
-            if np.random.rand()>0.9:
+            if np.random.rand()>1.1:
                 print(episode_reward, success, success_cnt)
                 np.save(os.path.join('./data/' + variant['env_name'] + '/goal_idx%d' % goal_idx,
                                      f'trj_evalsample{success_cnt}_step{49500}.npy'), np.array(trj))
