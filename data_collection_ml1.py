@@ -38,7 +38,7 @@ def deep_update_dict(fr, to):
 initialize(config_dir="rlkit/torch/sac/pytorch_sac/config/")
 cfg = compose("train.yaml")
 def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
-    os.makedirs('./data/'+variant['env_name']+'3/goal_idx%d'%goal_idx,exist_ok=True)
+    os.makedirs('./data/'+variant['env_name']+'/goal_idx%d'%goal_idx,exist_ok=True)
     ml1 = metaworld.MT1(variant['env_name'],seed=1337)  # Construct the benchmark, sampling tasks
 
     env = ml1.train_classes[variant['env_name']]()  # Create an environment with task
@@ -83,7 +83,7 @@ def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
         while not done:
             # tmp_obs = copy.deepcopy(obs)
             action = policy.get_action(policy,obs)
-            noise = np.random.randn(action.shape[0])  *0.2
+            noise = np.random.randn(action.shape[0])  *0.1
             action = (action+noise).clip(-1,1)
             new_obs, reward, done, info = env.step(action)
             # env.render()
@@ -99,7 +99,7 @@ def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
             success +=info['success']
         if 1:
             print(episode_reward,success,success_cnt)
-            np.save(os.path.join('./data/'+variant['env_name']+'3/goal_idx%d'%goal_idx, f'trj_evalsample{success_cnt}_step{49500}.npy'), np.array(trj))
+            np.save(os.path.join('./data/'+variant['env_name']+'/goal_idx%d'%goal_idx, f'trj_evalsample{success_cnt}_step{49500}.npy'), np.array(trj))
             success_cnt+=1
         else:
             if np.random.rand()>0.9:
