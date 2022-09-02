@@ -52,7 +52,7 @@ def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
     # env=gym.wrappers.TimeLimit(gym.wrappers.ClipAction(MetaWorldWrapper(env)),500)
     #
     # env.reset_task(goal_idx)
-
+    #['handle-pull-side-v2', 'handle-pull-v2', 'lever-pull-v2', 'peg-insert-side-v2', 'pick-place-wall-v2', 'pick-out-of-hole-v2', 'reach-v2', 'push-back-v2', 'push-v2', 'pick-place-v2', 'plate-slide-v2', 'plate-slide-side-v2', 'plate-slide-back-v2', 'plate-slide-back-side-v2', 'peg-unplug-side-v2', 'soccer-v2', 'stick-push-v2', 'stick-pull-v2', 'push-wall-v2', 'reach-wall-v2', 'shelf-place-v2', 'sweep-into-v2', 'sweep-v2', 'window-open-v2', 'window-close-v2']
 
     if variant['env_name']=='push-v2':
         policy = p.SawyerPushV2Policy
@@ -68,6 +68,14 @@ def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
         policy = p.SawyerWindowOpenV2Policy
     elif variant['env_name']=='drawer-close-v2':
         policy = p.SawyerDrawerCloseV2Policy
+    elif variant['env_name']=='handle-pull-side-v2':
+        policy = p.SawyerHandlePullSideV2Policy
+    elif variant['env_name']=='handle-pull-v2':
+        policy = p.SawyerHandlePullV2Policy
+    elif variant['env_name']=='lever-pull-v2':
+        policy = p.SawyerLeverPullV2Policy
+    elif variant['env_name']=='peg-insert-side-v2':
+        policy = p.SawyerPegInsertionSideV2Policy
     else:
         NotImplementedError
 

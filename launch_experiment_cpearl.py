@@ -56,6 +56,7 @@ def experiment(variant, seed=None):
             # env = gym.wrappers.TimeLimit(gym.wrappers.ClipAction(MetaWorldWrapper(env)), 500)
             env = gym.wrappers.TimeLimit(gym.wrappers.ClipAction(env), 500)
             env=MetaWorldWrapper(env)
+            env.is_metaworld = 1
         else:
             ml1 = metaworld.ML1(variant['env_name'], seed=1337)  # Construct the benchmark, sampling tasks
 
@@ -69,6 +70,7 @@ def experiment(variant, seed=None):
             # env = gym.wrappers.TimeLimit(gym.wrappers.ClipAction(MetaWorldWrapper(env)), 500)
             env = gym.wrappers.TimeLimit(gym.wrappers.ClipAction(env), 500)
             env = MetaWorldWrapper(env)
+            env.is_metaworld = 1
 
     if seed is not None:
         global_seed(seed)

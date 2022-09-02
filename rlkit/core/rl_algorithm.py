@@ -776,6 +776,14 @@ class OfflineMetaRLAlgorithm(metaclass=abc.ABCMeta):
 				sparse_rewards = np.stack(e['sparse_reward'] for e in p['env_infos']).reshape(-1, 1)
 				p['rewards'] = sparse_rewards
 
+		if hasattr(self.env, 'is_metaworld'):
+			p = paths[-1]
+			done = np.sum(e['success'] for e in p['env_infos'])
+			done = 1 if done > 0 else 0
+			p['done'] = done
+		else:
+			p = paths[-1]
+			p['done'] = 0
 		goal = self.env._goal
 		for path in paths:
 			path['goal'] = goal  # goal
@@ -898,12 +906,16 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 	def _do_eval(self, indices, epoch):
 		final_returns = []
 		online_returns = []
+		success_cnt = []
 		for idx in indices:
 			all_rets = []
+			success_single = 0
 			for r in range(self.num_evals):
 				paths = self.collect_paths(idx, epoch, r)
 				all_rets.append([eval_util.get_average_returns([p]) for p in paths])
+				success_single = success_single + paths[-1]['done']
 			final_returns.append(np.mean([a[-1] for a in all_rets]))
+			success_cnt.append(success_single / self.num_evals)
 			# record online returns for the first n trajectories
 			n = min([len(a) for a in all_rets])
 			all_rets = [a[:n] for a in all_rets]
@@ -911,7 +923,7 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 			online_returns.append(all_rets)
 		n = min([len(t) for t in online_returns])
 		online_returns = [t[:n] for t in online_returns]
-		return final_returns, online_returns
+		return final_returns, online_returns, success_cnt
 
 	def evaluate(self, epoch):
 		if self.eval_statistics is None:
@@ -970,13 +982,13 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 		eval_util.dprint('online returns with buffer context')
 		eval_util.dprint(buffercontext_returns)
 		### eval train tasks with on-policy data to match eval of test tasks
-		train_final_returns, train_online_returns = self._do_eval(indices, epoch)
+		train_final_returns, train_online_returns,train_success_cnt = self._do_eval(indices, epoch)
 		eval_util.dprint('train online returns')
 		eval_util.dprint(train_online_returns)
 
 		### test tasks
 		eval_util.dprint('evaluating on {} test tasks'.format(len(self.eval_tasks)))
-		test_final_returns, test_online_returns = self._do_eval(self.eval_tasks, epoch)
+		test_final_returns, test_online_returns,test_success_cnt = self._do_eval(self.eval_tasks, epoch)
 		eval_util.dprint('test online returns')
 		eval_util.dprint(test_online_returns)
 
@@ -993,6 +1005,9 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 		self.eval_statistics['AverageTrainReturn_all_train_tasks'] = train_returns
 		self.eval_statistics['AverageReturn_all_train_tasks'] = avg_train_return
 		self.eval_statistics['AverageReturn_all_test_tasks'] = avg_test_return
+		if hasattr(self.env, 'is_metaworld'):
+			self.eval_statistics['AverageSuccessRate_all_train_tasks'] = np.mean(train_success_cnt)
+			self.eval_statistics['AverageSuccessRate_all_test_tasks'] = np.mean(test_success_cnt)
 		logger.save_extra_data(avg_train_online_return, path='online-train-epoch{}'.format(epoch))
 		logger.save_extra_data(avg_test_online_return, path='online-test-epoch{}'.format(epoch))
 
@@ -1109,7 +1124,14 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 			elif num_trajs >= self.num_exp_traj_eval and type(self.agent.context) != type(None):
 				self.agent.infer_posterior(self.agent.context)
 				is_select = False
-
+		if hasattr(self.env, 'is_metaworld'):
+			p = paths[-1]
+			done = np.sum(e['success'] for e in p['env_infos'])
+			done = 1 if done > 0 else 0
+			p['done'] = done
+		else:
+			p = paths[-1]
+			p['done'] = 0
 		if self.sparse_rewards:
 			for p in paths:
 				sparse_rewards = np.stack(e['sparse_reward'] for e in p['env_infos']).reshape(-1, 1)
