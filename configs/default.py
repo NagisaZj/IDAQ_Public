@@ -80,6 +80,7 @@ default_config = dict(
         r_thres=0., # threshold of reward to encode
         is_onlineadapt_model=False, # default not use prepared online adapt using model boosting
         onlineadapt_max_num_candidates=5, # default the number of candidates during adaptation
+        load_dir='',
     ),
     util_params=dict(
         base_log_dir='output',

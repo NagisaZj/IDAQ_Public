@@ -362,8 +362,8 @@ def rollout(env, agent, max_path_length=np.inf, accum_context=True, is_select=Fa
     if animated:
         env.render()
     while path_length < max_path_length:
-        logging.info('task_indices:')
-        logging.info(agent.task_indices)
+        # logging.info('task_indices:')
+        # logging.info(agent.task_indices)
         logging.info('z')
         logging.info(agent.z)
         logging.info('o:')
@@ -415,6 +415,7 @@ def rollout(env, agent, max_path_length=np.inf, accum_context=True, is_select=Fa
         if is_onlineadapt_max:
             agent.update_onlineadapt_max(np.sum(scores), context)
         elif not is_select or np.sum(scores) > r_thres:
+            # print('A!')
             for c in context:
                 agent.update_context(c)
 
