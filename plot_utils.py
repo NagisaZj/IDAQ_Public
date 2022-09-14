@@ -126,6 +126,45 @@ def data_read_npy(paths=['./outputfin2/cheetah-vel-sparse/2019_11_20_08_52_39/pr
 	return xs, mean, std, ys.transpose()
 
 
+def data_read_macaw(paths=['./outputfin2/cheetah-vel-sparse/2019_11_20_08_52_39/progress.csv',
+                     '/home/zj/Desktop/new-pearl/outputfin2/cheetah-vel-sparse/2019_11_20_16_01_14/progress.csv',
+                     '/home/zj/Desktop/new-pearl/outputfin2/cheetah-vel-sparse/2019_11_19_19_57_40/progress.csv']):
+	mine_values = []
+	num_trajs = len(paths)
+	mine_paths = paths
+	shortest = 10000000000
+	for p in mine_paths:
+		path = p +'/reward.npy'
+		data = np.load(path,allow_pickle=True)
+		values_steps = np.arange(len(data))
+		values_returns = data
+		# values_returns = smoothingaverage(values_returns)
+		# print(values_steps.shape)
+		length = values_returns.shape[0]
+		shortest = length if length < shortest else shortest
+		mine_values.append([values_steps, values_returns])
+		# if 'pro-mp' in paths[0]:
+		#     shortest = 1500
+		'''plots = csv.reader(csvfile,delimiter=',')
+		print(plots)
+		for row in plots:
+			print(row)'''
+	'''if 'outputfin2' in paths[0]:
+		shortest = shortest-10'''
+
+	'''if 'rl2' in paths[0]:
+		shortest = 700'''
+
+	xs = mine_values[0][0][:shortest]
+	ys = np.zeros([shortest, num_trajs])
+	for i in range(num_trajs):
+		ys[:, i] = mine_values[i][1][:shortest]
+	mean = np.mean(ys, 1)
+	std = np.std(ys, 1)
+	print(mean[-1], std[-1])
+	return xs, mean, std, ys.transpose()
+
+
 def data_read_success(paths=['./outputfin2/cheetah-vel-sparse/2019_11_20_08_52_39/progress.csv',
                              '/home/zj/Desktop/new-pearl/outputfin2/cheetah-vel-sparse/2019_11_20_16_01_14/progress.csv',
                              '/home/zj/Desktop/new-pearl/outputfin2/cheetah-vel-sparse/2019_11_19_19_57_40/progress.csv']):
