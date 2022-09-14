@@ -57,7 +57,7 @@ def data_read(paths=['./outputfin2/cheetah-vel-sparse/2019_11_20_08_52_39/progre
 	shortest = 10000000000
 	for p in mine_paths:
 		csv_data = pd.read_csv(p)
-		values_steps = csv_data['Epoch'].values
+		values_steps = csv_data['Epoch'].values*5000
 		values_returns = csv_data[load_name].values
 		# values_returns = smoothingaverage(values_returns)
 		# print(values_steps.shape)
@@ -97,7 +97,7 @@ def data_read_npy(paths=['./outputfin2/cheetah-vel-sparse/2019_11_20_08_52_39/pr
 	for p in mine_paths:
 		path = p + load_name+'.npy'
 		data = np.load(path,allow_pickle=True)
-		values_steps = np.arange(len(data))
+		values_steps = np.arange(len(data))*5000
 		values_returns = data
 		# values_returns = smoothingaverage(values_returns)
 		# print(values_steps.shape)
@@ -136,7 +136,7 @@ def data_read_macaw(paths=['./outputfin2/cheetah-vel-sparse/2019_11_20_08_52_39/
 	for p in mine_paths:
 		path = p +'/reward.npy'
 		data = np.load(path,allow_pickle=True)
-		values_steps = np.arange(len(data))
+		values_steps = np.arange(len(data))*40*256
 		values_returns = data
 		# values_returns = smoothingaverage(values_returns)
 		# print(values_steps.shape)
@@ -622,7 +622,7 @@ def plot_all(datas, legends, start=0):
 	# plt.ylim(config['ylim'])
 	plt.tick_params('x', labelsize=20.0)
 	plt.tick_params('y', labelsize=20.0)
-	plt.xlabel(config['xlabel'], {'size': 26.0})
+	plt.xlabel('Samples', {'size': 26.0})
 	plt.ylabel(config['ylabel'], {'size': 26.0})
 	ax.xaxis.set_major_locator(ticker.MaxNLocator(6))
 	ax.yaxis.set_major_locator(ticker.MaxNLocator(6))
