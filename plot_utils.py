@@ -57,7 +57,7 @@ def data_read(paths=['./outputfin2/cheetah-vel-sparse/2019_11_20_08_52_39/progre
 	shortest = 10000000000
 	for p in mine_paths:
 		csv_data = pd.read_csv(p)
-		values_steps = csv_data['Epoch'].values*400*16*1000/1e6
+		values_steps = csv_data['Epoch'].values*400*16*1000*2/1e6
 		values_returns = csv_data[load_name].values
 		# values_returns = smoothingaverage(values_returns)
 		# print(values_steps.shape)
@@ -97,7 +97,7 @@ def data_read_npy(paths=['./outputfin2/cheetah-vel-sparse/2019_11_20_08_52_39/pr
 	for p in mine_paths:
 		path = p + load_name+'.npy'
 		data = np.load(path,allow_pickle=True)
-		values_steps = np.arange(len(data))*400*16*1000/1e6
+		values_steps = np.arange(len(data))*400*16*1000*2/1e6
 		values_returns = data
 		# values_returns = smoothingaverage(values_returns)
 		# print(values_steps.shape)
@@ -136,7 +136,7 @@ def data_read_macaw(paths=['./outputfin2/cheetah-vel-sparse/2019_11_20_08_52_39/
 	for p in mine_paths:
 		path = p +'/reward.npy'
 		data = np.load(path,allow_pickle=True)
-		values_steps = np.arange(len(data))*40*256*1000/1e6
+		values_steps = np.arange(len(data))*40*256*1000*2/1e6
 		values_returns = data
 		# values_returns = smoothingaverage(values_returns)
 		# print(values_steps.shape)
