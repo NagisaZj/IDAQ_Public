@@ -966,13 +966,45 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 			test_task_online_average_returns.append(np.mean(test_final_returns))
 			test_task_online_average_successes.append(np.mean(test_success_cnt))
 
-			np.save(os.path.join(experiment_log_dir,'train_task_online_average_returns.npy'),train_task_online_average_returns)
-			np.save(os.path.join(experiment_log_dir,'train_task_online_average_successes.npy'),train_task_online_average_successes)
-			np.save(os.path.join(experiment_log_dir,'test_task_online_average_returns.npy'),test_task_online_average_returns)
-			np.save(os.path.join(experiment_log_dir,'test_task_online_average_successes.npy'),test_task_online_average_successes)
+			np.save(os.path.join(load_dir,'train_task_online_average_returns.npy'),train_task_online_average_returns)
+			np.save(os.path.join(load_dir,'train_task_online_average_successes.npy'),train_task_online_average_successes)
+			np.save(os.path.join(load_dir,'test_task_online_average_returns.npy'),test_task_online_average_returns)
+			np.save(os.path.join(load_dir,'test_task_online_average_successes.npy'),test_task_online_average_successes)
 
+	def step_eval_2(self,load_dir,length,experiment_log_dir):
+		test_task_offline_average_returns = []
+		test_task_offline_average_successes = []
 
+		for i in range(length):
+			print(i)
+			self.load_epoch_model(i,load_dir)
+			train_returns = []
+			buffercontext_returns = []
+			for idx in self.eval_tasks:
+				self.task_idx = idx
+				self.env.reset_task(idx)
+				paths = []
+				for _ in range(self.num_steps_per_eval // self.max_path_length):
+					context = self.sample_context(idx)
+					self.agent.infer_posterior(context)
+					p, _ = self.sampler.obtain_samples(deterministic=self.eval_deterministic,
+													   max_samples=self.max_path_length,
+													   accum_context=False,
+													   max_trajs=1,
+													   resample=np.inf)
+					paths += p
 
+				if self.sparse_rewards:
+					for p in paths:
+						sparse_rewards = np.stack(e['sparse_reward'] for e in p['env_infos']).reshape(-1, 1)
+						p['rewards'] = sparse_rewards
+
+				train_returns.append(eval_util.get_average_returns(paths))
+				buffercontext_returns.append(np.array([eval_util.get_average_returns([p]) for p in paths]))
+
+			train_returns = np.mean(train_returns)
+			test_task_offline_average_returns.append(train_returns)
+			np.save(os.path.join(load_dir, 'test_task_offline_average_returns.npy'), test_task_offline_average_returns)
 
 	def evaluate(self, epoch):
 		if self.eval_statistics is None:
