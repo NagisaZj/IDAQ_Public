@@ -240,7 +240,7 @@ def experiment(variant, seed=None):
     values_steps = csv_data['Epoch'].values
     length = values_steps.shape[0]
     print(length)
-    algorithm.step_eval(load_path,length,experiment_log_dir)
+    algorithm.step_eval_2(load_path,length,experiment_log_dir)
 
     # run the algorithm
     # algorithm.train()
