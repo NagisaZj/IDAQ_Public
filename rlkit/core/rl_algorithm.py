@@ -981,6 +981,7 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 			train_returns = []
 			buffercontext_returns = []
 			for idx in self.eval_tasks:
+				self.agent.clear_z()
 				self.task_idx = idx
 				self.env.reset_task(idx)
 				paths = []
