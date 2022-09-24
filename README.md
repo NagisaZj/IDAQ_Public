@@ -34,7 +34,8 @@ FOCAL requires fixed data (batch) for meta-training and meta-testing, which are 
 Example of training policies and generating trajectories on multiple tasks:
 
 ```
-python policy_train.py ./configs/ant-goal.json --gpu 0
+python policy_train.py ./configs/ant-goal-3.json 
+python policy_train_ml1.py  /data2/zj/Offline-MetaRL/configs/ml1-reach.json
 ```
 
 Generate trajectories from pretrained models
@@ -49,6 +50,7 @@ Generated data will be saved in `./data/`
 Experiments are configured via `json` configuration files located in `./configs`. Basic settings are defined and described in `./configs/default.py`. To reproduce an experiment, run: 
 ```
 python launch_experiment.py ./configs/[EXP].json
+python launch_experiment.py ./configs/cheetah-vel.json ./data/cheetah-vel --gpu 0 
 python launch_experiment.py ./configs/sparse-point-robot.json --gpu 1
 python launch_experiment_model.py ./configs/sparse-point-robot.json --gpu 1
 # 6 7 8 dense

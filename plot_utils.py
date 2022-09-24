@@ -57,8 +57,87 @@ def data_read(paths=['./outputfin2/cheetah-vel-sparse/2019_11_20_08_52_39/progre
 	shortest = 10000000000
 	for p in mine_paths:
 		csv_data = pd.read_csv(p)
-		values_steps = csv_data['Epoch'].values
+		values_steps = csv_data['Epoch'].values*400*16*1000*2/1e6
 		values_returns = csv_data[load_name].values
+		# values_returns = smoothingaverage(values_returns)
+		# print(values_steps.shape)
+		length = values_returns.shape[0]
+		shortest = length if length < shortest else shortest
+		mine_values.append([values_steps, values_returns])
+		# if 'pro-mp' in paths[0]:
+		#     shortest = 1500
+		'''plots = csv.reader(csvfile,delimiter=',')
+		print(plots)
+		for row in plots:
+			print(row)'''
+	'''if 'outputfin2' in paths[0]:
+		shortest = shortest-10'''
+
+	'''if 'rl2' in paths[0]:
+		shortest = 700'''
+
+	xs = mine_values[0][0][:shortest]
+	ys = np.zeros([shortest, num_trajs])
+	for i in range(num_trajs):
+		ys[:, i] = mine_values[i][1][:shortest]
+	mean = np.mean(ys, 1)
+	std = np.std(ys, 1)
+	print(mean[-1], std[-1])
+	return xs, mean, std, ys.transpose()
+
+
+def data_read_npy(paths=['./outputfin2/cheetah-vel-sparse/2019_11_20_08_52_39/progress.csv',
+                     '/home/zj/Desktop/new-pearl/outputfin2/cheetah-vel-sparse/2019_11_20_16_01_14/progress.csv',
+                     '/home/zj/Desktop/new-pearl/outputfin2/cheetah-vel-sparse/2019_11_19_19_57_40/progress.csv'],
+              load_name='AverageReturn_all_test_tasks'):
+	mine_values = []
+	num_trajs = len(paths)
+	mine_paths = paths
+	shortest = 10000000000
+	for p in mine_paths:
+		path = p + load_name+'.npy'
+		data = np.load(path,allow_pickle=True)
+		values_steps = np.arange(len(data))*400*16*1000*2/1e6
+		values_returns = data
+		# values_returns = smoothingaverage(values_returns)
+		# print(values_steps.shape)
+		length = values_returns.shape[0]
+		shortest = length if length < shortest else shortest
+		mine_values.append([values_steps, values_returns])
+		# if 'pro-mp' in paths[0]:
+		#     shortest = 1500
+		'''plots = csv.reader(csvfile,delimiter=',')
+		print(plots)
+		for row in plots:
+			print(row)'''
+	'''if 'outputfin2' in paths[0]:
+		shortest = shortest-10'''
+
+	'''if 'rl2' in paths[0]:
+		shortest = 700'''
+
+	xs = mine_values[0][0][:shortest]
+	ys = np.zeros([shortest, num_trajs])
+	for i in range(num_trajs):
+		ys[:, i] = mine_values[i][1][:shortest]
+	mean = np.mean(ys, 1)
+	std = np.std(ys, 1)
+	print(mean[-1], std[-1])
+	return xs, mean, std, ys.transpose()
+
+
+def data_read_macaw(paths=['./outputfin2/cheetah-vel-sparse/2019_11_20_08_52_39/progress.csv',
+                     '/home/zj/Desktop/new-pearl/outputfin2/cheetah-vel-sparse/2019_11_20_16_01_14/progress.csv',
+                     '/home/zj/Desktop/new-pearl/outputfin2/cheetah-vel-sparse/2019_11_19_19_57_40/progress.csv']):
+	mine_values = []
+	num_trajs = len(paths)
+	mine_paths = paths
+	shortest = 10000000000
+	for p in mine_paths:
+		path = p +'/reward.npy'
+		data = np.load(path,allow_pickle=True)
+		values_steps = np.arange(len(data))*40*256*1000*2/1e6
+		values_returns = data
 		# values_returns = smoothingaverage(values_returns)
 		# print(values_steps.shape)
 		length = values_returns.shape[0]
@@ -326,7 +405,7 @@ plt_config_point = {
 	'data_scale': 1,
 	'legend_loc': 'best',
 	'legend_ncol': 1,
-	'legend_prop_size': 18.0,
+	'legend_prop_size': 15.0,
 	'xlabel': 'Iterations',
 	'ylabel': 'Average Return',
 	'xlim': (-5, 55),
@@ -539,11 +618,11 @@ def plot_all(datas, legends, start=0):
 	ax.spines['left'].set_color('black')
 	ax.spines['bottom'].set_color('black')
 
-	plt.xlim(config['xlim'])
-	plt.ylim(config['ylim'])
+	# plt.xlim(config['xlim'])
+	# plt.ylim(config['ylim'])
 	plt.tick_params('x', labelsize=20.0)
 	plt.tick_params('y', labelsize=20.0)
-	plt.xlabel(config['xlabel'], {'size': 26.0})
+	plt.xlabel('Million Samples', {'size': 26.0})
 	plt.ylabel(config['ylabel'], {'size': 26.0})
 	ax.xaxis.set_major_locator(ticker.MaxNLocator(6))
 	ax.yaxis.set_major_locator(ticker.MaxNLocator(6))

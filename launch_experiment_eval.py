@@ -231,8 +231,17 @@ def experiment(variant, seed=None):
         pickle_dir = experiment_log_dir + '/eval_trajectories'
         pathlib.Path(pickle_dir).mkdir(parents=True, exist_ok=True)
 
+    load_log_path = os.path.join(variant['algo_params']['load_dir'],variant['env_name'],'debug','progress.csv')
+    load_path = os.path.join(variant['algo_params']['load_dir'], variant['env_name'], 'debug')
+    import pandas as pd
+    csv_data = pd.read_csv(load_log_path)
+    values_steps = csv_data['Epoch'].values
+    length = values_steps.shape[0]
+    print(length)
+    algorithm.step_eval(load_path,length,experiment_log_dir)
+
     # run the algorithm
-    algorithm.train()
+    # algorithm.train()
 
 def deep_update_dict(fr, to):
     ''' update dict of dicts with new values '''
@@ -247,6 +256,7 @@ def deep_update_dict(fr, to):
 @click.command()
 @click.argument('config', default=None)
 @click.argument('data_dir', default=None)
+@click.argument('load_dir', default=None)
 @click.option('--gpu', default=0)
 @click.option("--is_sparse_reward", default=0)
 @click.option("--use_brac", default=0)
@@ -258,7 +268,8 @@ def deep_update_dict(fr, to):
 @click.option("--allow_backward_z", default=0)
 @click.option("--is_true_sparse_rewards", default=0)
 @click.option("--r_thres", default=0.)
-def main(config, data_dir, gpu, is_sparse_reward, use_brac, use_information_bottleneck, is_zloss, is_onlineadapt_thres,
+@click.option("--r_thres", default=0.)
+def main(config, data_dir, load_dir,gpu, is_sparse_reward, use_brac, use_information_bottleneck, is_zloss, is_onlineadapt_thres,
          is_onlineadapt_max, num_exp_traj_eval, allow_backward_z, is_true_sparse_rewards, r_thres):
 
     variant = default_config
@@ -278,6 +289,7 @@ def main(config, data_dir, gpu, is_sparse_reward, use_brac, use_information_bott
     variant['algo_params']['allow_backward_z'] = allow_backward_z
     variant['algo_params']['is_true_sparse_rewards'] = is_true_sparse_rewards
     variant['algo_params']['r_thres'] = r_thres
+    variant['algo_params']['load_dir'] = load_dir
 
     # multi-processing
     p = mp.Pool(mp.cpu_count())

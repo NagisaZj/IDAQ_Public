@@ -9,14 +9,19 @@ from . import register_env
 class AntGoalEnv(MultitaskAntEnv):
     def __init__(self, task={}, n_tasks=2, randomize_tasks=True, max_episode_steps=100, **kwargs):
         self._steps = 0
-        self._max_episode_steps = max_episode_steps
+        self._max_episode_steps = 200
+        self._step = 0
         super(AntGoalEnv, self).__init__(task, n_tasks, **kwargs)
+
+    def reset(self):
+        self._step = 0
+        return super().reset()
 
     def step(self, action):
         self.do_simulation(action, self.frame_skip)
         xposafter = np.array(self.get_body_com("torso"))
 
-        goal_reward = -np.sum(np.abs(xposafter[:2] - self._goal)) # make it happy, not suicidal
+        goal_reward = -np.sum(np.abs(xposafter[:2] - self._goal))  # make it happy, not suicidal
 
         ctrl_cost = .1 * np.square(action).sum()
         contact_cost = 0.5 * 1e-3 * np.sum(
@@ -26,10 +31,9 @@ class AntGoalEnv(MultitaskAntEnv):
         state = self.state_vector()
         done = False
         ob = self._get_obs()
-        self._steps +=1
-        if self._steps ==self._max_episode_steps:
-            done=True
-            self._steps = 0
+        self._step += 1
+        if self._step >= self._max_episode_steps:
+            done = True
         return ob, reward, done, dict(
             goal_forward=goal_reward,
             reward_ctrl=-ctrl_cost,
@@ -38,8 +42,9 @@ class AntGoalEnv(MultitaskAntEnv):
         )
 
     def sample_tasks(self, num_tasks):
-        a = np.random.random(num_tasks) * np.pi
-        r = 1
+        np.random.seed(1337)
+        a = np.random.random(num_tasks) * 2 * np.pi
+        r = 3 * np.random.random(num_tasks) ** 0.5
         goals = np.stack((r * np.cos(a), r * np.sin(a)), axis=-1)
         tasks = [{'goal': goal} for goal in goals]
         return tasks

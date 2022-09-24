@@ -91,13 +91,10 @@ class Workspace(object):
             done = False
             episode_reward = 0
             trj = []
-            step = 0
             while not done:
                 with utils.eval_mode(self.agent):
                     action = self.agent.act(obs, sample=False)
                 new_obs, reward, done, _ = self.env.step(action)
-                done = float(1) if step+1==self.env._max_episode_steps else done
-                step +=1
                 trj.append([obs, action, reward, new_obs])
                 obs = new_obs
                 episode_reward += reward
@@ -118,13 +115,10 @@ class Workspace(object):
             done = False
             episode_reward = 0
             trj = []
-            step = 0
             while not done:
                 with utils.eval_mode(self.agent):
                     action = self.agent.act(obs, sample=True)
                 new_obs, reward, done, _ = self.env.step(action)
-                done = float(1) if step+1==self.env._max_episode_steps else done
-                step +=1
                 trj.append([obs, action, reward, new_obs])
                 obs = new_obs
                 episode_reward += reward
@@ -146,10 +140,11 @@ class Workspace(object):
         #import torch.nn.functional as F
         episode, episode_reward, done = 0, 0, True
         start_time = time.time()
-        count = 0
+        cnt = 0
+        steps = 0
         while self.step < self.cfg.num_train_steps:
             if done:
-                count +=1
+                cnt +=1
                 if self.step > 0:
                     self.logger.log('train/duration',
                                     time.time() - start_time, self.step)
@@ -158,7 +153,8 @@ class Workspace(object):
                         self.step, save=(self.step > self.cfg.num_seed_steps))
 
                 # evaluate agent periodically
-                if self.step > self.cfg.num_seed_steps and count %10==0: # self.step % self.cfg.eval_frequency == 0:
+                # print(self.step)
+                if self.step > self.cfg.num_seed_steps and cnt %10==0: # and self.step % self.cfg.eval_frequency == 0:
                     self.logger.log('eval/episode', episode, self.step)
                     self.evaluate()
                     self.evaluate_sample()
@@ -191,7 +187,7 @@ class Workspace(object):
 
             # allow infinite bootstrap
             done = float(done)
-            done = float(1) if episode_step + 1 == self.env._max_episode_steps else done
+            # done = float(1) if episode_step + 1 == self.env._max_episode_steps else done
             done_no_max = 0 if episode_step + 1 == self.env._max_episode_steps else done
             episode_reward += reward
 

@@ -138,6 +138,7 @@ class PEARLAgent(nn.Module):
             r = info['sparse_reward']
         o = ptu.from_numpy(o[None, None, ...])
         a = ptu.from_numpy(a[None, None, ...])
+        r=np.array(r)
         if len(r.shape) == 0:
             r = ptu.from_numpy(np.array([r])[None, None, ...])
         else:
@@ -376,6 +377,7 @@ class OldPEARLAgent(nn.Module):
             r = info['sparse_reward']
         o = ptu.from_numpy(o[None, None, ...])
         a = ptu.from_numpy(a[None, None, ...])
+        r=np.array(r)
         if len(r.shape) == 0:
             r = ptu.from_numpy(np.array([r])[None, None, ...])
         else:

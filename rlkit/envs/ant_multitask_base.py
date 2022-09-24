@@ -8,6 +8,7 @@ class MultitaskAntEnv(AntEnv):
         self._task = task
         self.tasks = self.sample_tasks(n_tasks)
         self._goal = self.tasks[0]['goal']
+        self._goal_idx = 0
         super(MultitaskAntEnv, self).__init__(**kwargs)
 
     """
@@ -35,4 +36,5 @@ class MultitaskAntEnv(AntEnv):
     def reset_task(self, idx):
         self._task = self.tasks[idx]
         self._goal = self._task['goal'] # assume parameterization of task by single vector
+        self._goal_idx = idx
         self.reset()

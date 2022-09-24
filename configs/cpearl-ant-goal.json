@@ -1,10 +1,10 @@
 {
-    "env_name": "cheetah-vel",
-    "n_train_tasks": 80,
+    "env_name": "ant-goal",
+    "n_train_tasks": 60,
     "n_eval_tasks": 20,
     "randomize_tasks": 1,
     "env_params": {
-        "n_tasks": 100,
+        "n_tasks": 80,
         "randomize_tasks": 0
     }
     ,
@@ -29,7 +29,7 @@
         "alpha_max": 2e3,
         "train_epoch": 49800,
         "eval_epoch": 49800,
-        "data_dir": "./data/cheetah-vel",
+        "data_dir": "./data/ant-goal-backup",
         "divergence_name": "kl",
         "use_brac": 1,
         "use_information_bottleneck": 0,

@@ -1,13 +1,13 @@
 #!/bin/bash
    # Script to reproduce results
 
- Foldername="0723_offline_meta_rl_bb"
+ Foldername="0723_offline_meta_rl_cc"
  mkdir out_logs/${Foldername} &> /dev/null
- declare -a tasks=( "cpearl-cheetah-vel" )
+ declare -a tasks=( "cpearl-ant-goal" )
  declare -a algos=( "cpearl" )
  ##
  declare -a seeds=( "1" )
- declare -a datadirs=( "cheetah-vel" )
+ declare -a datadirs=( "ant-goal-backup" )
  declare -a is_sparses=( "0" )
  declare -a use_bracs=( "0" "1" )
  declare -a use_information_bottlenecks=( "1" )
@@ -18,7 +18,7 @@
  declare -a allow_backward_zs=( "1" )
  declare -a is_true_sparses=( "0" )
  declare -a r_threses=( "0.0" )
- n=2
+ n=5
  gpunum=8
  for task in "${tasks[@]}"
  do

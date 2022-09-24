@@ -1,9 +1,9 @@
 {
-    "env_name": "cheetah-vel",
-    "n_train_tasks": 80,
+    "env_name": "ant-goal",
+    "n_train_tasks": 60,
     "n_eval_tasks": 20,
     "env_params": {
-        "n_tasks": 100
+        "n_tasks": 80
     }
     ,
     "algo_params": {
@@ -23,7 +23,7 @@
         "epoch": null,
         "n_trj": 50,
         "sparse_rewards": 0,
-        "alpha_init": 5e1, 
+        "alpha_init": 5e1,
         "alpha_max": 2e3,
         "train_epoch": 49800,
         "eval_epoch": 49800

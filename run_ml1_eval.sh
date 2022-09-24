@@ -1,24 +1,25 @@
 #!/bin/bash
    # Script to reproduce results
 
- Foldername="0723_offline_meta_rl_bb"
+ Foldername="0723_offline_meta_rl_gg"
  mkdir out_logs/${Foldername} &> /dev/null
- declare -a tasks=( "cpearl-cheetah-vel" )
- declare -a algos=( "cpearl" )
+ declare -a tasks=( "cpearl-ml1-eval" )
+ declare -a algos=( "eval" )
  ##
  declare -a seeds=( "1" )
- declare -a datadirs=( "cheetah-vel" )
+ declare -a datadirs=( "window-open-v2med" )  # actually unused, any valid dataset is okay
+ declare -a loaddirs=( "/data2/zj/Offline-MetaRL/output/reach-v2__2022-09-01_11-16-47"  "/data2/zj/Offline-MetaRL/output/reach-v2__2022-09-01_18-53-27" "/data2/zj/Offline-MetaRL/output/reach-v2__2022-09-01_11-16-58" "/data2/zj/Offline-MetaRL/output/reach-v2__2022-09-01_18-53-35")  # use absolute paths
  declare -a is_sparses=( "0" )
- declare -a use_bracs=( "0" "1" )
- declare -a use_information_bottlenecks=( "1" )
+ declare -a use_bracs=( "1")
+ declare -a use_information_bottlenecks=( "0" )
  declare -a is_zlosses=( "1" )
  declare -a is_onlineadapt_threses=( "0" )
  declare -a is_onlineadapt_maxes=( "1" )
- declare -a num_exp_traj_evals=( "2" )
- declare -a allow_backward_zs=( "1" )
+ declare -a num_exp_traj_evals=( "5" )
+ declare -a allow_backward_zs=( "0" )
  declare -a is_true_sparses=( "0" )
  declare -a r_threses=( "0.0" )
- n=2
+ n=0
  gpunum=8
  for task in "${tasks[@]}"
  do
@@ -27,6 +28,8 @@
  for seed in "${seeds[@]}"
  do
  for datadir in "${datadirs[@]}"
+ do
+ for loaddir in "${loaddirs[@]}"
  do
  for is_sparse in "${is_sparses[@]}"
  do
@@ -51,6 +54,7 @@
  OMP_NUM_THREADS=16 KMP_AFFINITY="compact,granularity\=fine" nohup python launch_experiment_${algo}.py \
  ./configs/${task}.json \
  ./data/${datadir} \
+ ${loaddir} \
  --gpu=${n} \
  --is_sparse_reward=${is_sparse} \
  --use_brac=${use_brac} \
@@ -84,9 +88,11 @@
  done
  done
  done
-# CUDA_VISIBLE_DEVICES=3  python policy_train.py ./configs/cheetah-vel.json
-# python policy_train.py ./configs/sparse-point-robot.json --is_uniform
-# determinsitic first
+ done
 
+# run focal's online adaptation
 
-# 27 probablistic first randomize
+# Running: bash run_ml1_eval.sh.
+# To change to other environments, modify "loaddirs" in line 11, as well as "env_name" in ./configs/cpeal-ml1-eval.json.
+
+# Plot training curves: TODO. Data are stored in 4 .npy files.

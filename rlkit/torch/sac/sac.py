@@ -1920,6 +1920,7 @@ class CPEARL(OMRLOnlineAdaptAlgorithm):
 
     def load_epoch_model(self, epoch, log_dir):
         path = log_dir
+        print(epoch)
         try:
             self.agent.context_encoder.load_state_dict(
                 torch.load(os.path.join(path, 'context_encoder_itr_{}.pth'.format(epoch))))
