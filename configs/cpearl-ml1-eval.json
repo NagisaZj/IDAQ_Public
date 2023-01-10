@@ -1,5 +1,5 @@
 {
-    "env_name": "reach-v2",
+    "env_name": "peg-insert-side-v2",
     "n_train_tasks": 40,
     "n_eval_tasks": 10,
     "randomize_tasks": 1,

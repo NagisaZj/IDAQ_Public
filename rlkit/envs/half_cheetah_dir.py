@@ -23,8 +23,9 @@ class HalfCheetahDirEnv(HalfCheetahEnv):
         model-based control", 2012
         (https://homes.cs.washington.edu/~todorov/papers/TodorovIROS12.pdf)
     """
+
     def __init__(self, task={}, n_tasks=2, randomize_tasks=False, max_episode_steps=200):
-        directions = [-1, 1]
+        directions = [-1, 1, -1, 1]
         self.tasks = [{'direction': direction} for direction in directions]
         self._task = task
         self._goal_dir = task.get('direction', 1)
@@ -46,10 +47,16 @@ class HalfCheetahDirEnv(HalfCheetahEnv):
         reward = forward_reward - ctrl_cost
         done = False
         infos = dict(reward_forward=forward_reward,
-            reward_ctrl=-ctrl_cost, task=self._task)
+                     reward_ctrl=-ctrl_cost, task=self._task)
         self._step += 1
         if self._step >= self._max_episode_steps:
             done = True
+        curr_x_pos = self.get_body_com("torso")[0]
+        sparse_reward = reward
+        if np.abs(curr_x_pos) < 5:
+            sparse_reward = infos['reward_ctrl']
+        infos.update({'sparse_reward': sparse_reward})
+        # reward = sparse_reward
         return (observation, reward, done, infos)
 
     def sample_tasks(self, num_tasks):
@@ -59,7 +66,7 @@ class HalfCheetahDirEnv(HalfCheetahEnv):
 
     def get_all_task_idx(self):
         return range(len(self.tasks))
-    
+
     def reset(self):
         self._step = 0
         return super().reset()

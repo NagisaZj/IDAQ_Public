@@ -272,10 +272,12 @@ def main(name):
 		for j in range(45):
 			file_name = path+'/goal_idx%d'%i+'/trj_evalsample%d_step49500.npy'%j
 			traj = np.load(file_name,allow_pickle=1)
-			returns.append(np.sum(s[2] for s in traj))
+			returns.append(sum(s[2] for s in traj))
 
 
 	average_return = np.mean(returns)
+
+	# average_return = 1
 
 
 	for i in range(len(datas)):
@@ -283,8 +285,8 @@ def main(name):
 		interval_distance = np.mean(datas[i][2][-20:])
 		means.append(mean)
 		distances.append(interval_distance)
-	print(['%.2f$~\pm~$%.2f & '%(m/average_return,d/average_return) for (m,d) in zip(means,distances)])
-
+	# print(['%.2f$~\pm~$%.2f & '%(m/average_return,d/average_return) for (m,d) in zip(means,distances)])
+	print("%.2f"%average_return)
 
 	# datas = [mine_data_new_intr, promp_data, erl2_data, mame_data]
 	# legends = ["MetaCURE", "ProMP", "E-RL^2", "MAME"]

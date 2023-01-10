@@ -5,9 +5,9 @@ from gym.envs.mujoco import HalfCheetahEnv as HalfCheetahEnv_
 class HalfCheetahEnv(HalfCheetahEnv_):
     def _get_obs(self):
         return np.concatenate([
-            self.sim.data.qpos.flat[1:],
-            self.sim.data.qvel.flat,
             self.get_body_com("torso").flat,
+            self.sim.data.qpos.flat,
+            self.sim.data.qvel.flat,
         ]).astype(np.float32).flatten()
 
     def viewer_setup(self):

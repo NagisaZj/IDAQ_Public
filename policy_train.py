@@ -33,9 +33,10 @@ def deep_update_dict(fr, to):
 initialize(config_dir="rlkit/torch/sac/pytorch_sac/config/")
 cfg = compose("train.yaml")
 def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
+    print(variant['env_name'])
     env = NormalizedBoxEnv(ENVS[variant['env_name']](**variant['env_params']))
     if seed is not None:
-        env.seed(seed) 
+        env.seed(seed)
     env.reset_task(goal_idx)
     if "cuda" in cfg.device:
         os.environ["CUDA_VISIBLE_DEVICES"] = str(goal_idx % variant['util_params']['num_gpus'])
@@ -53,7 +54,7 @@ def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
 
 @click.command()
 @click.argument("config", default="./configs/sparse-point-robot.json")
-@click.option("--num_gpus", default=8)
+@click.option("--num_gpus", default=2)
 @click.option("--docker", is_flag=True, default=False)
 @click.option("--debug", is_flag=True, default=False)
 @click.option("--eval", is_flag=True, default=False)

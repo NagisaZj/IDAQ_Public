@@ -1,14 +1,11 @@
 {
-    "env_name": "sparse-point-robot",
-    "n_train_tasks": 80,
-    "n_eval_tasks": 20,
+    "env_name": "sparse-cheetah-dir",
+    "n_train_tasks": 1,
+    "n_eval_tasks": 1,
     "seed_list": [],
     "randomize_tasks": 1,
     "env_params": {
-        "n_tasks": 100,
-        "goal_radius": -0.2,
-        "randomize_tasks": 0,
-        "max_episode_steps": 20
+        "n_tasks": 2
     },
     "algo_params": {
         "meta_batch":16,
@@ -22,9 +19,9 @@
         "num_steps_per_eval": 400,
         "embedding_batch_size": 1024,
         "embedding_mini_batch_size": 1024,
-        "max_path_length": 20,
+        "max_path_length": 200,
         "discount": 0.90,
-        "reward_scale": 100.0,
+        "reward_scale": 1.0,
         "sparse_rewards": 1,
         "kl_lambda": 1.0,
         "num_exp_traj_eval": 5,

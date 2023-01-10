@@ -1,5 +1,5 @@
 {
-    "env_name": "push-v2",
+    "env_name": "hammer-v2",
     "n_train_tasks": 40,
     "n_eval_tasks": 10,
     "randomize_tasks": 1,
@@ -32,7 +32,7 @@
         "eval_epoch": 49500,
         "data_dir": "./data/push-v2",
         "divergence_name": "kl",
-        "z_loss_weight": 1000,
+        "z_loss_weight": 100,
         "max_path_length": 500,
         "use_brac": 1,
         "use_information_bottleneck": 0,

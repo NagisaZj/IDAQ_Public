@@ -54,6 +54,9 @@ def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
     # env.reset_task(goal_idx)
     #['handle-pull-side-v2', 'handle-pull-v2', 'lever-pull-v2', 'peg-insert-side-v2', 'pick-place-wall-v2', 'pick-out-of-hole-v2', 'reach-v2', 'push-back-v2', 'push-v2', 'pick-place-v2', 'plate-slide-v2', 'plate-slide-side-v2', 'plate-slide-back-v2', 'plate-slide-back-side-v2', 'peg-unplug-side-v2', 'soccer-v2', 'stick-push-v2', 'stick-pull-v2', 'push-wall-v2', 'reach-wall-v2', 'shelf-place-v2', 'sweep-into-v2', 'sweep-v2', 'window-open-v2', 'window-close-v2']
 
+
+    # ppwall use other policy
+
     if variant['env_name']=='push-v2':
         policy = p.SawyerPushV2Policy
     elif variant['env_name']=='reach-v2':
@@ -70,15 +73,53 @@ def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
         policy = p.SawyerDrawerCloseV2Policy
     elif variant['env_name']=='handle-pull-side-v2':
         policy = p.SawyerHandlePullSideV2Policy
-    elif variant['env_name']=='handle-pull-v2':
+    elif variant['env_name']=='handle-pull-v2':#
         policy = p.SawyerHandlePullV2Policy
     elif variant['env_name']=='lever-pull-v2':
         policy = p.SawyerLeverPullV2Policy
     elif variant['env_name']=='peg-insert-side-v2':
         policy = p.SawyerPegInsertionSideV2Policy
+    elif variant['env_name']=='pick-place-wall-v2':
+        policy = p.SawyerPickPlaceWallV2Policy
+    elif variant['env_name']=='pick-out-of-hole-v2':
+        policy = p.SawyerPickOutOfHoleV2Policy
+    elif variant['env_name']=='push-back-v2':
+        policy = p.SawyerPushBackV2Policy  # bad data collection
+    elif variant['env_name']=='plate-slide-v2':
+        policy = p.SawyerPlateSlideV2Policy
+    elif variant['env_name']=='plate-slide-side-v2':
+        policy = p.SawyerPlateSlideSideV2Policy
+    elif variant['env_name']=='plate-slide-back-v2':
+        policy = p.SawyerPlateSlideBackV2Policy # bad data collection
+    elif variant['env_name']=='plate-slide-back-side-v2':
+        policy = p.SawyerPlateSlideBackSideV2Policy # bad data collection
+    elif variant['env_name']=='peg-unplug-side-v2':
+        policy = p.SawyerPegUnplugSideV2Policy# bad data collection
+    elif variant['env_name']=='soccer-v2':
+        policy = p.SawyerSoccerV2Policy
+    elif variant['env_name']=='stick-push-v2':# bad data collection   bad 2
+        policy = p.SawyerStickPushV2Policy
+    elif variant['env_name']=='stick-pull-v2':# bad data collection  bad 2   button press 2000  box close 600  coffee push 29 disassemble 220
+        policy = p.SawyerStickPullV2Policy
+    elif variant['env_name']=='push-wall-v2':
+        policy = p.SawyerPushWallV2Policy
+    elif variant['env_name']=='reach-wall-v2':
+        policy = p.SawyerReachWallV2Policy
+    elif variant['env_name']=='shelf-place-v2':
+        policy = p.SawyerShelfPlaceV2Policy
+    elif variant['env_name']=='sweep-into-v2':# bad data collection
+        policy = p.SawyerSweepIntoV2Policy
+    elif variant['env_name']=='sweep-v2':
+        policy = p.SawyerSweepV2Policy
+    elif variant['env_name']=='window-close-v2':
+        policy = p.SawyerWindowCloseV2Policy
     else:
         NotImplementedError
 
+    # from stable_baselines3 import SAC
+    # model = SAC("MlpPolicy", env, verbose=1, tensorboard_log="./sac_mt1/" + env_name)
+    # # model.learn(total_timesteps=1000000, log_interval=4)
+    # model.load(env_name + '_111')
 
     success_cnt = 0
     while success_cnt <45:
@@ -90,6 +131,14 @@ def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
         success = 0
         while not done:
             # tmp_obs = copy.deepcopy(obs)
+
+            # unscaled_action, _ = model.predict(obs, deterministic=False)
+            # caled_action = self.policy.scale_action(unscaled_action)
+            #
+            # action = np.clip(scaled_action, -1, 1)
+            #
+
+
             action = policy.get_action(policy,obs)
             noise = np.random.randn(action.shape[0])  *0.1
             action = (action+noise).clip(-1,1)

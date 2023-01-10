@@ -6,19 +6,19 @@
  declare -a tasks=( "cpearl-cheetah-vel" )
  declare -a algos=( "cpearl" )
  ##
- declare -a seeds=( "1" )
- declare -a datadirs=( "cheetah-vel" )
+ declare -a seeds=( "1" "2" "3" "4")
+ declare -a datadirs=( "cheetah-velmed" )
  declare -a is_sparses=( "0" )
- declare -a use_bracs=( "0" "1" )
- declare -a use_information_bottlenecks=( "1" )
+ declare -a use_bracs=( "1" )
+ declare -a use_information_bottlenecks=( "0" )
  declare -a is_zlosses=( "1" )
  declare -a is_onlineadapt_threses=( "0" )
  declare -a is_onlineadapt_maxes=( "1" )
  declare -a num_exp_traj_evals=( "2" )
- declare -a allow_backward_zs=( "1" )
+ declare -a allow_backward_zs=( "0" )
  declare -a is_true_sparses=( "0" )
  declare -a r_threses=( "0.0" )
- n=2
+ n=0
  gpunum=8
  for task in "${tasks[@]}"
  do
@@ -84,7 +84,7 @@
  done
  done
  done
-# CUDA_VISIBLE_DEVICES=3  python policy_train.py ./configs/cheetah-vel.json
+# CUDA_VISIBLE_DEVICES=7  python policy_train.py ./configs/cheetah-vel.json
 # python policy_train.py ./configs/sparse-point-robot.json --is_uniform
 # determinsitic first
 

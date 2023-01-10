@@ -5,6 +5,8 @@ import pandas as pd
 import copy
 import matplotlib.ticker as ticker
 from matplotlib.ticker import FuncFormatter
+import scipy
+import scipy.stats as stats
 
 
 def data_read_varibad(paths=[]):
@@ -23,9 +25,15 @@ def data_read_varibad(paths=[]):
 	# print(mean,std)
 	xs = (np.arange(length) + 1) * 3200 * 25 / 1000000
 	print(xs.shape, mean.shape, std.shape)
+	confidence_interval = stats.bootstrap((xs,),np.mean,axis=1)
+	low = confidence_interval.confidence_interval.low
+	high = confidence_interval.confidence_interval.high
+	mean = np.mean(low,high)
+	interval_distance = high-mean
 	# print(rewards,np.arange(rewards[0].shape[0]),rewards[0].shape[0])
 	# print(xs,mean,std)
-	return xs, mean, std, rewards
+
+	return xs, mean, interval_distance, rewards
 
 
 def data_read_varibad2(paths=[]):
@@ -57,7 +65,7 @@ def data_read(paths=['./outputfin2/cheetah-vel-sparse/2019_11_20_08_52_39/progre
 	shortest = 10000000000
 	for p in mine_paths:
 		csv_data = pd.read_csv(p)
-		values_steps = csv_data['Epoch'].values*400*16*1000*2/1e6
+		values_steps = csv_data['Epoch'].values#*400*16*1000*2/1e6
 		values_returns = csv_data[load_name].values
 		# values_returns = smoothingaverage(values_returns)
 		# print(values_steps.shape)
@@ -82,8 +90,21 @@ def data_read(paths=['./outputfin2/cheetah-vel-sparse/2019_11_20_08_52_39/progre
 		ys[:, i] = mine_values[i][1][:shortest]
 	mean = np.mean(ys, 1)
 	std = np.std(ys, 1)
-	print(mean[-1], std[-1])
-	return xs, mean, std, ys.transpose()
+	# print(mean[-1], std[-1])
+	# print(ys.shape)
+	# ys[-20:,:] = np.mean(ys[-20:,:],0,keepdims=1)
+	ys+=np.random.rand(ys.shape[0],ys.shape[1])*1e-3
+	confidence_interval = stats.bootstrap((ys,),np.mean,axis=1)
+	low = confidence_interval.confidence_interval.low
+	high = confidence_interval.confidence_interval.high
+	# print(low.shape,high.shape,ys.shape)
+	mean = np.mean(np.array([low, high]),0)
+	interval_distance = high-mean
+	# print(rewards,np.arange(rewards[0].shape[0]),rewards[0].shape[0])
+	# print(xs,mean,std)
+
+	return xs, mean, interval_distance, ys.transpose()
+	# return xs, mean, std, ys.transpose()
 
 
 def data_read_npy(paths=['./outputfin2/cheetah-vel-sparse/2019_11_20_08_52_39/progress.csv',
@@ -97,7 +118,7 @@ def data_read_npy(paths=['./outputfin2/cheetah-vel-sparse/2019_11_20_08_52_39/pr
 	for p in mine_paths:
 		path = p + load_name+'.npy'
 		data = np.load(path,allow_pickle=True)
-		values_steps = np.arange(len(data))*400*16*1000*2/1e6
+		values_steps = np.arange(len(data))#*400*16*1000*2/1e6
 		values_returns = data
 		# values_returns = smoothingaverage(values_returns)
 		# print(values_steps.shape)
@@ -122,8 +143,19 @@ def data_read_npy(paths=['./outputfin2/cheetah-vel-sparse/2019_11_20_08_52_39/pr
 		ys[:, i] = mine_values[i][1][:shortest]
 	mean = np.mean(ys, 1)
 	std = np.std(ys, 1)
-	print(mean[-1], std[-1])
-	return xs, mean, std, ys.transpose()
+	# print(mean[-1], std[-1])
+
+	ys[-20:,:] = np.mean(ys[-20:,:],0,keepdims=1)
+	ys+=np.random.rand(ys.shape[0],ys.shape[1])*1e-3
+	confidence_interval = stats.bootstrap((ys,), np.mean, axis=1)
+	low = confidence_interval.confidence_interval.low
+	high = confidence_interval.confidence_interval.high
+	# print(low.shape,high.shape,ys.shape)
+	mean = np.mean(np.array([low, high]),0)
+	# print(mean.shape)
+	interval_distance = high - mean
+	# print(mean.shape,interval_distance.shape)
+	return xs, mean, interval_distance, ys.transpose()
 
 
 def data_read_macaw(paths=['./outputfin2/cheetah-vel-sparse/2019_11_20_08_52_39/progress.csv',
@@ -161,8 +193,17 @@ def data_read_macaw(paths=['./outputfin2/cheetah-vel-sparse/2019_11_20_08_52_39/
 		ys[:, i] = mine_values[i][1][:shortest]
 	mean = np.mean(ys, 1)
 	std = np.std(ys, 1)
-	print(mean[-1], std[-1])
-	return xs, mean, std, ys.transpose()
+	# print(mean[-1], std[-1])
+
+	ys[-20:,:] = np.mean(ys[-20:,:],0,keepdims=1)
+	ys+=np.random.rand(ys.shape[0],ys.shape[1])*1e-3
+	confidence_interval = stats.bootstrap((ys,), np.mean, axis=1)
+	low = confidence_interval.confidence_interval.low
+	high = confidence_interval.confidence_interval.high
+	# print(low.shape,high.shape,ys.shape)
+	mean = np.mean(np.array([low, high]),0)
+	interval_distance = high - mean
+	return xs, mean, interval_distance, ys.transpose()
 
 
 def data_read_success(paths=['./outputfin2/cheetah-vel-sparse/2019_11_20_08_52_39/progress.csv',
@@ -361,8 +402,8 @@ def new_plot_full(data_full, color, name):
 	print('min', np.min(data))
 	ax.fill_between(index[: len(data[0])], data_mean - data_std, data_mean + data_std, alpha=0.08, color=color,
 	                linewidth=0)
-	ax.plot(index[: len(data[0])], data_mean, color=color,
-	        label=name, linewidth=config['linewidth'])
+	ax.plot(index[: len(data[0])], data_mean, '--' if 'Expert' in name else '', color=color,
+	        label=name, linewidth=config['linewidth'],)
 	# ax.fill_between(index[: len(data[0])], data_min, data_max, alpha=0.1, color=color,
 	#                linewidth=0)
 
@@ -405,7 +446,7 @@ plt_config_point = {
 	'data_scale': 1,
 	'legend_loc': 'best',
 	'legend_ncol': 1,
-	'legend_prop_size': 15.0,
+	'legend_prop_size': 19.0,
 	'xlabel': 'Iterations',
 	'ylabel': 'Average Return',
 	'xlim': (-5, 55),
@@ -622,7 +663,7 @@ def plot_all(datas, legends, start=0):
 	# plt.ylim(config['ylim'])
 	plt.tick_params('x', labelsize=20.0)
 	plt.tick_params('y', labelsize=20.0)
-	plt.xlabel('Million Samples', {'size': 26.0})
+	plt.xlabel('Iterations', {'size': 26.0})
 	plt.ylabel(config['ylabel'], {'size': 26.0})
 	ax.xaxis.set_major_locator(ticker.MaxNLocator(6))
 	ax.yaxis.set_major_locator(ticker.MaxNLocator(6))
@@ -651,7 +692,8 @@ def plot_all(datas, legends, start=0):
 	#    new_plot_full_xuxian(datas[i], color_list[i+start], legends[i])
 	new_plot_full(datas[0], color_list[0], legends[0])
 	# for i in range(1,len(datas)):
-	for i in range(len(datas) - 1, 0, -1):
+	# for i in range(len(datas) - 1, 0, -1):
+	for i in range(1,len(datas)):
 		new_plot_full(datas[i], color_list[i + start], legends[i])
 	# new_plot_full_xuxian(datas[0], color_list[0], legends[0])
 	# new_plot_full(datas[0], color_list[0], legends[0])

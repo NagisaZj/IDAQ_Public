@@ -3,19 +3,19 @@
 
  Foldername="0723_offline_meta_rl_gg"
  mkdir out_logs/${Foldername} &> /dev/null
- declare -a tasks=( "cpearl-ml1-eval" )
+ declare -a tasks=( "cpearl-cheetah-dir2" ) # cpearl-cheetah-vel-eval cpearl-ml1-eval cpearl-sparse-point-robot-eval
  declare -a algos=( "eval" )
  ##
  declare -a seeds=( "1" )
- declare -a datadirs=( "window-open-v2med" )  # actually unused, any valid dataset is okay
- declare -a loaddirs=( "/data2/zj/Offline-MetaRL/output/reach-v2__2022-09-01_11-16-47"  "/data2/zj/Offline-MetaRL/output/reach-v2__2022-09-01_18-53-27" "/data2/zj/Offline-MetaRL/output/reach-v2__2022-09-01_11-16-58" "/data2/zj/Offline-MetaRL/output/reach-v2__2022-09-01_18-53-35")  # use absolute paths
+ declare -a datadirs=( "cheeetah-dir" )  # actually unused, any valid dataset is okay  #cheetah-vel-backup window-open-v2med
+ declare -a loaddirs=("cheetah-dir__2022-12-09_08-11-23" )  # use absolute paths
  declare -a is_sparses=( "0" )
  declare -a use_bracs=( "1")
  declare -a use_information_bottlenecks=( "0" )
  declare -a is_zlosses=( "1" )
  declare -a is_onlineadapt_threses=( "0" )
  declare -a is_onlineadapt_maxes=( "1" )
- declare -a num_exp_traj_evals=( "5" )
+ declare -a num_exp_traj_evals=( "4" )
  declare -a allow_backward_zs=( "0" )
  declare -a is_true_sparses=( "0" )
  declare -a r_threses=( "0.0" )
@@ -73,7 +73,7 @@
  echo "     num_exp_traj_eval: ${num_exp_traj_eval}, allow_backward_z: ${allow_backward_z}"
  echo "     is_true_sparse: ${is_true_sparse}, r_thres: ${r_thres}, seed: ${seed}, GPU: $n"
  n=$[($n+1) % ${gpunum}]
- sleep 10
+ sleep 5
  done
  done
  done

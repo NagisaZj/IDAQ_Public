@@ -3,6 +3,7 @@ Launcher for experiments with FOCAL
 
 """
 import os
+import os.path
 import pathlib
 import numpy as np
 import click
@@ -231,8 +232,9 @@ def experiment(variant, seed=None):
         pickle_dir = experiment_log_dir + '/eval_trajectories'
         pathlib.Path(pickle_dir).mkdir(parents=True, exist_ok=True)
 
-    load_log_path = os.path.join(variant['algo_params']['load_dir'],variant['env_name'],'debug','progress.csv')
-    load_path = os.path.join(variant['algo_params']['load_dir'], variant['env_name'], 'debug')
+    load_dir = os.path.join('/data2/zj/Offline-MetaRL/output/',variant['algo_params']['load_dir'])
+    load_log_path = os.path.join(load_dir,variant['env_name'],'debug','progress.csv')
+    load_path = os.path.join(load_dir, variant['env_name'], 'debug')
     import pandas as pd
     csv_data = pd.read_csv(load_log_path)
     values_steps = csv_data['Epoch'].values

@@ -1,17 +1,17 @@
 #!/bin/bash
    # Script to reproduce results
 
- Foldername="0723_offline_meta_rl_aa"
+ Foldername="0723_offline_meta_rl_zzzzz"
  mkdir out_logs/${Foldername} &> /dev/null
- declare -a tasks=( "cpearl-sparse-point-robot" )
+ declare -a tasks=( "cpearl-cheetah-dir2" )
  #  "cpearl-sparse-point-robot"
  declare -a algos=( "cpearl" )
  ##
- declare -a seeds=( "1" )
- declare -a datadirs=( "sparse-point-robot" )
+ declare -a seeds=( "26" "23")
+ declare -a datadirs=( "cheetah-dir" )
  # "sparse-point-robot-20"
  declare -a is_sparses=( "0" )
- declare -a use_bracs=( "0" )
+ declare -a use_bracs=( "1" )
  declare -a use_information_bottlenecks=( "0" )
  declare -a is_zlosses=( "1" )
  declare -a is_onlineadapt_threses=( "0" )
@@ -19,9 +19,11 @@
  declare -a num_exp_traj_evals=( "5" "10" )
  declare -a allow_backward_zs=( "0" )
  declare -a is_true_sparses=( "0" )
- declare -a r_threses=( "0.0" )
+ declare -a r_threses=( "-1000000" )
  n=2
- gpunum=3
+ # 52 54 21
+ # 52 54 21 dense
+ gpunum=8
  for task in "${tasks[@]}"
  do
  for algo in "${algos[@]}"
@@ -64,14 +66,14 @@
  --allow_backward_z=${allow_backward_z} \
  --is_true_sparse_rewards=${is_true_sparse} \
  --r_thres=${r_thres} \
- >& out_logs/${Foldername}/${task}_${algo}_${datadir}_${is_sparse}_${use_brac}_${use_information_bottleneck}_${is_zloss}_${is_onlineadapt_thres}_${is_onlineadapt_max}_${num_exp_traj_eval}_${allow_backward_z}_${is_true_sparse}_${r_thres}_${seed}.txt &
+ >& out_logs/${Foldername}/${task}_${algo}_${datadir}_${is_sparse}_${use_brac}_${use_information_bottleneck}_${is_zloss}_${is_onlineadapt_thres}_${is_onlineadapt_max}_${num_exp_traj_eval}_${allow_backward_z}_${is_true_sparse}_${r_thres}_${seed}_${n}.txt &
  echo "task: ${task}, algo: ${algo}, datadir: ${datadir}, is_sparse: ${is_sparse}, use_brac: ${use_brac}"
  echo "     use_information_bottleneck: ${use_information_bottleneck}, is_zloss: ${is_zloss}"
  echo "     is_onlineadapt_thres: ${is_onlineadapt_thres}, is_onlineadapt_max: ${is_onlineadapt_max}"
  echo "     num_exp_traj_eval: ${num_exp_traj_eval}, allow_backward_z: ${allow_backward_z}"
  echo "     is_true_sparse: ${is_true_sparse}, r_thres: ${r_thres}, seed: ${seed}, GPU: $n"
  n=$[($n+1) % ${gpunum}]
- sleep 10
+ sleep 5
  done
  done
  done

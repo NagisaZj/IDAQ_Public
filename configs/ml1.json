@@ -1,5 +1,5 @@
 {
-    "env_name": "push-v2",
+    "env_name": "pick-out-of-hole-v2",
     "n_train_tasks": 40,
     "n_eval_tasks": 10,
     "env_params": {

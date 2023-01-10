@@ -158,6 +158,8 @@ def experiment(variant, seed=None):
             rng = default_rng()
             train_tasks = np.sort(rng.choice(len(tasks), size=variant['n_train_tasks'], replace=False))
             eval_tasks = set(range(len(tasks))).difference(train_tasks)
+            train_tasks = np.array([0,1])
+            eval_tasks = np.array([2,3])
             if 'goal_radius' in variant['env_params']:
                 algorithm = CPEARL(
                     env=env,

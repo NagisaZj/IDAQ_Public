@@ -1,24 +1,24 @@
 #!/bin/bash
    # Script to reproduce results
 
- Foldername="0723_offline_meta_rl_dd"
+ Foldername="0723_offline_meta_rl_ff"
  mkdir out_logs/${Foldername} &> /dev/null
  declare -a tasks=( "cpearl-ml1" )
  declare -a algos=( "cpearl" )
  ##
- declare -a seeds=( "1" )
- declare -a datadirs=( "push-v2" )
+ declare -a seeds=( "1" "2" "3" "4")
+ declare -a datadirs=( "peg-insert-side-v2med" )
  declare -a is_sparses=( "0" )
- declare -a use_bracs=( "1" "1" )
- declare -a use_information_bottlenecks=( "1" )
+ declare -a use_bracs=( "1")
+ declare -a use_information_bottlenecks=( "0" )
  declare -a is_zlosses=( "1" )
  declare -a is_onlineadapt_threses=( "0" )
  declare -a is_onlineadapt_maxes=( "1" )
  declare -a num_exp_traj_evals=( "5" )
- declare -a allow_backward_zs=( "1" )
+ declare -a allow_backward_zs=( "0" )
  declare -a is_true_sparses=( "0" )
- declare -a r_threses=( "0.0" )
- n=0
+ declare -a r_threses=( "-1000000" )
+ n=4
  gpunum=8
  for task in "${tasks[@]}"
  do
@@ -84,7 +84,7 @@
  done
  done
  done
-#
+
 # data collection: python data_collection_ml1.py ./configs/ml1.json
 # To change to other environments, modify "env_name" in ./configs/ml1.json.
 

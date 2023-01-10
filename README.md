@@ -34,7 +34,7 @@ FOCAL requires fixed data (batch) for meta-training and meta-testing, which are 
 Example of training policies and generating trajectories on multiple tasks:
 
 ```
-python policy_train.py ./configs/ant-goal-3.json 
+CUDA_VISIBLE_DEVICES=6 python policy_train.py ./configs/sparse-point-robot.json 
 python policy_train_ml1.py  /data2/zj/Offline-MetaRL/configs/ml1-reach.json
 ```
 

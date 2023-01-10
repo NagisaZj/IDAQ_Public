@@ -15,6 +15,7 @@ def main(name):
 
 	name='cheetah-vel__2022-08-27_11-06-44'
 	name = 'cheetah-vel__2022-08-27_11-07-30'
+	names = []
 	path = 'output/' + name + '/cheetah-vel/debug/'
 	mine_testing_data = \
 		data_read(paths=[path + 'progress.csv'],
