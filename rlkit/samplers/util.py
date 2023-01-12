@@ -533,9 +533,7 @@ def ensemble_rollout(env, agent, max_path_length=np.inf, accum_context=True, is_
             break
     observation_batch = torch.from_numpy(np.array(observations)).to(agent.z.device)
     action_batch = torch.from_numpy(np.array(actions)).to(agent.z.device)
-    predictions = []
-    prediction_errors = []
-    dynamics_predictions = []
+
     n_observations = np.array(observations)
     if len(n_observations.shape) == 1:
         n_observations = np.expand_dims(n_observations, 1)
@@ -548,25 +546,27 @@ def ensemble_rollout(env, agent, max_path_length=np.inf, accum_context=True, is_
             np.expand_dims(n_next_o, 0)
         )
     )
-    for i in range(4):
-        prediction = reward_models[i].forward(0, 0, agent.z.detach().float().repeat(observation_batch.shape[0],1), observation_batch.float(), action_batch.float())
+
+    num_ensemble = len(reward_models)
+    reward_predictions = []
+    prediction_errors = []
+    dynamics_predictions = []
+    for i in range(num_ensemble):
+        reward_prediction = reward_models[i].forward(0, 0, agent.z.detach().float().repeat(observation_batch.shape[0],1), observation_batch.float(), action_batch.float())
         dynamic_prediction = dynamic_models[i].forward(0, 0, agent.z.detach().float().repeat(observation_batch.shape[0], 1),
                                               observation_batch.float(), action_batch.float())
-        predictions.append(prediction)
+        reward_predictions.append(reward_prediction)
         dynamics_predictions.append(dynamic_prediction)
-        prediction_errors.append(((prediction-torch.from_numpy(np.array(rewards).reshape(-1, 1)).to(agent.z.device).float())**2).mean().item()+((dynamic_prediction-torch.from_numpy(n_next_observations).to(agent.z.device).float())**2).mean().item())
+        prediction_errors.append(((reward_prediction-torch.from_numpy(np.array(rewards).reshape(-1, 1)).to(agent.z.device).float())**2).mean().item()+((dynamic_prediction-torch.from_numpy(n_next_observations).to(agent.z.device).float())**2).mean().item())
+    reward_predictions = torch.stack(reward_predictions)
+    dynamics_predictions = torch.stack(dynamics_predictions)
 
-    max_error = 0
-    for i in range(4):
-        for j in range(i,4):
-            error = ((predictions[i]-predictions[j])**2).mean()+((dynamics_predictions[i]-dynamics_predictions[j])**2).mean()
-            if error>max_error:
-                max_error = error
+    uncentainty = torch.std(reward_predictions, dim=1).mean() + torch.std(dynamics_predictions, dim=1).mean()
     # update the agent's current context
     if accum_context:
         if is_onlineadapt_max:
-            agent.update_onlineadapt_max(-1*max_error, context)
-            print(max_error.item(),np.sum(scores),'!!!')
+            agent.update_onlineadapt_max(-1 * uncentainty, context)
+            print(uncentainty.item(),np.sum(scores),'!!!')
         elif not is_select or np.sum(scores) > r_thres:
             # print('A!')
             for c in context:
@@ -593,11 +593,7 @@ def ensemble_rollout(env, agent, max_path_length=np.inf, accum_context=True, is_
         terminals=np.array(terminals).reshape(-1, 1),
         agent_infos=agent_infos,
         env_infos=env_infos,
-        uncertanties=-1*max_error.item(),
-        prediction1=predictions[0].detach().cpu().numpy(),
-        prediction2=predictions[1].detach().cpu().numpy(),
-        prediction3=predictions[2].detach().cpu().numpy(),
-        prediction4=predictions[3].detach().cpu().numpy(),
+        uncertanties=-1 * uncentainty.item(),
         prediction_errors=prediction_errors
     )
 

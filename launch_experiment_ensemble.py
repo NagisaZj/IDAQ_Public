@@ -122,7 +122,7 @@ def experiment(variant, seed=None):
 
     reward_models = torch.nn.ModuleList()
     dynamic_models = torch.nn.ModuleList()
-    for i in range(4):
+    for i in range(variant['algo_params']['num_ensemble']):
         reward_models.append(
             FlattenMlp(hidden_sizes=[net_size, net_size, net_size],
                        input_size=latent_dim + obs_dim + action_dim,

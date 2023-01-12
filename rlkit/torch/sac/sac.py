@@ -987,6 +987,7 @@ class FOCALSoftActorCriticModel2(OMRLOnlineAdaptAlgorithmEnsemble):
         self.z_loss_weight = kwargs['z_loss_weight']
         self.max_entropy = kwargs['max_entropy']
         self.allow_backward_z = kwargs['allow_backward_z']
+        self.num_ensemble = kwargs['num_ensemble']
         self.loss = {}
         self.plotter = plotter
         self.render_eval_paths = render_eval_paths
@@ -1017,7 +1018,10 @@ class FOCALSoftActorCriticModel2(OMRLOnlineAdaptAlgorithmEnsemble):
     ###### Torch stuff #####
     @property
     def networks(self):
-        return self.agent.networks + [self.agent] + [self.qf1, self.qf2, self.vf, self.target_vf, self.c]+[self.reward_models[0]]+[self.reward_models[1]]+[self.reward_models[2]]+[self.reward_models[3]]+[self.dynamic_models[0]]+[self.dynamic_models[1]]+[self.dynamic_models[2]]+[self.dynamic_models[3]]
+        net = self.agent.networks + [self.agent] + [self.qf1, self.qf2, self.vf, self.target_vf, self.c]
+        for i in range(self.num_ensemble):
+            net += [self.reward_models[i], self.dynamic_models[i]]
+        return net
 
     @property
     def get_alpha(self):
@@ -1261,7 +1265,7 @@ class FOCALSoftActorCriticModel2(OMRLOnlineAdaptAlgorithmEnsemble):
         pred_rewardss = rewards.view(self.batch_size * num_tasks, -1)
 
         model_loss = None
-        for i in range(4):
+        for i in range(self.num_ensemble):
             obs1, actions1, rewards1, next_obs1, terms1 = self.sample_sac(indices)
 
             t, b, _ = obs1.size()
