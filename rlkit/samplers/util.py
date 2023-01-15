@@ -551,17 +551,23 @@ def ensemble_rollout(env, agent, max_path_length=np.inf, accum_context=True, is_
     reward_predictions = []
     prediction_errors = []
     dynamics_predictions = []
+    pes = []
     for i in range(num_ensemble):
         reward_prediction = reward_models[i].forward(0, 0, agent.z.detach().float().repeat(observation_batch.shape[0],1), observation_batch.float(), action_batch.float())
         dynamic_prediction = dynamic_models[i].forward(0, 0, agent.z.detach().float().repeat(observation_batch.shape[0], 1),
                                               observation_batch.float(), action_batch.float())
         reward_predictions.append(reward_prediction)
         dynamics_predictions.append(dynamic_prediction)
+        pe = ((reward_prediction-torch.from_numpy(np.array(rewards).reshape(-1, 1)).to(agent.z.device).float())**2).mean()+((dynamic_prediction-torch.from_numpy(n_next_observations).to(agent.z.device).float())**2).mean()
+        pes.append(pe)
         prediction_errors.append(((reward_prediction-torch.from_numpy(np.array(rewards).reshape(-1, 1)).to(agent.z.device).float())**2).mean().item()+((dynamic_prediction-torch.from_numpy(n_next_observations).to(agent.z.device).float())**2).mean().item())
     reward_predictions = torch.stack(reward_predictions)
     dynamics_predictions = torch.stack(dynamics_predictions)
+    pes = torch.stack(pes)
 
-    uncentainty = torch.std(reward_predictions, dim=1).mean() + torch.std(dynamics_predictions, dim=1).mean()
+    # uncentainty = torch.std(reward_predictions, dim=1).mean() + torch.std(dynamics_predictions, dim=1).mean()
+    # uncentainty = reward_predictions.mean() + dynamics_predictions.mean()
+    uncentainty = pes.mean()
     # update the agent's current context
     if accum_context:
         if is_onlineadapt_max:

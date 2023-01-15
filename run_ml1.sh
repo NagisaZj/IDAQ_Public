@@ -4,7 +4,7 @@
  Foldername="0723_offline_meta_rl_ff"
  mkdir out_logs/${Foldername} &> /dev/null
  declare -a tasks=( "cpearl-ml1" )
- declare -a algos=( "cpearl" )
+ declare -a algos=( "ensemble" )
  ##
  declare -a seeds=( "1" "2" "3" "4")
  declare -a datadirs=( "peg-insert-side-v2med" )

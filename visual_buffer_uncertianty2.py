@@ -144,11 +144,11 @@ m=0
 for m in range(10):
     plt.subplot(2,5,m+1)
     # plt.title('Episode %d,\n Pridiction Error Mean %.2e,\n Prediciton Error Std %.2e'%(m+1,all_paths_pes[0][m+0],all_paths_pe_stds[0][m+0]))
-    #
-    # plt.title('Episode %d,\n Uncertainty %.2e,\n Prediciton Error Std %.2e'%(m+1,all_paths_uncertainties[0][m+0],all_paths_pe_stds[0][m+0]))
 
+    plt.title('Episode %d,\n Uncertainty %.2e,\n Prediciton Error Std %.2e'%(m+1,all_paths_uncertainties[0][m+0],all_paths_pe_stds[0][m+0]))
+    #
     # plt.title('Episode %d, Uncertainty %.3f'%(m+1,all_paths_uncertainties[0][m+0]))
-    plt.title('Episode %d, Return %.2f' % (m + 1, all_paths_returns[0][m + 0]))
+    # plt.title('Episode %d, Return %.2f' % (m + 1, all_paths_returns[0][m + 0]))
     for g in goals:
         # circle = plt.Circle((g[0], g[1]), radius=0.1, alpha=0.4)
         # axes.add_artist(circle)

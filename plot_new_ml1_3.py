@@ -7,7 +7,7 @@ import click
 from plot_utils import *
 
 @click.command()
-@click.option("--name", default="Push-V2")
+@click.option("--name", default="Sparse-Point-Robot")
 def main(name):
 	exp_dict = {
 		"Push-V2": ["push-v2__2022-09-09_19-49-10", "push-v2__2022-09-09_19-49-18",
@@ -61,9 +61,10 @@ def main(name):
 		"Cheetah-Vel": ["cheetah-vel__2022-09-09_08-54-59", "cheetah-vel__2022-09-09_08-55-09",
 						"cheetah-vel__2022-09-09_08-55-19", "cheetah-vel__2022-09-09_08-55-30"],
 		# "cheetah-vel__2022-08-27_11-06-44", "cheetah-vel__2022-08-27_11-07-30" ,
-		"Sparse-Point-Robot": ["sparse-point-robot__2022-09-09_08-47-58", "sparse-point-robot__2022-09-09_08-48-08",
-							   "sparse-point-robot__2022-09-09_08-48-18", "sparse-point-robot__2022-09-09_08-48-28",
-							   "sparse-point-robot__2022-09-09_08-53-36"],  # "sparse-point-robot__2022-08-24_11-00-19"
+		# "Sparse-Point-Robot": ["sparse-point-robot__2022-09-09_08-47-58", "sparse-point-robot__2022-09-09_08-48-08",
+		# 					   "sparse-point-robot__2022-09-09_08-48-18", "sparse-point-robot__2022-09-09_08-48-28",
+		# 					   "sparse-point-robot__2022-09-09_08-53-36"],  # "sparse-point-robot__2022-08-24_11-00-19"
+		"Sparse-Point-Robot": ["sparse-point-robot__2023-01-14_08-44-38", "sparse-point-robot__2023-01-14_08-44-41",],
 		"Sparse-Point-RobotMed": ["sparse-point-robot__2022-09-21_15-27-16", "sparse-point-robot__2022-09-21_15-27-25",
 								  "sparse-point-robot__2022-09-21_15-27-36", "sparse-point-robot__2022-09-21_15-27-46"]
 	}
@@ -244,7 +245,8 @@ def main(name):
 
 	focal_training_data = data_read_npy(focal_paths,'train_task_online_average_returns')
 	focal_testing_data = data_read_npy(focal_paths, 'test_task_online_average_returns')
-	focal_offline_testing_data = data_read_npy(focal_offline_paths, 'test_task_offline_average_returns')
+	focal_offline_testing_data = focal_testing_data
+	# focal_offline_testing_data = data_read_npy(focal_offline_paths, 'test_task_offline_average_returns')
 
 	macaw_testing_data = data_read_macaw(macaw_paths)
 	macaw_testing_data_offline = data_read_macaw(macaw_paths2)
@@ -266,18 +268,18 @@ def main(name):
 	distances = []
 
 
-	returns = []
-	path = './data/'+name.lower()
-	for i in range(50):
-		for j in range(45):
-			file_name = path+'/goal_idx%d'%i+'/trj_evalsample%d_step49500.npy'%j
-			traj = np.load(file_name,allow_pickle=1)
-			returns.append(sum(s[2] for s in traj))
+	# returns = []
+	# path = './data/'+name.lower()
+	# for i in range(50):
+	# 	for j in range(45):
+	# 		file_name = path+'/goal_idx%d'%i+'/trj_evalsample%d_step49500.npy'%j
+	# 		traj = np.load(file_name,allow_pickle=1)
+	# 		returns.append(sum(s[2] for s in traj))
+	#
+	#
+	# average_return = np.mean(returns)
 
-
-	average_return = np.mean(returns)
-
-	# average_return = 1
+	average_return = 1
 
 
 	for i in range(len(datas)):
@@ -285,7 +287,7 @@ def main(name):
 		interval_distance = np.mean(datas[i][2][-20:])
 		means.append(mean)
 		distances.append(interval_distance)
-	# print(['%.2f$~\pm~$%.2f & '%(m/average_return,d/average_return) for (m,d) in zip(means,distances)])
+	print(['%.2f$~\pm~$%.2f & '%(m/average_return,d/average_return) for (m,d) in zip(means,distances)])
 	print("%.2f"%average_return)
 
 	# datas = [mine_data_new_intr, promp_data, erl2_data, mame_data]
