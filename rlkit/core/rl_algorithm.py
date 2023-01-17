@@ -2525,7 +2525,7 @@ class OMRLOnlineAdaptAlgorithmEnsemble(OfflineMetaRLAlgorithm):
 			                                        r_thres=self.r_thres,
 			                                        is_onlineadapt_max=self.is_onlineadapt_max,
 			                                        is_sparse_reward=self.sparse_rewards,
-													reward_models=self.reward_models,dynamic_models=self.dynamic_models,update_score=(num_trajs <= self.num_exp_traj_eval))
+													reward_models=self.reward_models,dynamic_models=self.dynamic_models,update_score=(num_trajs < self.num_exp_traj_eval))
 
 			paths += path
 			num_transitions += num
