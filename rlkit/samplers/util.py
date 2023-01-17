@@ -445,7 +445,7 @@ def rollout(env, agent, max_path_length=np.inf, accum_context=True, is_select=Fa
 
 
 def ensemble_rollout(env, agent, max_path_length=np.inf, accum_context=True, is_select=False, animated=False,
-            save_frames=False, r_thres=0., is_onlineadapt_max=False, is_sparse_reward=False,reward_models=None,dynamic_models=None):
+            save_frames=False, r_thres=0., is_onlineadapt_max=False, is_sparse_reward=False,reward_models=None,dynamic_models=None,update_score=True):
     """
     The following value for the following keys will be a 2D array, with the
     first dimension corresponding to the time dimension.
@@ -571,7 +571,10 @@ def ensemble_rollout(env, agent, max_path_length=np.inf, accum_context=True, is_
     # update the agent's current context
     if accum_context:
         if is_onlineadapt_max:
-            agent.update_onlineadapt_max(-1 * uncentainty, context)
+            if update_score:
+                agent.update_onlineadapt_max(-1 * uncentainty, context)
+            else:
+                agent.fix_update_onlineadapt_max(-1 * uncentainty, context)
             print(uncentainty.item(),np.sum(scores),'!!!')
         elif not is_select or np.sum(scores) > r_thres:
             # print('A!')

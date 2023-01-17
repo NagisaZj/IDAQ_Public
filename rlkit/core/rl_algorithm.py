@@ -2508,8 +2508,8 @@ class OMRLOnlineAdaptAlgorithmEnsemble(OfflineMetaRLAlgorithm):
 					z_sample = self.adapt_draw_z_from_updated_belief()
 					self.agent.set_z_sample(z_sample)
 					self.adapt_sampled_z_list.append(self.agent.z)
-				if num_transitions + self.max_path_length >= self.num_steps_per_eval:
-					self.agent.set_onlineadapt_z_sample()
+				# if num_transitions + self.max_path_length >= self.num_steps_per_eval:
+				# 	self.agent.set_onlineadapt_z_sample()
 			elif self.is_onlineadapt_thres:
 				is_select = True
 				if num_trajs < self.num_exp_traj_eval or type(self.agent.context) == type(None):
@@ -2525,7 +2525,7 @@ class OMRLOnlineAdaptAlgorithmEnsemble(OfflineMetaRLAlgorithm):
 			                                        r_thres=self.r_thres,
 			                                        is_onlineadapt_max=self.is_onlineadapt_max,
 			                                        is_sparse_reward=self.sparse_rewards,
-													reward_models=self.reward_models,dynamic_models=self.dynamic_models)
+													reward_models=self.reward_models,dynamic_models=self.dynamic_models,update_score=(num_trajs <= self.num_exp_traj_eval))
 
 			paths += path
 			num_transitions += num
