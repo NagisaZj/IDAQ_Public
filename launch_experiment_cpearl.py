@@ -77,7 +77,7 @@ def experiment(variant, seed=None):
         env.seed(seed)
 
     tasks = env.get_all_task_idx()
-    # print(tasks)
+    print(tasks)
     obs_dim = int(np.prod(env.observation_space.shape))
     action_dim = int(np.prod(env.action_space.shape))
     reward_dim = 1
@@ -158,8 +158,8 @@ def experiment(variant, seed=None):
             rng = default_rng()
             train_tasks = np.sort(rng.choice(len(tasks), size=variant['n_train_tasks'], replace=False))
             eval_tasks = set(range(len(tasks))).difference(train_tasks)
-            train_tasks = np.array([0,1])
-            eval_tasks = np.array([2,3])
+            # train_tasks = np.array([0,1])
+            # eval_tasks = np.array([2,3])
             if 'goal_radius' in variant['env_params']:
                 algorithm = CPEARL(
                     env=env,
