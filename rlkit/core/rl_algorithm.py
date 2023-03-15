@@ -2067,7 +2067,7 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 					self.agent.set_z(self.trained_z[sampled_idx][0], self.trained_z[sampled_idx][1])
 
 			path, num = self.sampler.obtain_samples(deterministic=self.eval_deterministic,
-			                                        max_samples=self.num_steps_per_eval - num_transitions, max_trajs=1,
+			                                        max_samples=self.num_steps_per_eval - num_transitions, max_trajs=1, #2
 			                                        accum_context=True,
 			                                        is_select=is_select,
 			                                        r_thres=self.r_thres,
@@ -2076,7 +2076,7 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 
 			paths += path
 			num_transitions += num
-			num_trajs += 1
+			num_trajs += len(path)
 			if self.is_onlineadapt_max:
 				pass
 			elif self.is_onlineadapt_thres:
@@ -2219,7 +2219,7 @@ class OMRLOnlineAdaptAlgorithmEnsemble(OfflineMetaRLAlgorithm):
 		self.is_onlineadapt_model = kwargs['is_onlineadapt_model']
 		self.onlineadapt_max_num_candidates = kwargs['onlineadapt_max_num_candidates']
 
-	def _do_eval(self, indices, epoch):
+	def _do_eval(self, indices, epoch,num_models=12):
 		final_returns = []
 		online_returns = []
 		success_cnt = []
@@ -2227,7 +2227,7 @@ class OMRLOnlineAdaptAlgorithmEnsemble(OfflineMetaRLAlgorithm):
 			all_rets = []
 			success_single = 0
 			for r in range(self.num_evals):
-				paths = self.collect_paths(idx, epoch, r)
+				paths = self.collect_paths(idx, epoch, r,num_models)
 				all_rets.append([eval_util.get_average_returns([p]) for p in paths])
 				success_single = success_single + paths[-1]['done']
 			final_returns.append(np.mean([a[-1] for a in all_rets]))
@@ -2242,7 +2242,7 @@ class OMRLOnlineAdaptAlgorithmEnsemble(OfflineMetaRLAlgorithm):
 		return final_returns, online_returns, success_cnt
 
 
-	def _do_eval_std(self, indices, epoch):
+	def _do_eval_std(self, indices, epoch,num_models=12):
 		final_returns = []
 		online_returns = []
 		success_cnt = []
@@ -2250,7 +2250,7 @@ class OMRLOnlineAdaptAlgorithmEnsemble(OfflineMetaRLAlgorithm):
 			all_rets = []
 			success_single = 0
 			for r in range(self.num_evals):
-				paths = self.collect_paths_std(idx, epoch, r)
+				paths = self.collect_paths_std(idx, epoch, r,num_models)
 				all_rets.append([eval_util.get_average_returns([p]) for p in paths])
 				success_single = success_single + paths[-1]['done']
 			final_returns.append(np.mean([a[-1] for a in all_rets]))
@@ -2264,7 +2264,7 @@ class OMRLOnlineAdaptAlgorithmEnsemble(OfflineMetaRLAlgorithm):
 		online_returns = [t[:n] for t in online_returns]
 		return final_returns, online_returns, success_cnt
 
-	def _do_eval_online(self, indices, epoch):
+	def _do_eval_online(self, indices, epoch,num_models=12):
 		final_returns = []
 		online_returns = []
 		success_cnt = []
@@ -2273,7 +2273,7 @@ class OMRLOnlineAdaptAlgorithmEnsemble(OfflineMetaRLAlgorithm):
 			success_single = 0
 			print(idx)
 			for r in range(self.num_evals):
-				paths = self.collect_paths_online(idx, epoch, r)
+				paths = self.collect_paths_online(idx, epoch, r,num_models=12)
 				all_rets.append([eval_util.get_average_returns([p]) for p in paths])
 				success_single = success_single + paths[-1]['done']
 			final_returns.append(np.mean([a[-1] for a in all_rets]))
@@ -2417,26 +2417,43 @@ class OMRLOnlineAdaptAlgorithmEnsemble(OfflineMetaRLAlgorithm):
 		eval_util.dprint('online returns with buffer context')
 		eval_util.dprint(buffercontext_returns)
 		### eval train tasks with on-policy data to match eval of test tasks
-		train_final_returns, train_online_returns,train_success_cnt = self._do_eval(indices, epoch)
-		eval_util.dprint('train online returns')
-		eval_util.dprint(train_online_returns)
 
-		### test tasks
-		eval_util.dprint('evaluating on {} test tasks'.format(len(self.eval_tasks)))
-		test_final_returns, test_online_returns,test_success_cnt = self._do_eval(self.eval_tasks, epoch)
-		eval_util.dprint('test online returns')
-		eval_util.dprint(test_online_returns)
 
-		### eval train tasks with on-policy data to match eval of test tasks
-		std_train_final_returns, std_train_online_returns, std_train_success_cnt = self._do_eval_std(indices, epoch)
-		eval_util.dprint('std train online returns')
-		eval_util.dprint(std_train_online_returns)
+		num_models=[2,4,8,12]
 
-		### test tasks
-		eval_util.dprint('evaluating on {} test tasks'.format(len(self.eval_tasks)))
-		std_test_final_returns, std_test_online_returns, std_test_success_cnt = self._do_eval_std(self.eval_tasks, epoch)
-		eval_util.dprint('std test online returns')
-		eval_util.dprint(std_test_online_returns)
+		train_final_returnss = []
+		test_final_returnss = []
+		std_train_final_returnss = []
+		std_test_final_returnss = []
+
+		for n in num_models:
+
+			train_final_returns, train_online_returns,train_success_cnt = self._do_eval(indices, epoch,n)
+			eval_util.dprint('train online returns')
+			eval_util.dprint(train_online_returns)
+
+			### test tasks
+			eval_util.dprint('evaluating on {} test tasks'.format(len(self.eval_tasks)))
+			test_final_returns, test_online_returns,test_success_cnt = self._do_eval(self.eval_tasks, epoch,n)
+			eval_util.dprint('test online returns')
+			eval_util.dprint(test_online_returns)
+
+			### eval train tasks with on-policy data to match eval of test tasks
+			std_train_final_returns, std_train_online_returns, std_train_success_cnt = self._do_eval_std(indices, epoch,n)
+			eval_util.dprint('std train online returns')
+			eval_util.dprint(std_train_online_returns)
+
+			### test tasks
+			eval_util.dprint('evaluating on {} test tasks'.format(len(self.eval_tasks)))
+			std_test_final_returns, std_test_online_returns, std_test_success_cnt = self._do_eval_std(self.eval_tasks, epoch,n)
+			eval_util.dprint('std test online returns')
+			eval_util.dprint(std_test_online_returns)
+
+			train_final_returnss.append(np.mean(train_final_returns))
+			test_final_returnss.append(np.mean(test_final_returns))
+			std_train_final_returnss.append(np.mean(std_train_final_returns))
+			std_test_final_returnss.append(np.mean(std_test_final_returns))
+
 
 
 		# save the final posterior
@@ -2452,6 +2469,15 @@ class OMRLOnlineAdaptAlgorithmEnsemble(OfflineMetaRLAlgorithm):
 		avg_train_online_return = np.mean(np.stack(train_online_returns), axis=0)
 		avg_test_online_return = np.mean(np.stack(test_online_returns), axis=0)
 		self.eval_statistics['AverageTrainReturn_all_train_tasks'] = train_returns
+
+		cnt = 0
+		for n in num_models:
+			self.eval_statistics['AverageReturn_all_train_tasks_%d'%n] = train_final_returnss[cnt]
+			self.eval_statistics['AverageReturn_all_test_tasks_%d'%n] = test_final_returnss[cnt]
+			self.eval_statistics['AverageReturn_std_all_train_tasks_%d'%n] = std_train_final_returnss[cnt]
+			self.eval_statistics['AverageReturn_std_all_test_tasks_%d'%n] = std_test_final_returnss[cnt]
+			cnt+=1
+
 		self.eval_statistics['AverageReturn_all_train_tasks'] = avg_train_return
 		self.eval_statistics['AverageReturn_all_test_tasks'] = avg_test_return
 		self.eval_statistics['AverageReturn_std_all_train_tasks'] = std_avg_train_return
@@ -2518,7 +2544,7 @@ class OMRLOnlineAdaptAlgorithmEnsemble(OfflineMetaRLAlgorithm):
 		assert idx != -1
 		return idx
 
-	def collect_paths(self, idx, epoch, run):
+	def collect_paths(self, idx, epoch, run,num_models=12):
 		self.task_idx = idx
 		self.env.reset_task(idx)
 
@@ -2564,7 +2590,7 @@ class OMRLOnlineAdaptAlgorithmEnsemble(OfflineMetaRLAlgorithm):
 			                                        r_thres=self.r_thres,
 			                                        is_onlineadapt_max=self.is_onlineadapt_max,
 			                                        is_sparse_reward=self.sparse_rewards,
-													reward_models=self.reward_models,dynamic_models=self.dynamic_models,update_score=(num_trajs < self.num_exp_traj_eval))
+													reward_models=self.reward_models[:num_models],dynamic_models=self.dynamic_models[:num_models],update_score=(num_trajs < self.num_exp_traj_eval))
 
 			paths += path
 			num_transitions += num
@@ -2601,7 +2627,7 @@ class OMRLOnlineAdaptAlgorithmEnsemble(OfflineMetaRLAlgorithm):
 		return paths
 
 
-	def collect_paths_std(self, idx, epoch, run):
+	def collect_paths_std(self, idx, epoch, run,num_models=12):
 		self.task_idx = idx
 		self.env.reset_task(idx)
 
@@ -2647,7 +2673,7 @@ class OMRLOnlineAdaptAlgorithmEnsemble(OfflineMetaRLAlgorithm):
 			                                        r_thres=self.r_thres,
 			                                        is_onlineadapt_max=self.is_onlineadapt_max,
 			                                        is_sparse_reward=self.sparse_rewards,
-													reward_models=self.reward_models,dynamic_models=self.dynamic_models,update_score=(num_trajs < self.num_exp_traj_eval),use_std=True)
+													reward_models=self.reward_models[:num_models],dynamic_models=self.dynamic_models[:num_models],update_score=(num_trajs < self.num_exp_traj_eval),use_std=True)
 
 			paths += path
 			num_transitions += num
