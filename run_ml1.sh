@@ -1,12 +1,12 @@
 #!/bin/bash
    # Script to reproduce results
 
- Foldername="0723_offline_meta_rl_rec333"
+ Foldername="0723_offline_meta_rl_rec5"
  mkdir out_logs/${Foldername} &> /dev/null
  declare -a tasks=( "cpearl-ml1" )
- declare -a algos=( "ensemble" )
+ declare -a algos=( "cpearl" )    #cpearl
  ##
- declare -a seeds=( "1" "2"  )
+ declare -a seeds=( "1" "2" )
  declare -a datadirs=( "peg-insert-side-v2med" )
  declare -a is_sparses=( "0" )
  declare -a use_bracs=( "1")
@@ -14,11 +14,11 @@
  declare -a is_zlosses=( "1" )
  declare -a is_onlineadapt_threses=( "0" )
  declare -a is_onlineadapt_maxes=( "1" )
- declare -a num_exp_traj_evals=( "5" )
+ declare -a num_exp_traj_evals=( "6" )
  declare -a allow_backward_zs=( "0" )
  declare -a is_true_sparses=( "0" )
  declare -a r_threses=( "0.0" )
- declare -a num_ensembles=( "8" "12" )
+ declare -a num_ensembles=( "12" )
  n=4
  gpunum=8
  for num_ensemble in "${num_ensembles[@]}"
