@@ -4,7 +4,7 @@
  Foldername="0723_offline_meta_rl_rec5"
  mkdir out_logs/${Foldername} &> /dev/null
  declare -a tasks=( "cpearl-ml1" )
- declare -a algos=( "cpearl" )    #cpearl
+ declare -a algos=( "ensemble" )    #cpearl
  ##
  declare -a seeds=( "1" "2" )
  declare -a datadirs=( "peg-insert-side-v2med" )
@@ -14,7 +14,7 @@
  declare -a is_zlosses=( "1" )
  declare -a is_onlineadapt_threses=( "0" )
  declare -a is_onlineadapt_maxes=( "1" )
- declare -a num_exp_traj_evals=( "6" )
+ declare -a num_exp_traj_evals=( "5" )
  declare -a allow_backward_zs=( "0" )
  declare -a is_true_sparses=( "0" )
  declare -a r_threses=( "0.0" )
