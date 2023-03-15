@@ -51,10 +51,10 @@ class InPlacePathSampler(object):
                     scores+=score
                     contexts+=context
                 else:
-                    path, scores,context = rollout(
+                    path, score,context = rollout(
                         self.env, policy, max_path_length=self.max_path_length, accum_context=accum_context,
                         is_select=is_select, r_thres=r_thres, is_onlineadapt_max=is_onlineadapt_max,
-                        is_sparse_reward=is_sparse_reward, update=True,out_scores=scores,out_contexts=context)
+                        is_sparse_reward=is_sparse_reward, update=True,out_scores=scores,out_contexts=contexts)
             else:
                 path = ensemble_rollout(
                     self.env, policy, max_path_length=self.max_path_length, accum_context=accum_context,
