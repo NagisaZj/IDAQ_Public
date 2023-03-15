@@ -324,7 +324,7 @@ def offline_sample(env, agent, buffer, max_path_length=np.inf, accum_context=Tru
 
 
 def rollout(env, agent, max_path_length=np.inf, accum_context=True, is_select=False, animated=False,
-            save_frames=False, r_thres=0., is_onlineadapt_max=False, is_sparse_reward=False):
+            save_frames=False, r_thres=0., is_onlineadapt_max=False, is_sparse_reward=False,update=True,out_scores=None,out_contexts=None):
     """
     The following value for the following keys will be a 2D array, with the
     first dimension corresponding to the time dimension.
@@ -412,10 +412,10 @@ def rollout(env, agent, max_path_length=np.inf, accum_context=True, is_select=Fa
             break
     observation_batch = torch.from_numpy(np.array(observations))
     # update the agent's current context
-    if accum_context:
+    if accum_context and update:
         if is_onlineadapt_max:
-            agent.update_onlineadapt_max(np.sum(scores), context)
-        elif not is_select or np.sum(scores) > r_thres:
+            agent.update_onlineadapt_max(np.sum(scores)+out_scores, context+out_contexts)
+        elif not is_select or np.sum(scores)+out_scores > r_thres:
             # print('A!')
             for c in context:
                 agent.update_context(c)
@@ -441,11 +441,11 @@ def rollout(env, agent, max_path_length=np.inf, accum_context=True, is_select=Fa
         terminals=np.array(terminals).reshape(-1, 1),
         agent_infos=agent_infos,
         env_infos=env_infos,
-    )
+    ),np.sum(scores),context
 
 
 def ensemble_rollout(env, agent, max_path_length=np.inf, accum_context=True, is_select=False, animated=False,
-            save_frames=False, r_thres=0., is_onlineadapt_max=False, is_sparse_reward=False,reward_models=None,dynamic_models=None,update_score=True):
+            save_frames=False, r_thres=0., is_onlineadapt_max=False, is_sparse_reward=False,reward_models=None,dynamic_models=None,update_score=True,use_std=False):
     """
     The following value for the following keys will be a 2D array, with the
     first dimension corresponding to the time dimension.
@@ -565,9 +565,11 @@ def ensemble_rollout(env, agent, max_path_length=np.inf, accum_context=True, is_
     dynamics_predictions = torch.stack(dynamics_predictions)
     pes = torch.stack(pes)
 
-    # uncentainty = torch.std(reward_predictions, dim=1).mean() + torch.std(dynamics_predictions, dim=1).mean()
-    # uncentainty = reward_predictions.mean() + dynamics_predictions.mean()
+
     uncentainty = pes.mean()
+    if use_std:
+        uncentainty = torch.std(reward_predictions, dim=1).mean() + torch.std(dynamics_predictions, dim=1).mean()
+        # uncentainty = reward_predictions.mean() + dynamics_predictions.mean()
     # update the agent's current context
     if accum_context:
         if is_onlineadapt_max:
@@ -575,7 +577,8 @@ def ensemble_rollout(env, agent, max_path_length=np.inf, accum_context=True, is_
                 agent.update_onlineadapt_max(-1 * uncentainty, context)
             else:
                 agent.fix_update_onlineadapt_max(-1 * uncentainty, context)
-            print(uncentainty.item(),np.sum(scores),'!!!')
+            if update_score:
+                print(use_std,uncentainty.item(),',',np.sum(scores),'!!!')
         elif not is_select or np.sum(scores) > r_thres:
             # print('A!')
             for c in context:

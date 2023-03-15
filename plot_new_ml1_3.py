@@ -201,6 +201,22 @@ def main(name):
 	ps = exp_dict[name]
 	pps = focal_dict[name]
 	ori_name = name
+
+
+
+	returns = []
+	path = './data/'+name.lower()
+	for i in range(50):
+		for j in range(45):
+			file_name = path+'/goal_idx%d'%i+'/trj_evalsample%d_step49800.npy'%j
+			traj = np.load(file_name,allow_pickle=1)
+			returns.append(sum(s[2] for s in traj))
+
+
+	average_return = np.mean(returns)
+
+	print(average_return)
+
 	name = name if "Medium" not in name else  name[:-7]
 	if "Medium" not in name and "Med" in name:
 		name = name[:-3]

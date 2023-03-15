@@ -28,7 +28,7 @@ class InPlacePathSampler(object):
         pass
 
     def obtain_samples(self, deterministic=False, max_samples=np.inf, max_trajs=np.inf, accum_context=True,
-                       is_select=False, resample=1, r_thres=0., is_onlineadapt_max=False, is_sparse_reward=False,reward_models=None,dynamic_models=None,update_score=True):
+                       is_select=False, resample=1, r_thres=0., is_onlineadapt_max=False, is_sparse_reward=False,reward_models=None,dynamic_models=None,update_score=True,use_std=False):
         """
         Obtains samples in the environment until either we reach either max_samples transitions or
         num_traj trajectories.
@@ -39,17 +39,27 @@ class InPlacePathSampler(object):
         paths = []
         n_steps_total = 0
         n_trajs = 0
+        scores = 0
+        contexts=[]
         while n_steps_total < max_samples and n_trajs < max_trajs:
             if reward_models is None:
-                path = rollout(
-                self.env, policy, max_path_length=self.max_path_length, accum_context=accum_context,
-                is_select=is_select, r_thres=r_thres, is_onlineadapt_max=is_onlineadapt_max,
-                is_sparse_reward=is_sparse_reward)
+                if n_trajs<max_trajs-1:
+                    path, score,context = rollout(
+                    self.env, policy, max_path_length=self.max_path_length, accum_context=accum_context,
+                    is_select=is_select, r_thres=r_thres, is_onlineadapt_max=is_onlineadapt_max,
+                    is_sparse_reward=is_sparse_reward,update=False,out_scores=None,out_contexts=None)
+                    scores+=score
+                    contexts+=context
+                else:
+                    path, scores,context = rollout(
+                        self.env, policy, max_path_length=self.max_path_length, accum_context=accum_context,
+                        is_select=is_select, r_thres=r_thres, is_onlineadapt_max=is_onlineadapt_max,
+                        is_sparse_reward=is_sparse_reward, update=True,out_scores=scores,out_contexts=context)
             else:
                 path = ensemble_rollout(
                     self.env, policy, max_path_length=self.max_path_length, accum_context=accum_context,
                     is_select=is_select, r_thres=r_thres, is_onlineadapt_max=is_onlineadapt_max,
-                    is_sparse_reward=is_sparse_reward,reward_models=reward_models,dynamic_models=dynamic_models,update_score = update_score)
+                    is_sparse_reward=is_sparse_reward,reward_models=reward_models,dynamic_models=dynamic_models,update_score = update_score,use_std=use_std)
             # save the latent context that generated this trajectory
             path['context'] = policy.z.detach().cpu().numpy()
             paths.append(path)

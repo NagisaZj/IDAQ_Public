@@ -190,8 +190,8 @@ def main(name):
 	paths = ["output/" + n + "/"+name.lower()+"/debug/progress.csv" for n in ps]
 	focal_paths = ["output/" + n + "/"+name.lower()+"/debug/" for n in pps]
 	focal_offline_paths = ["output/" + n + "/"+name.lower()+"/debug/" for n in ps]
-	macaw_paths=["/data2/zj/macaw/log/"+n for n in macaw_names]
-	macaw_paths2=["/data2/zj/macaw/log4/"+n for n in macaw_names]
+	macaw_paths=["/data3/zj/macaw/log/"+n for n in macaw_names]
+	macaw_paths2=["/data3/zj/macaw/log4/"+n for n in macaw_names]
 	# path = "output/" + name + "/reach-v2/debug/"
 	# test_task_online_average_returns
 	# test_task_online_average_successes
@@ -232,7 +232,7 @@ def main(name):
 	legends = ["Ours Online Adaptation", "FOCAL Online Adaptation", "MACAW Online Adaptation", "FOCAL Offline Adpataion", "FOCAL Offline Adpataion (Train)", "MACAW Offline Adaptation"]
 
 	datas = [mine_testing_data, focal_testing_data, focal_offline_testing_data,uncertanty_testing_data]
-	legends = ["GCC", "FOCAL", "FOCAL with Expert Context","Uncertainty Estimation"]
+	legends = ["IDAQ+Return", "FOCAL", "FOCAL with Expert Context","IDAQ+Prediction Variance"]
 
 
 	# datas = [mine_data_new_intr, promp_data, erl2_data, mame_data]

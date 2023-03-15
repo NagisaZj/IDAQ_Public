@@ -10,6 +10,7 @@
 **/*ft_local
 data/
 output/
+outputnew/
 out_logs/
 .vscode
 .temp

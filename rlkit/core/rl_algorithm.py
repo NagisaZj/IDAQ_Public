@@ -1942,6 +1942,7 @@ class OMRLOnlineAdaptAlgorithm(OfflineMetaRLAlgorithm):
 		eval_util.dprint('online returns with buffer context')
 		eval_util.dprint(buffercontext_returns)
 		### eval train tasks with on-policy data to match eval of test tasks
+		print('*****',indices,self.eval_tasks)
 		train_final_returns, train_online_returns,train_success_cnt = self._do_eval(indices, epoch)
 		eval_util.dprint('train online returns')
 		eval_util.dprint(train_online_returns)
@@ -2241,6 +2242,28 @@ class OMRLOnlineAdaptAlgorithmEnsemble(OfflineMetaRLAlgorithm):
 		return final_returns, online_returns, success_cnt
 
 
+	def _do_eval_std(self, indices, epoch):
+		final_returns = []
+		online_returns = []
+		success_cnt = []
+		for idx in indices:
+			all_rets = []
+			success_single = 0
+			for r in range(self.num_evals):
+				paths = self.collect_paths_std(idx, epoch, r)
+				all_rets.append([eval_util.get_average_returns([p]) for p in paths])
+				success_single = success_single + paths[-1]['done']
+			final_returns.append(np.mean([a[-1] for a in all_rets]))
+			success_cnt.append(success_single / self.num_evals)
+			# record online returns for the first n trajectories
+			n = min([len(a) for a in all_rets])
+			all_rets = [a[:n] for a in all_rets]
+			all_rets = np.mean(np.stack(all_rets), axis=0)  # avg return per nth rollout
+			online_returns.append(all_rets)
+		n = min([len(t) for t in online_returns])
+		online_returns = [t[:n] for t in online_returns]
+		return final_returns, online_returns, success_cnt
+
 	def _do_eval_online(self, indices, epoch):
 		final_returns = []
 		online_returns = []
@@ -2404,6 +2427,18 @@ class OMRLOnlineAdaptAlgorithmEnsemble(OfflineMetaRLAlgorithm):
 		eval_util.dprint('test online returns')
 		eval_util.dprint(test_online_returns)
 
+		### eval train tasks with on-policy data to match eval of test tasks
+		std_train_final_returns, std_train_online_returns, std_train_success_cnt = self._do_eval_std(indices, epoch)
+		eval_util.dprint('std train online returns')
+		eval_util.dprint(std_train_online_returns)
+
+		### test tasks
+		eval_util.dprint('evaluating on {} test tasks'.format(len(self.eval_tasks)))
+		std_test_final_returns, std_test_online_returns, std_test_success_cnt = self._do_eval_std(self.eval_tasks, epoch)
+		eval_util.dprint('std test online returns')
+		eval_util.dprint(std_test_online_returns)
+
+
 		# save the final posterior
 		self.agent.log_diagnostics(self.eval_statistics)
 
@@ -2412,11 +2447,15 @@ class OMRLOnlineAdaptAlgorithmEnsemble(OfflineMetaRLAlgorithm):
 
 		avg_train_return = np.mean(train_final_returns)
 		avg_test_return = np.mean(test_final_returns)
+		std_avg_train_return = np.mean(std_train_final_returns)
+		std_avg_test_return = np.mean(std_test_final_returns)
 		avg_train_online_return = np.mean(np.stack(train_online_returns), axis=0)
 		avg_test_online_return = np.mean(np.stack(test_online_returns), axis=0)
 		self.eval_statistics['AverageTrainReturn_all_train_tasks'] = train_returns
 		self.eval_statistics['AverageReturn_all_train_tasks'] = avg_train_return
 		self.eval_statistics['AverageReturn_all_test_tasks'] = avg_test_return
+		self.eval_statistics['AverageReturn_std_all_train_tasks'] = std_avg_train_return
+		self.eval_statistics['AverageReturn_std_all_test_tasks'] = std_avg_test_return
 		if hasattr(self.env, 'is_metaworld'):
 			self.eval_statistics['AverageSuccessRate_all_train_tasks'] = np.mean(train_success_cnt)
 			self.eval_statistics['AverageSuccessRate_all_test_tasks'] = np.mean(test_success_cnt)
@@ -2558,6 +2597,89 @@ class OMRLOnlineAdaptAlgorithmEnsemble(OfflineMetaRLAlgorithm):
 		# save the paths for visualization, only useful for point mass
 		if self.dump_eval_paths:
 			logger.save_extra_data(paths, path='eval_trajectories/task{}-epoch{}-run{}'.format(idx, epoch, run))
+
+		return paths
+
+
+	def collect_paths_std(self, idx, epoch, run):
+		self.task_idx = idx
+		self.env.reset_task(idx)
+
+		self.agent.clear_z()
+		paths = []
+		num_transitions = 0
+		num_trajs = 0
+		is_select = False
+		self.train_task_weight = np.zeros(self.num_tasks)
+		self.adapt_sampled_z_list = []
+		adapt_sampled_idx_list = []
+		if self.is_onlineadapt_max:
+			self.agent.clear_onlineadapt_max()
+		while num_transitions < self.num_steps_per_eval:
+			if self.is_onlineadapt_max:
+				if num_trajs < self.num_exp_traj_eval:
+					sampled_idx = self.adapt_draw_one_task_from_prior()
+					self.agent.clear_z()
+					self.agent.set_z(self.trained_z[sampled_idx][0], self.trained_z[sampled_idx][1])
+					self.agent.set_z_sample(self.trained_z_sample[sampled_idx])
+					adapt_sampled_idx_list.append(sampled_idx)
+					self.adapt_sampled_z_list.append(self.agent.z)
+				else:
+					if num_trajs == self.num_exp_traj_eval:
+						self.agent.set_onlineadapt_update_context()
+					z_sample = self.adapt_draw_z_from_updated_belief()
+					self.agent.set_z_sample(z_sample)
+					self.adapt_sampled_z_list.append(self.agent.z)
+				# if num_transitions + self.max_path_length >= self.num_steps_per_eval:
+				# 	self.agent.set_onlineadapt_z_sample()
+			elif self.is_onlineadapt_thres:
+				is_select = True
+				if num_trajs < self.num_exp_traj_eval or type(self.agent.context) == type(None):
+					sampled_idx = np.random.choice(self.train_tasks)
+					sampled_idx = self.adapt_draw_one_task_from_prior()
+					self.agent.clear_z()
+					self.agent.set_z(self.trained_z[sampled_idx][0], self.trained_z[sampled_idx][1])
+
+			path, num = self.sampler.obtain_samples(deterministic=self.eval_deterministic,
+			                                        max_samples=self.num_steps_per_eval - num_transitions, max_trajs=1,
+			                                        accum_context=True,
+			                                        is_select=is_select,
+			                                        r_thres=self.r_thres,
+			                                        is_onlineadapt_max=self.is_onlineadapt_max,
+			                                        is_sparse_reward=self.sparse_rewards,
+													reward_models=self.reward_models,dynamic_models=self.dynamic_models,update_score=(num_trajs < self.num_exp_traj_eval),use_std=True)
+
+			paths += path
+			num_transitions += num
+			num_trajs += 1
+			if self.is_onlineadapt_max:
+				pass
+			elif self.is_onlineadapt_thres:
+				if num_trajs >= self.num_exp_traj_eval and type(self.agent.context) != type(None):
+					self.agent.infer_posterior(self.agent.context)
+			elif num_trajs >= self.num_exp_traj_eval and type(self.agent.context) != type(None):
+				self.agent.infer_posterior(self.agent.context)
+				is_select = False
+		if hasattr(self.env, 'is_metaworld'):
+			p = paths[-1]
+			done = np.sum(e['success'] for e in p['env_infos'])
+			done = 1 if done > 0 else 0
+			p['done'] = done
+		else:
+			p = paths[-1]
+			p['done'] = 0
+		if self.sparse_rewards:
+			for p in paths:
+				sparse_rewards = np.stack(e['sparse_reward'] for e in p['env_infos']).reshape(-1, 1)
+				p['rewards'] = sparse_rewards
+
+		goal = self.env._goal
+		for path in paths:
+			path['goal'] = goal  # goal
+
+		# save the paths for visualization, only useful for point mass
+		if self.dump_eval_paths:
+			logger.save_extra_data(paths, path='eval_trajectories/std-task{}-epoch{}-run{}'.format(idx, epoch, run))
 
 		return paths
 

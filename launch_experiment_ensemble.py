@@ -272,8 +272,9 @@ def deep_update_dict(fr, to):
 @click.option("--allow_backward_z", default=0)
 @click.option("--is_true_sparse_rewards", default=0)
 @click.option("--r_thres", default=0.)
+@click.option("--num_ensemble", default=4)
 def main(config, data_dir, gpu, is_sparse_reward, use_brac, use_information_bottleneck, is_zloss, is_onlineadapt_thres,
-         is_onlineadapt_max, num_exp_traj_eval, allow_backward_z, is_true_sparse_rewards, r_thres):
+         is_onlineadapt_max, num_exp_traj_eval, allow_backward_z, is_true_sparse_rewards, r_thres,num_ensemble):
 
     variant = default_config
     if config:
@@ -292,6 +293,7 @@ def main(config, data_dir, gpu, is_sparse_reward, use_brac, use_information_bott
     variant['algo_params']['allow_backward_z'] = allow_backward_z
     variant['algo_params']['is_true_sparse_rewards'] = is_true_sparse_rewards
     variant['algo_params']['r_thres'] = r_thres
+    variant['algo_params']['num_ensemble'] = num_ensemble
 
     # multi-processing
     p = mp.Pool(mp.cpu_count())

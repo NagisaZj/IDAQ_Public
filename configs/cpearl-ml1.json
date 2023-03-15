@@ -1,5 +1,5 @@
 {
-    "env_name": "hammer-v2",
+    "env_name": "peg-insert-side-v2",
     "n_train_tasks": 40,
     "n_eval_tasks": 10,
     "randomize_tasks": 1,
@@ -22,6 +22,7 @@
         "num_train_steps_per_itr": 1000,
         "embedding_batch_size": 400,
         "embedding_mini_batch_size": 400,
+        "dump_eval_paths": 1,
         "sample": 1,
         "epoch": null,
         "n_trj": 45,

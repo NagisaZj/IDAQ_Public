@@ -1,13 +1,13 @@
 #!/bin/bash
    # Script to reproduce results
 
- Foldername="0723_offline_meta_rl_azzzzzz"
+ Foldername="0723_offline_meta_rl_rec2"
  mkdir out_logs/${Foldername} &> /dev/null
  declare -a tasks=( "cpearl-sparse-point-robot" )
  #  "cpearl-sparse-point-robot"
  declare -a algos=( "ensemble" )
  ##
- declare -a seeds=( "26" "23")
+ declare -a seeds=( "26")
  declare -a datadirs=( "sparse-point-robot" )
  # "sparse-point-robot-20"
  declare -a is_sparses=( "0" )
@@ -20,7 +20,7 @@
  declare -a allow_backward_zs=( "0" )
  declare -a is_true_sparses=( "0" )
  declare -a r_threses=( "-1000000" )
- n=4
+ n=3
  # 52 54 21
  # 52 54 21 dense
  gpunum=8
@@ -73,7 +73,7 @@
  echo "     num_exp_traj_eval: ${num_exp_traj_eval}, allow_backward_z: ${allow_backward_z}"
  echo "     is_true_sparse: ${is_true_sparse}, r_thres: ${r_thres}, seed: ${seed}, GPU: $n"
  n=$[($n+1) % ${gpunum}]
- sleep 10
+ sleep 15
  done
  done
  done

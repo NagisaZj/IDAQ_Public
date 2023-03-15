@@ -7,43 +7,33 @@ import os,pickle,matplotlib
 
 
 show_tasks_ids=[51,24,49,74,99]
-show_tasks_ids=[1]
+show_tasks_ids=[2]
 
 colors = ['r','b','g','purple','y']
 
 figure = plt.figure(figsize=(20, 6))
-name = 'sparse-point-robot__2022-09-09_08-48-18'
-epoch = 46
-name = 'sparse-point-robot__2022-11-09_14-03-51'
-epoch = 15
-name='sparse-point-robot__2022-11-09_14-03-34'
-epoch = 45
-name='sparse-point-robot__2022-11-11_13-56-53'
-epoch = 31
-name='sparse-point-robot__2022-11-12_09-31-49'
-name='sparse-point-robot__2022-11-15_15-15-36'
-epoch = 36
-name='sparse-point-robot__2022-11-17_10-42-19'
-epoch = 48
-name='sparse-point-robot__2022-11-17_16-44-42'
-epoch = 41
-name='sparse-point-robot__2023-01-17_15-46-06'
-epoch = 17
+
+name='push-v2__2023-01-19_12-02-15'
+epoch = 29
 # name='sparse-point-robot__2022-11-12_09-31-49'
 # epoch = 28
-epochs=[31,36,38,47,48]
 gr = 0.2  # goal radius, for visualization purposes
 run_num = 0
 cmap = matplotlib.cm.get_cmap('plasma')
 sample_locs = np.linspace(0, 0.9, 20)
 colors = [cmap(s) for s in sample_locs]
 
-expdir = 'output/' + name + '/sparse-point-robot/debug/eval_trajectories/'
+expdir = 'output/' + name + '/push-v2/debug/eval_trajectories/'
 test_task_list = [show_tasks_ids[0]]
 
 
 def load_pkl(task):
     with open(os.path.join(expdir, 'task{}-epoch{}-run{}.pkl'.format(task, epoch, run_num)), 'rb') as f:
+        data = pickle.load(f)
+    return data
+
+def load_pkl_std(task):
+    with open(os.path.join(expdir, 'std-task{}-epoch{}-run{}.pkl'.format(task, epoch, run_num)), 'rb') as f:
         data = pickle.load(f)
     return data
 
@@ -54,11 +44,7 @@ def load_pkl_prior():
     return data
 
 
-goals = [load_pkl(task)[0]['goal'] for task in test_task_list]
-axes = plt.axes()
-axes.set(aspect='equal')
-# plt.axis([-1.55, 1.55, -0.55, 1.55])
-num_trajs = 20
+
 
 all_paths = []
 for task in test_task_list:
@@ -93,7 +79,11 @@ argmin = np.argmin(all_paths_uncertainties[0][:10])
 from matplotlib import cm
 map_vir = cm.get_cmap(name='viridis')
 
-
+plt.figure()
+print((np.array(all_paths_returns).shape))
+print(all_paths_returns,all_paths_uncertainties)
+plt.scatter(np.array(all_paths_returns),np.array(all_paths_uncertainties))
+plt.show()
 #
 # plt.figure()
 # plt.scatter(np.random.rand(10),np.random.rand(10),all_paths_uncertainties[0][:10],cmap='viridis')

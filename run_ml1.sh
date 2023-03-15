@@ -1,12 +1,12 @@
 #!/bin/bash
    # Script to reproduce results
 
- Foldername="0723_offline_meta_rl_ff"
+ Foldername="0723_offline_meta_rl_rec333"
  mkdir out_logs/${Foldername} &> /dev/null
  declare -a tasks=( "cpearl-ml1" )
  declare -a algos=( "ensemble" )
  ##
- declare -a seeds=( "1" "2" "3" "4")
+ declare -a seeds=( "1" "2"  )
  declare -a datadirs=( "peg-insert-side-v2med" )
  declare -a is_sparses=( "0" )
  declare -a use_bracs=( "1")
@@ -17,9 +17,12 @@
  declare -a num_exp_traj_evals=( "5" )
  declare -a allow_backward_zs=( "0" )
  declare -a is_true_sparses=( "0" )
- declare -a r_threses=( "-1000000" )
+ declare -a r_threses=( "0.0" )
+ declare -a num_ensembles=( "8" "12" )
  n=4
  gpunum=8
+ for num_ensemble in "${num_ensembles[@]}"
+ do
  for task in "${tasks[@]}"
  do
  for algo in "${algos[@]}"
@@ -62,6 +65,7 @@
  --allow_backward_z=${allow_backward_z} \
  --is_true_sparse_rewards=${is_true_sparse} \
  --r_thres=${r_thres} \
+ --num_ensemble=${num_ensemble} \
  >& out_logs/${Foldername}/${task}_${algo}_${datadir}_${is_sparse}_${use_brac}_${use_information_bottleneck}_${is_zloss}_${is_onlineadapt_thres}_${is_onlineadapt_max}_${num_exp_traj_eval}_${allow_backward_z}_${is_true_sparse}_${r_thres}_${seed}_${n}.txt &
  echo "task: ${task}, algo: ${algo}, datadir: ${datadir}, is_sparse: ${is_sparse}, use_brac: ${use_brac}"
  echo "     use_information_bottleneck: ${use_information_bottleneck}, is_zloss: ${is_zloss}"
@@ -69,7 +73,8 @@
  echo "     num_exp_traj_eval: ${num_exp_traj_eval}, allow_backward_z: ${allow_backward_z}"
  echo "     is_true_sparse: ${is_true_sparse}, r_thres: ${r_thres}, seed: ${seed}, GPU: $n"
  n=$[($n+1) % ${gpunum}]
- sleep 10
+ sleep 15
+ done
  done
  done
  done

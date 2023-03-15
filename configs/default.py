@@ -84,7 +84,7 @@ default_config = dict(
         num_ensemble=4,
     ),
     util_params=dict(
-        base_log_dir='output',
+        base_log_dir='outputnew',
         use_gpu=True,
         gpu_id=0,
         debug=True, # debugging triggers printing and writes logs to debug directory
