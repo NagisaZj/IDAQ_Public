@@ -1,13 +1,13 @@
 #!/bin/bash
    # Script to reproduce results
 
- Foldername="0723_offline_meta_rl_rec5"
+ Foldername="0723_offline_meta_rl_qwer"
  mkdir out_logs/${Foldername} &> /dev/null
  declare -a tasks=( "cpearl-ml1" )
- declare -a algos=( "ensemble" )    #cpearl
+ declare -a algos=( "cpearl" )    #cpearl
  ##
- declare -a seeds=( "1" "2" )
- declare -a datadirs=( "peg-insert-side-v2med" )
+ declare -a seeds=( "1"  )
+ declare -a datadirs=( "soccer-v2" )
  declare -a is_sparses=( "0" )
  declare -a use_bracs=( "1")
  declare -a use_information_bottlenecks=( "0" )
@@ -19,7 +19,7 @@
  declare -a is_true_sparses=( "0" )
  declare -a r_threses=( "0.0" )
  declare -a num_ensembles=( "12" )
- n=4
+ n=5
  gpunum=8
  for num_ensemble in "${num_ensembles[@]}"
  do
@@ -73,7 +73,7 @@
  echo "     num_exp_traj_eval: ${num_exp_traj_eval}, allow_backward_z: ${allow_backward_z}"
  echo "     is_true_sparse: ${is_true_sparse}, r_thres: ${r_thres}, seed: ${seed}, GPU: $n"
  n=$[($n+1) % ${gpunum}]
- sleep 15
+ sleep 10
  done
  done
  done

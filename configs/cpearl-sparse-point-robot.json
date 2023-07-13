@@ -46,7 +46,8 @@
         "r_thres": 0.3,
         "num_evals": 1,
         "is_onlineadapt_model": 1,
-        "onlineadapt_max_num_candidates": 20
+        "onlineadapt_max_num_candidates": 20,
+        "load_dir":"sparse-point-robot__2022-09-09_08-47-58"
     },
     "util_params": {
         "use_gpu": 1

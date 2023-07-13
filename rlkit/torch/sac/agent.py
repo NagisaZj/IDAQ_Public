@@ -107,7 +107,7 @@ class PEARLAgent(nn.Module):
         else:
             self.context = self.is_onlineadapt_max_context
             self.set_z(self.is_onlineadapt_max_z[0], self.is_onlineadapt_max_z[1])
-
+        # print('hereeeee!',self.context)
     def fix_update_onlineadapt_max(self, score, context):
         if score > self.is_onlineadapt_max_score:
             # self.is_onlineadapt_max_score = score

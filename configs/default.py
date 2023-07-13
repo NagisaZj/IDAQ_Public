@@ -81,7 +81,7 @@ default_config = dict(
         is_onlineadapt_model=False, # default not use prepared online adapt using model boosting
         onlineadapt_max_num_candidates=5, # default the number of candidates during adaptation
         load_dir='',
-        num_ensemble=4,
+        num_ensemble=12,
     ),
     util_params=dict(
         base_log_dir='outputnew',
