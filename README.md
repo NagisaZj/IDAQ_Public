@@ -32,8 +32,6 @@ For point-robot and cheetah-vel:
 ```
 CUDA_VISIBLE_DEVICES=6 python policy_train.py ./configs/sparse-point-robot.json   # actually dense reward is used.
 CUDA_VISIBLE_DEVICES=6 python policy_train.py ./configs/cheetah-vel.json
-python policy_train_ml1.py  ./configs/ml1.json
-python data_collection_ml1.py  ./configs/ml1.json
 ```
 
 For Meta-World ML1 tasks (you can modify the task in `./configs/ml1.json`):
