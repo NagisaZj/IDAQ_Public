@@ -21,7 +21,7 @@ export MUJOCO_PY_MJPRO_PATH=~/.mujoco/mjpro${VERSION_NUM}
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.mujoco/mjpro${VERSION_NUM}/bin
 ``` 
 
-The environments make use of the module `rand_param_envs` which is submoduled in this repository. Add the module to your python path, `export PYTHONPATH=./rand_param_envs:$PYTHONPATH` (Check out [direnv](https://direnv.net/) for handy directory-dependent path managenement.)
+
 
 
 ## Data Generation
