@@ -10,7 +10,14 @@ For the remaining dependencies, create conda environment by
 ```
 conda env create -f environment.yaml
 ```
+Note that we use the Meta-World version with commit b0b66d1f56bbe6c1a4f3df0eb64a6dc3c38429b3
 
+```
+git clone https://github.com/Farama-Foundation/Metaworld.git
+cd Metaworld
+git reset b0b66d1f56bbe
+pip install -e .
+```
 <!-- For task distributions where the transition function (dynamics)  varies  -->
 
 **For Walker environments**, MuJoCo131 is required.
@@ -30,7 +37,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.mujoco/mjpro${VERSION_NUM}/bin
 Example of training policies and generating trajectories on multiple tasks:
 For point-robot and cheetah-vel:
 ```
-CUDA_VISIBLE_DEVICES=6 python policy_train.py ./configs/sparse-point-robot.json   # actually dense reward is used.
+CUDA_VISIBLE_DEVICES=6 python policy_train.py ./configs/sparse-point-robot.json   # actually dense reward is used. To run the sparse reward version, uncomment line 205 in ./Offline-MetaRL/rlkit/envs/point_robot.py.
 CUDA_VISIBLE_DEVICES=6 python policy_train.py ./configs/cheetah-vel.json
 ```
 

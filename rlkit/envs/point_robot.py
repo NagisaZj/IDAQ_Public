@@ -202,4 +202,5 @@ class SparsePointEnv(PointEnv):
         ob, reward, done, d = super().step(action)
         sparse_reward = self.sparsify_rewards(reward)
         d.update({'sparse_reward': sparse_reward})
+        # reward = sparse_reward
         return ob, reward, done, d
