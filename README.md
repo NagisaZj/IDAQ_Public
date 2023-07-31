@@ -15,7 +15,7 @@ Note that we use the Meta-World version with commit b0b66d1f56bbe6c1a4f3df0eb64a
 ```
 git clone https://github.com/Farama-Foundation/Metaworld.git
 cd Metaworld
-git reset b0b66d1f56bbe
+git reset --hard b0b66d1f56bbe
 pip install -e .
 ```
 <!-- For task distributions where the transition function (dynamics)  varies  -->
