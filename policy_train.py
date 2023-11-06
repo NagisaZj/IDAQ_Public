@@ -54,7 +54,7 @@ def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
 
 @click.command()
 @click.argument("config", default="./configs/sparse-point-robot.json")
-@click.option("--num_gpus", default=2)
+@click.option("--num_gpus", default=7)
 @click.option("--docker", is_flag=True, default=False)
 @click.option("--debug", is_flag=True, default=False)
 @click.option("--eval", is_flag=True, default=False)
@@ -78,7 +78,7 @@ def main(config, num_gpus, docker, debug, eval, is_uniform, goal_idx=0, seed=0):
     #print('cfg.agent', cfg.agent)
     print(list(range(variant['env_params']['n_tasks'])))
     # multi-processing
-    p = mp.Pool(min(mp.cpu_count(), num_gpus))
+    p = mp.Pool(32)
     if variant['env_params']['n_tasks'] > 1:
         p.starmap(experiment, product([variant], [cfg], random_task_id))
     else:

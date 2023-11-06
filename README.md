@@ -37,8 +37,9 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/.mujoco/mjpro${VERSION_NUM}/bin
 Example of training policies and generating trajectories on multiple tasks:
 For point-robot and cheetah-vel:
 ```
-CUDA_VISIBLE_DEVICES=6 python policy_train.py ./configs/cpearl-sparse-point-robot.json   # actually dense reward is used. To run the sparse reward version, uncomment line 205 in ./Offline-MetaRL/rlkit/envs/point_robot.py.
-CUDA_VISIBLE_DEVICES=6 python policy_train.py ./configs/cheetah-vel.json
+python policy_train.py ./configs/cpearl-sparse-point-robot.json   # actually dense reward is used. To run the sparse reward version, uncomment line 205 in ./Offline-MetaRL/rlkit/envs/point_robot.py.
+python policy_train.py ./configs/cheetah-vel.json
+python policy_train_mt1.py ./configs/cpearl-mt1.json
 ```
 
 For Meta-World ML1 tasks (you can modify the task in `./configs/ml1.json`):
