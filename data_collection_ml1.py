@@ -57,34 +57,148 @@ def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
 
     # ppwall use other policy
 
+    # if variant['env_name']=='push-v2':
+    #     policy = p.SawyerPushV2Policy
+    # elif variant['env_name']=='reach-v2':
+    #     policy = p.SawyerReachV2Policy
+    # elif variant['env_name']=='pick-place-v2':
+    #     policy = p.SawyerPickPlaceV2Policy
+    # elif variant['env_name']=='push-wall-v2':
+    #     policy = p.SawyerPushWallV2Policy
+    # elif variant['env_name']=='pick-place-wall-v2':
+    #     policy = p.SawyerPickPlaceV2Policy
+    # elif variant['env_name']=='window-open-v2':
+    #     policy = p.SawyerWindowOpenV2Policy
+    # elif variant['env_name']=='drawer-close-v2':
+    #     policy = p.SawyerDrawerCloseV2Policy
+    # elif variant['env_name']=='handle-pull-side-v2':
+    #     policy = p.SawyerHandlePullSideV2Policy
+    # elif variant['env_name']=='handle-pull-v2':#
+    #     policy = p.SawyerHandlePullV2Policy
+    # elif variant['env_name']=='lever-pull-v2':
+    #     policy = p.SawyerLeverPullV2Policy
+    # elif variant['env_name']=='peg-insert-side-v2':
+    #     policy = p.SawyerPegInsertionSideV2Policy
+    # elif variant['env_name']=='pick-place-wall-v2':
+    #     policy = p.SawyerPickPlaceWallV2Policy
+    # elif variant['env_name']=='pick-out-of-hole-v2':
+    #     policy = p.SawyerPickOutOfHoleV2Policy
+    # elif variant['env_name']=='push-back-v2':
+    #     policy = p.SawyerPushBackV2Policy  # bad data collection
+    # elif variant['env_name']=='plate-slide-v2':
+    #     policy = p.SawyerPlateSlideV2Policy
+    # elif variant['env_name']=='plate-slide-side-v2':
+    #     policy = p.SawyerPlateSlideSideV2Policy
+    # elif variant['env_name']=='plate-slide-back-v2':
+    #     policy = p.SawyerPlateSlideBackV2Policy # bad data collection
+    # elif variant['env_name']=='plate-slide-back-side-v2':
+    #     policy = p.SawyerPlateSlideBackSideV2Policy # bad data collection
+    # elif variant['env_name']=='peg-unplug-side-v2':
+    #     policy = p.SawyerPegUnplugSideV2Policy# bad data collection
+    # elif variant['env_name']=='soccer-v2':
+    #     policy = p.SawyerSoccerV2Policy
+    # elif variant['env_name']=='stick-push-v2':# bad data collection   bad 2
+    #     policy = p.SawyerStickPushV2Policy
+    # elif variant['env_name']=='stick-pull-v2':# bad data collection  bad 2   button press 2000  box close 600  coffee push 29 disassemble 220
+    #     policy = p.SawyerStickPullV2Policy
+    # elif variant['env_name']=='push-wall-v2':
+    #     policy = p.SawyerPushWallV2Policy
+    # elif variant['env_name']=='reach-wall-v2':
+    #     policy = p.SawyerReachWallV2Policy
+    # elif variant['env_name']=='shelf-place-v2':
+    #     policy = p.SawyerShelfPlaceV2Policy
+    # elif variant['env_name']=='sweep-into-v2':# bad data collection
+    #     policy = p.SawyerSweepIntoV2Policy
+    # elif variant['env_name']=='sweep-v2':
+    #     policy = p.SawyerSweepV2Policy
+    # elif variant['env_name']=='window-close-v2':
+    #     policy = p.SawyerWindowCloseV2Policy
+    # else:
+    #     NotImplementedError
     if variant['env_name']=='push-v2':
         policy = p.SawyerPushV2Policy
-    elif variant['env_name']=='reach-v2':
-        policy = p.SawyerReachV2Policy
-    elif variant['env_name']=='pick-place-v2':
-        policy = p.SawyerPickPlaceV2Policy
+    elif variant['env_name']== 'basketball-v2':
+        policy = p.SawyerBasketballV2Policy
     elif variant['env_name']=='push-wall-v2':
         policy = p.SawyerPushWallV2Policy
-    elif variant['env_name']=='pick-place-wall-v2':
-        policy = p.SawyerPickPlaceV2Policy
-    elif variant['env_name']=='window-open-v2':
-        policy = p.SawyerWindowOpenV2Policy
     elif variant['env_name']=='drawer-close-v2':
         policy = p.SawyerDrawerCloseV2Policy
     elif variant['env_name']=='handle-pull-side-v2':
         policy = p.SawyerHandlePullSideV2Policy
+    elif variant['env_name']=='sweep-v2':
+        policy = p.SawyerSweepV2Policy
+    elif variant['env_name']=='coffee-push-v2':
+        policy = p.SawyerCoffeePushV2Policy
     elif variant['env_name']=='handle-pull-v2':#
         policy = p.SawyerHandlePullV2Policy
     elif variant['env_name']=='lever-pull-v2':
         policy = p.SawyerLeverPullV2Policy
+    elif variant['env_name']=='hammer-v2':
+        policy = p.SawyerHammerV2Policy
+    elif variant['env_name']=='assembly-v2':
+        policy = p.SawyerAssemblyV2Policy
+    elif variant['env_name']=='bin-picking-v2':
+        policy = p.SawyerBinPickingV2Policy
+    elif variant['env_name']=='box-close-v2':
+        policy = p.SawyerBoxCloseV2Policy
+    elif variant['env_name']=='button-press-topdown-v2':
+        policy = p.SawyerButtonPressTopdownV2Policy
+    elif variant['env_name']== 'button-press-topdown-wall-v2':
+        policy = p.SawyerButtonPressTopdownWallV2Policy
+    elif variant['env_name']=='button-press-v2':
+        policy = p.SawyerButtonPressV2Policy
+    elif variant['env_name']=='button-press-wall-v2':
+        policy = p.SawyerButtonPressWallV2Policy
+    elif variant['env_name']=='coffee-button-v2':
+        policy = p.SawyerCoffeeButtonV2Policy
+    elif variant['env_name']=='coffee-pull-v2':
+        policy = p.SawyerCoffeePullV2Policy
+    elif variant['env_name']=='coffeepush-v2':
+        policy = p.SawyerCoffeePushV2Policy
+    elif variant['env_name']=='dial-turn-v2':
+        policy = p.SawyerDialTurnV2Policy
+    elif variant['env_name']=='disassemble-v2':
+        policy = p.SawyerDisassembleV2Policy
+    elif variant['env_name']=='door-close-v2':
+        policy = p.SawyerDoorCloseV2Policy
+    elif variant['env_name']=='door-lock-v2':
+        policy = p.SawyerDoorLockV2Policy
+    elif variant['env_name']=='door-open-v2':
+        policy = p.SawyerDoorOpenV2Policy
+    elif variant['env_name']=='door-unlock-v2':
+        policy = p.SawyerDoorUnlockV2Policy
+    elif variant['env_name']=='hand-insert-v2':
+        policy = p.SawyerHandInsertV2Policy
+    elif variant['env_name']=='drawer-close-v2':
+        policy = p.SawyerDrawerCloseV2Policy
+    elif variant['env_name']=='drawer-open-v2':
+        policy = p.SawyerDrawerOpenV2Policy
+    elif variant['env_name']=='faucet-close-v2':
+        policy = p.SawyerFaucetCloseV2Policy
+    elif variant['env_name']=='faucet-open-v2':
+        policy = p.SawyerFaucetOpenV2Policy
+    elif variant['env_name']=='pick-place-wall-v2':
+        policy = p.SawyerPickPlaceV2Policy
+    elif variant['env_name']=='hammer-v2':
+        policy = p.SawyerHammerV2Policy
+    elif variant['env_name']=='handle-press-side-v2':
+        policy = p.SawyerHandlePressSideV2Policy
+    elif variant['env_name']=='handle-press-v2':
+        policy = p.SawyerHandlePressV2Policy
+    elif variant['env_name']=='handle-pull-side-v2':
+        policy = p.SawyerHandlePullSideV2Policy
+    elif variant['env_name']=='handle-pull-v2':
+        policy = p.SawyerHandlePullV2Policy
     elif variant['env_name']=='peg-insert-side-v2':
         policy = p.SawyerPegInsertionSideV2Policy
     elif variant['env_name']=='pick-place-wall-v2':
         policy = p.SawyerPickPlaceWallV2Policy
     elif variant['env_name']=='pick-out-of-hole-v2':
         policy = p.SawyerPickOutOfHoleV2Policy
-    elif variant['env_name']=='push-back-v2':
-        policy = p.SawyerPushBackV2Policy  # bad data collection
+    elif variant['env_name']=='reach-v2':
+        policy = p.SawyerReachV2Policy
+    elif variant['env_name']=='pick-place-v2':
+        policy = p.SawyerPickPlaceV2Policy
     elif variant['env_name']=='plate-slide-v2':
         policy = p.SawyerPlateSlideV2Policy
     elif variant['env_name']=='plate-slide-side-v2':
@@ -109,13 +223,16 @@ def experiment(variant, cfg=cfg, goal_idx=0, seed=0,  eval=False):
         policy = p.SawyerShelfPlaceV2Policy
     elif variant['env_name']=='sweep-into-v2':# bad data collection
         policy = p.SawyerSweepIntoV2Policy
-    elif variant['env_name']=='sweep-v2':
-        policy = p.SawyerSweepV2Policy
     elif variant['env_name']=='window-close-v2':
         policy = p.SawyerWindowCloseV2Policy
+    elif variant['env_name']=='window-open-v2':
+        policy = p.SawyerWindowOpenV2Policy
+    elif variant['env_name']=='push-back-v2':
+        policy = p.SawyerPushBackV2Policy  # bad data collection
+    # elif variant['env_name']=='soccer-v2':
+    #     policy = p.SawyerHammerV2Policy
     else:
         NotImplementedError
-
     # from stable_baselines3 import SAC
     # model = SAC("MlpPolicy", env, verbose=1, tensorboard_log="./sac_mt1/" + env_name)
     # # model.learn(total_timesteps=1000000, log_interval=4)
